@@ -21,15 +21,24 @@
     <ClCompile Include="GlfwHandler.hpp">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="glfwHandler.cpp">
+    <ClCompile Include="GlfwHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="App.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VulkanRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RendererCommon.hpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanRenderer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

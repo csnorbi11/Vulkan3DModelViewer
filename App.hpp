@@ -1,5 +1,5 @@
 #include "GlfwHandler.hpp"
-
+#include "VulkanRenderer.hpp"
 
 class App {
 public:
@@ -11,7 +11,8 @@ public:
 private:
 	void loop();
 
-	GlfwHandler glfwHandler{};
 
+	GlfwHandler glfwHandler;
+	VulkanRenderer renderer;
 
 };

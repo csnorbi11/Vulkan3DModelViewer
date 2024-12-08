@@ -144,12 +144,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
-    <ClCompile Include="glfwHandler.cpp" />
+    <ClCompile Include="GlfwHandler.cpp" />
     <ClCompile Include="GlfwHandler.hpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="RendererCommon.hpp" />
+    <ClCompile Include="VulkanRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp" />
+    <ClInclude Include="VulkanRenderer.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

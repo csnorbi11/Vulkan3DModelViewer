@@ -5,6 +5,7 @@ GlfwHandler::GlfwHandler()
 	WIDTH(800),
 	HEIGHT(600)
 {
+
 	glfwInit();
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
