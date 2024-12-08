@@ -24,7 +24,7 @@ public:
 private:
 	VkInstance instance;
 	VkDebugUtilsMessengerEXT debugMessenger;
-	
+
 private:
 	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
 		VkDebugUtilsMessageTypeFlagsEXT messageType,

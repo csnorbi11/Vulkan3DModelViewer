@@ -11,7 +11,7 @@ ValidationLayers::ValidationLayers()
 
 ValidationLayers::~ValidationLayers()
 {
-	
+
 }
 
 void ValidationLayers::setupDebugMessenger(VkInstance instance)
