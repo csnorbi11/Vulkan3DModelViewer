@@ -1,6 +1,9 @@
 #include "VulkanRenderer.hpp"
 
 VulkanRenderer::VulkanRenderer(GLFWwindow* window)
+	:
+	instance(nullptr),
+	validationLayers()
 {
 	createInstance();
 	validationLayers.setupDebugMessenger(instance);
@@ -9,6 +12,12 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window)
 VulkanRenderer::~VulkanRenderer()
 {
 
+
+
+	if (enableValidationLayers) {
+		DestroyDebugUtilsMessengerEXT(instance, validationLayers.getDebugMessenger(), nullptr);
+	}
+	vkDestroyInstance(instance, nullptr);
 }
 
 void VulkanRenderer::createInstance()

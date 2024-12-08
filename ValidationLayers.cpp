@@ -11,9 +11,7 @@ ValidationLayers::ValidationLayers()
 
 ValidationLayers::~ValidationLayers()
 {
-	if (enableValidationLayers) {
-		DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
-	}
+	
 }
 
 void ValidationLayers::setupDebugMessenger(VkInstance instance)
@@ -88,6 +86,11 @@ void ValidationLayers::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCre
 		VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
 	createInfo.pfnUserCallback = debugCallback;
 	createInfo.pUserData = nullptr;
+}
+
+VkDebugUtilsMessengerEXT ValidationLayers::getDebugMessenger()
+{
+	return debugMessenger;
 }
 
 
