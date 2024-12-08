@@ -30,8 +30,11 @@
     <ClCompile Include="VulkanRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RendererCommon.hpp">
+    <ClCompile Include="RendererCommon.h">
       <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ValidationLayers.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -39,6 +42,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VulkanRenderer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ValidationLayers.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

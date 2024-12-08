@@ -1,6 +1,5 @@
-#include "RendererCommon.hpp"
+#include "RendererCommon.h"
 
-#include <iostream>
 #include <memory>
 
 struct GLFWwindowDeleter {

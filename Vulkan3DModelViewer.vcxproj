@@ -147,11 +147,13 @@
     <ClCompile Include="GlfwHandler.cpp" />
     <ClCompile Include="GlfwHandler.hpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="RendererCommon.hpp" />
+    <ClCompile Include="RendererCommon.h" />
+    <ClCompile Include="ValidationLayers.cpp" />
     <ClCompile Include="VulkanRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp" />
+    <ClInclude Include="ValidationLayers.hpp" />
     <ClInclude Include="VulkanRenderer.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
