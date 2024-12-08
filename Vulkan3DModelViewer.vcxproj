@@ -147,12 +147,15 @@
     <ClCompile Include="GlfwHandler.cpp" />
     <ClCompile Include="GlfwHandler.hpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="RendererCommon.cpp" />
     <ClCompile Include="RendererCommon.h" />
+    <ClCompile Include="Swapchain.cpp" />
     <ClCompile Include="ValidationLayers.cpp" />
     <ClCompile Include="VulkanRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp" />
+    <ClInclude Include="Swapchain.hpp" />
     <ClInclude Include="ValidationLayers.hpp" />
     <ClInclude Include="VulkanRenderer.hpp" />
   </ItemGroup>

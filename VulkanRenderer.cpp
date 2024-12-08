@@ -8,6 +8,10 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window)
 	validationLayers.setupDebugMessenger(instance);
 	pickPhysicalDevice();
 	createLogicalDevice();
+	int width, height;
+	glfwGetFramebufferSize(window, &width, &height);
+	swapchain.createSwapChain(physicalDevice, device, surface,
+		static_cast<uint32_t>(width),static_cast<uint32_t>(height));
 }
 VulkanRenderer::~VulkanRenderer()
 {
@@ -102,20 +106,16 @@ bool VulkanRenderer::isPhysicalDeviceSuitable(VkPhysicalDevice device)
 {
 	QueueFamilyIndices indices = findQueueFamilies(device, surface);
 
-	//VkDeviceQueueCreateInfo queueInfo{};
-	//queueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-	//queueInfo.queueFamilyIndex
+	bool extensionsSupported = checkPhysicalDeviceExtensionSupport(device);
 
-	//VkPhysicalDeviceProperties phyDevProps;
-	//vkGetPhysicalDeviceProperties(device, &phyDeviceProps);
-
-
-
-	//VkPhysicalDeviceFeatures phyDevFeatures;
-	//vkGetPhysicalDeviceFeatures(device, &phyDevFeatures);
+	bool isSwapChainSuitable = false;
+	if (extensionsSupported) {
+		SwapChainSupportDetails swapChainDetails = querySwapChainSupport(device, surface);
+		isSwapChainSuitable = !swapChainDetails.formats.empty() && !swapChainDetails.presents.empty();
+	}
 
 
-	return indices.isComplete();
+	return indices.isComplete() && extensionsSupported && isSwapChainSuitable;
 }
 bool VulkanRenderer::checkPhysicalDeviceExtensionSupport(VkPhysicalDevice device)
 {
@@ -133,6 +133,7 @@ bool VulkanRenderer::checkPhysicalDeviceExtensionSupport(VkPhysicalDevice device
 
 	return requiredExtensions.empty();
 }
+
 
 void VulkanRenderer::createLogicalDevice()
 {
@@ -182,32 +183,3 @@ void VulkanRenderer::createLogicalDevice()
 
 }
 
-QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surface)
-{
-	QueueFamilyIndices indices;
-
-	uint32_t familyCount = 0;
-	vkGetPhysicalDeviceQueueFamilyProperties(device, &familyCount, nullptr);
-
-	std::vector<VkQueueFamilyProperties> queueFamilies(familyCount);
-	vkGetPhysicalDeviceQueueFamilyProperties(device, &familyCount, queueFamilies.data());
-
-	int i = 0;
-	for (const auto& family : queueFamilies) {
-		if (family.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-			indices.graphicsFamily = i;
-		}
-
-		VkBool32 presentSupported = false;
-		vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupported);
-		if (presentSupported) {
-			indices.presentFamily = i;
-		}
-
-		if (indices.isComplete())
-			break;
-		i++;
-	}
-
-	return indices;
-}

@@ -1,8 +1,9 @@
 #include "RendererCommon.h"
 #include "ValidationLayers.hpp"
+#include "Swapchain.hpp"
 
 #include <vector>
-#include <optional>
+
 
 
 
@@ -27,6 +28,7 @@ private:
 	VkQueue graphicsQueue;
 	VkQueue presentQueue;
 
+	Swapchain swapchain;
 
 
 private:
@@ -37,19 +39,10 @@ private:
 	void pickPhysicalDevice();
 	bool isPhysicalDeviceSuitable(VkPhysicalDevice device);
 	bool checkPhysicalDeviceExtensionSupport(VkPhysicalDevice device);
+	
 
 	void createLogicalDevice();
 
+
+
 };
-
-
-struct QueueFamilyIndices {
-	std::optional<uint32_t> graphicsFamily;
-	std::optional<uint32_t> presentFamily;
-
-	bool isComplete() {
-		return graphicsFamily.has_value() && presentFamily.has_value();
-	}
-};
-
-QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surface);

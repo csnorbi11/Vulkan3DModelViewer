@@ -1,7 +1,5 @@
 #include "RendererCommon.h"
 
-#include <vector>
-
 
 
 class ValidationLayers {
@@ -22,7 +20,6 @@ public:
 	};
 
 private:
-	VkInstance instance;
 	VkDebugUtilsMessengerEXT debugMessenger;
 
 private:
