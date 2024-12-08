@@ -27,7 +27,6 @@ void VulkanRenderer::createInstance()
 		throw std::runtime_error("validation layers requested, but not available");
 	}
 
-	//app info
 	VkApplicationInfo appInfo{};
 	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 	appInfo.pApplicationName = "Vulkan 3D Model Viewer";
@@ -37,7 +36,6 @@ void VulkanRenderer::createInstance()
 	appInfo.apiVersion = VK_API_VERSION_1_0;
 
 
-	//instance info
 	VkInstanceCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	createInfo.pApplicationInfo = &appInfo;
@@ -59,9 +57,8 @@ void VulkanRenderer::createInstance()
 		createInfo.pNext = nullptr;
 	}
 
-	VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);
 
-	if (result != VK_SUCCESS) {
+	if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create instance");
 	}
 
@@ -143,7 +140,7 @@ void VulkanRenderer::createLogicalDevice()
 
 	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 	std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(),
-		indices.presentFamily.value(), indices.transferFamily.value() };
+		indices.presentFamily.value() };
 
 
 	float queuePriority = 1.0f;
@@ -182,8 +179,6 @@ void VulkanRenderer::createLogicalDevice()
 
 	vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
 	vkGetDeviceQueue(device, indices.presentFamily.value(), 0, &presentQueue);
-	vkGetDeviceQueue(device, indices.transferFamily.value(), 0, &transferQueue);
-
 
 }
 
@@ -201,9 +196,6 @@ QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surfa
 	for (const auto& family : queueFamilies) {
 		if (family.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
 			indices.graphicsFamily = i;
-		}
-		if (family.queueFlags & VK_QUEUE_TRANSFER_BIT) {
-			indices.transferFamily = i;
 		}
 
 		VkBool32 presentSupported = false;
