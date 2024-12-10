@@ -1,5 +1,4 @@
 #include "VulkanRenderer.hpp"
-#include <set>
 
 VulkanRenderer::VulkanRenderer(GLFWwindow* window)
 {

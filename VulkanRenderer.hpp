@@ -25,5 +25,5 @@ private:
 
 	std::unique_ptr<ValidationLayers> validationLayers;
 	std::unique_ptr<DeviceManager> deviceManager;
-	std::unique_ptr <SwapchainManager> swapchainManager;
+	std::unique_ptr<SwapchainManager> swapchainManager;
 };

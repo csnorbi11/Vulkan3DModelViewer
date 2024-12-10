@@ -1,7 +1,6 @@
 #pragma once
 #include "RendererCommon.h"
-#include "DeviceManager.hpp"
-
+#include "DepthBuffer.hpp"
 
 class SwapchainManager {
 public:
@@ -14,16 +13,31 @@ public:
 	void cleanup();
 	void recreate(uint32_t frameBufferWidth, uint32_t frameBufferHeight);
 
-	VkSwapchainKHR get();
+	const VkSwapchainKHR& get();
+	const VkExtent2D getImageExtent();
+ 
 
 private:
 	void create();
+	
 	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& avaiableFormats);
 	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& avaiablePresentModes);
 	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
+	void createImages(uint32_t& imageCount, VkSurfaceFormatKHR& surfaceFormat);
+	void createImageViews();
 
 	VkSwapchainKHR swapChain;
+	VkFramebuffer framebuffer;
+
+	std::unique_ptr<DepthBuffer> depthBuffer;
+
+	std::vector<VkImage> images;
+	VkFormat imageFormat;
+	VkExtent2D imageExtent;
+	std::vector<VkImageView> imageViews;
+
+
 	VkSurfaceKHR surface;
 	VkPhysicalDevice physicalDevice;
 	VkDevice device;

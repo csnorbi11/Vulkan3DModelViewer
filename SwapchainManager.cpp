@@ -20,16 +20,24 @@ SwapchainManager::SwapchainManager(const VkPhysicalDevice& phyDevice, const VkDe
 	framebufferHeight(frameBufferHeight)
 {
 	create();
+	depthBuffer = std::make_unique<DepthBuffer>(physicalDevice, this->device, imageExtent);
 }
 
 void SwapchainManager::cleanup()
 {
+	depthBuffer->cleanup();
+
 	vkDestroySwapchainKHR(device, swapChain, nullptr);
+
 }
 
-VkSwapchainKHR SwapchainManager::get()
+const VkSwapchainKHR& SwapchainManager::get()
 {
 	return swapChain;
+}
+const VkExtent2D SwapchainManager::getImageExtent()
+{
+	return imageExtent;
 }
 void SwapchainManager::create()
 {
@@ -75,7 +83,11 @@ void SwapchainManager::create()
 	if (vkCreateSwapchainKHR(device, &swapCreateInfo, nullptr, &swapChain) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create swapchain");
 	}
+
+	createImages(imageCount, surfaceFormat);
+	createImageViews();
 }
+
 void SwapchainManager::recreate(uint32_t frameBufferWidth, uint32_t frameBufferHeight)
 {
 
@@ -118,4 +130,24 @@ VkExtent2D SwapchainManager::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& ca
 
 		return actualExtent;
 	}
+}
+
+void SwapchainManager::createImages(uint32_t& imageCount, VkSurfaceFormatKHR& surfaceFormat)
+{
+	vkGetSwapchainImagesKHR(device, swapChain, &imageCount, nullptr);
+	images.resize(imageCount);
+	vkGetSwapchainImagesKHR(device, swapChain, &imageCount, images.data());
+
+	imageFormat = surfaceFormat.format;
+	imageExtent = imageExtent;
+}
+void SwapchainManager::createImageViews()
+{
+	imageViews.resize(images.size());
+
+	for (size_t i = 0; i < imageViews.size(); i++) {
+		imageViews[i] = createImageView(images[i], imageFormat, VK_IMAGE_ASPECT_COLOR_BIT, 1, device);
+	}
+
+
 }

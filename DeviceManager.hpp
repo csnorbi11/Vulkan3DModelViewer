@@ -23,6 +23,7 @@ private:
 
 	void createLogicalDevice(const std::vector<const char*>& extensions);
 
+
 	VkPhysicalDevice physicalDevice;
 	VkPhysicalDeviceProperties phyDeviceProps;
 	QueueFamilyIndices indices;
