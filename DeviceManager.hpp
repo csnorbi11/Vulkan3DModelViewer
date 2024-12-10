@@ -7,15 +7,22 @@ public:
 	DeviceManager();
 	~DeviceManager();
 
+	DeviceManager(VkInstance instance, VkSurfaceKHR surface, const std::vector<const char*>& extensions);
+	void cleanup();
 
-public:
+	const VkPhysicalDevice& getPhysicalDevice();
+	const VkPhysicalDeviceProperties& getPhysicalDeviceProperties();
+	const QueueFamilyIndices& getIndices();
+	const VkDevice& getDevice();
+	const std::vector<const char*>& getDeviceExtensions();
+
+private:
 	void pickPhysicalDevice(VkInstance instance, VkSurfaceKHR surface);
 	bool isPhysicalDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface);
 	bool checkPhysicalDeviceExtensionSupport(VkPhysicalDevice device);
 
-	void createLogicalDevice(ValidationLayers valLayers);
+	void createLogicalDevice(const std::vector<const char*>& extensions);
 
-public:
 	VkPhysicalDevice physicalDevice;
 	VkPhysicalDeviceProperties phyDeviceProps;
 	QueueFamilyIndices indices;
@@ -25,8 +32,6 @@ public:
 	};
 
 	VkDevice device;
-
-
 	VkQueue graphicsQueue;
 	VkQueue presentQueue;
 

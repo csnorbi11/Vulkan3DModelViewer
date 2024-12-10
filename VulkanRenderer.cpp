@@ -3,23 +3,23 @@
 
 VulkanRenderer::VulkanRenderer(GLFWwindow* window)
 {
+	validationLayers = std::make_unique<ValidationLayers>();
 	createInstance();
 	createSurface(window);
-	validationLayers.setupDebugMessenger(instance);
-	deviceManager.pickPhysicalDevice(instance, surface);
-	deviceManager.createLogicalDevice(validationLayers);
+	validationLayers->setupDebugMessenger(instance);
+	deviceManager = std::make_unique<DeviceManager>(instance, surface, validationLayers->getValidationLayers());
+
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
-	swapchainManager.createSwapChain(deviceManager.physicalDevice, deviceManager.device, surface,
-		static_cast<uint32_t>(width),static_cast<uint32_t>(height));
+	swapchainManager = std::make_unique<SwapchainManager>(deviceManager->getPhysicalDevice(), deviceManager->getDevice(),
+		deviceManager->getDeviceExtensions(), deviceManager->getIndices(), surface, width, height);
 }
 VulkanRenderer::~VulkanRenderer()
 {
-
-
-	vkDestroyDevice(deviceManager.device, nullptr);
+	swapchainManager->cleanup();
+	deviceManager->cleanup();
 	if (enableValidationLayers) {
-		DestroyDebugUtilsMessengerEXT(instance, validationLayers.getDebugMessenger(), nullptr);
+		DestroyDebugUtilsMessengerEXT(instance, validationLayers->getDebugMessenger(), nullptr);
 	}
 	vkDestroySurfaceKHR(instance, surface, nullptr);
 	vkDestroyInstance(instance, nullptr);
@@ -27,7 +27,7 @@ VulkanRenderer::~VulkanRenderer()
 
 void VulkanRenderer::createInstance()
 {
-	if (enableValidationLayers && !validationLayers.checkValidationLayerSupport()) {
+	if (enableValidationLayers && !validationLayers->checkValidationLayerSupport()) {
 		throw std::runtime_error("validation layers requested, but not available");
 	}
 
@@ -44,16 +44,16 @@ void VulkanRenderer::createInstance()
 	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	createInfo.pApplicationInfo = &appInfo;
 
-	auto extensions = validationLayers.getRequiredExtensions();
+	auto extensions = validationLayers->getRequiredExtensions();
 	createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
 	createInfo.ppEnabledExtensionNames = extensions.data();
 
 	VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
 	if (enableValidationLayers) {
-		createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.validationLayers.size());
-		createInfo.ppEnabledLayerNames = validationLayers.validationLayers.data();
+		createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers->getValidationLayers().size());
+		createInfo.ppEnabledLayerNames = validationLayers->getValidationLayers().data();
 
-		validationLayers.populateDebugMessengerCreateInfo(debugCreateInfo);
+		validationLayers->populateDebugMessengerCreateInfo(debugCreateInfo);
 		createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
 	}
 	else {
@@ -67,7 +67,6 @@ void VulkanRenderer::createInstance()
 	}
 
 }
-
 void VulkanRenderer::createSurface(GLFWwindow* window)
 {
 	if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS) {

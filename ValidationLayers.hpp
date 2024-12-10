@@ -14,21 +14,19 @@ public:
 	std::vector<const char*> getRequiredExtensions();
 	void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
 
-	VkDebugUtilsMessengerEXT getDebugMessenger();
-
-public:
-	const std::vector<const char*> validationLayers = {
-		"VK_LAYER_KHRONOS_validation"
-	};
-
-private:
-	VkDebugUtilsMessengerEXT debugMessenger;
+	const VkDebugUtilsMessengerEXT& getDebugMessenger();
+	const std::vector<const char*>& getValidationLayers();
 
 private:
 	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
 		VkDebugUtilsMessageTypeFlagsEXT messageType,
 		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
 		void* pUserData);
+
+	VkDebugUtilsMessengerEXT debugMessenger;
+	const std::vector<const char*> validationLayers = {
+	"VK_LAYER_KHRONOS_validation"
+	};
 };
 
 

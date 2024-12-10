@@ -12,6 +12,7 @@ ValidationLayers::~ValidationLayers()
 
 }
 
+
 void ValidationLayers::setupDebugMessenger(VkInstance instance)
 {
 	if (!enableValidationLayers)return;
@@ -86,9 +87,14 @@ void ValidationLayers::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCre
 	createInfo.pUserData = nullptr;
 }
 
-VkDebugUtilsMessengerEXT ValidationLayers::getDebugMessenger()
+const VkDebugUtilsMessengerEXT& ValidationLayers::getDebugMessenger()
 {
 	return debugMessenger;
+}
+
+const std::vector<const char*>& ValidationLayers::getValidationLayers()
+{
+	return validationLayers;
 }
 
 

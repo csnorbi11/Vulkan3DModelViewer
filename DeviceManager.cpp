@@ -1,14 +1,45 @@
 #include "DeviceManager.hpp"
 
-
 DeviceManager::DeviceManager()
 {
-
 }
-
 DeviceManager::~DeviceManager()
 {
-	//vkDestroyDevice(device, nullptr);
+}
+
+DeviceManager::DeviceManager(VkInstance instance, VkSurfaceKHR surface, const std::vector<const char*>& extensions)
+{
+	pickPhysicalDevice(instance, surface);
+	createLogicalDevice(extensions);
+}
+void DeviceManager::cleanup()
+{
+	vkDestroyDevice(device, nullptr);
+}
+
+const VkPhysicalDevice& DeviceManager::getPhysicalDevice()
+{
+	return physicalDevice;
+}
+
+const VkPhysicalDeviceProperties& DeviceManager::getPhysicalDeviceProperties()
+{
+	return phyDeviceProps;
+}
+
+const QueueFamilyIndices& DeviceManager::getIndices()
+{
+	return indices;
+}
+
+const VkDevice& DeviceManager::getDevice()
+{
+	return device;
+}
+
+const std::vector<const char*>& DeviceManager::getDeviceExtensions()
+{
+	return deviceExtensions;
 }
 
 void DeviceManager::pickPhysicalDevice(VkInstance instance, VkSurfaceKHR surface)
@@ -23,6 +54,7 @@ void DeviceManager::pickPhysicalDevice(VkInstance instance, VkSurfaceKHR surface
 	vkEnumeratePhysicalDevices(instance, &devicesCount, devices.data());
 
 	for (const auto& device : devices) {
+		
 		if (isPhysicalDeviceSuitable(device, surface)) {
 			physicalDevice = device;
 
@@ -40,8 +72,8 @@ void DeviceManager::pickPhysicalDevice(VkInstance instance, VkSurfaceKHR surface
 
 bool DeviceManager::isPhysicalDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface)
 {
+	
 	indices = findQueueFamilies(device, surface);
-
 	bool extensionsSupported = checkPhysicalDeviceExtensionSupport(device);
 
 	bool isSwapChainSuitable = false;
@@ -54,7 +86,7 @@ bool DeviceManager::isPhysicalDeviceSuitable(VkPhysicalDevice device, VkSurfaceK
 	return indices.isComplete() && extensionsSupported && isSwapChainSuitable;
 }
 
-void DeviceManager::createLogicalDevice(ValidationLayers valLayers)
+void DeviceManager::createLogicalDevice(const std::vector<const char*>& extensions)
 {
 	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 	std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(),
@@ -84,8 +116,8 @@ void DeviceManager::createLogicalDevice(ValidationLayers valLayers)
 	createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
 	if (enableValidationLayers) {
-		createInfo.enabledLayerCount = static_cast<uint32_t>(valLayers.validationLayers.size());
-		createInfo.ppEnabledLayerNames = valLayers.validationLayers.data();
+		createInfo.enabledLayerCount = static_cast<uint32_t>(extensions.size());
+		createInfo.ppEnabledLayerNames = extensions.data();
 	}
 	else {
 		createInfo.enabledLayerCount = 0;
@@ -99,6 +131,8 @@ void DeviceManager::createLogicalDevice(ValidationLayers valLayers)
 	vkGetDeviceQueue(device, indices.presentFamily.value(), 0, &presentQueue);
 
 }
+
+
 
 bool DeviceManager::checkPhysicalDeviceExtensionSupport(VkPhysicalDevice device)
 {
