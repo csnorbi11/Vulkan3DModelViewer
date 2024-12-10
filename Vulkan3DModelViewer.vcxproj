@@ -144,6 +144,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="DeviceManager.cpp" />
+    <ClCompile Include="DeviceManager.hpp" />
     <ClCompile Include="GlfwHandler.cpp" />
     <ClCompile Include="GlfwHandler.hpp" />
     <ClCompile Include="main.cpp" />

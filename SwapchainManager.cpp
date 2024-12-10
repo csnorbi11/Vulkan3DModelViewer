@@ -76,6 +76,7 @@ void SwapchainManager::recreateSwapChain(VkPhysicalDevice phyDevice, VkDevice de
 }
 void SwapchainManager::cleanupSwapChain()
 {
+	
 }
 VkSurfaceFormatKHR SwapchainManager::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
 {

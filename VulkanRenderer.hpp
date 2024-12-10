@@ -1,6 +1,8 @@
+#pragma once
 #include "RendererCommon.h"
 #include "ValidationLayers.hpp"
 #include "SwapchainManager.hpp"
+#include "DeviceManager.hpp"
 
 #include <vector>
 
@@ -18,15 +20,7 @@ private:
 
 	VkSurfaceKHR surface;
 
-	VkPhysicalDevice physicalDevice;
-	VkPhysicalDeviceProperties phyDeviceProps;
-	const std::vector<const char*> deviceExtensions = {
-	VK_KHR_SWAPCHAIN_EXTENSION_NAME
-	};
-
-	VkDevice device;
-	VkQueue graphicsQueue;
-	VkQueue presentQueue;
+	DeviceManager deviceManager;
 
 	SwapchainManager swapchainManager;
 

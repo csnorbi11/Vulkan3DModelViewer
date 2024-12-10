@@ -7,7 +7,8 @@
 #include <vector>
 #include <optional>
 #include <algorithm>
-
+#include <string>
+#include <set>
 
 #if NDEBUG
 const bool enableValidationLayers = false;

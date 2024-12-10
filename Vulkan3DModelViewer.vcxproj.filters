@@ -42,6 +42,12 @@
     <ClCompile Include="RendererCommon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DeviceManager.hpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DeviceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
