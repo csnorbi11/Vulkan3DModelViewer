@@ -34,7 +34,7 @@ QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surfa
 SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface)
 {
 	SwapChainSupportDetails details;
-	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilites);
+	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilities);
 
 	uint32_t formatCount;
 	vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);

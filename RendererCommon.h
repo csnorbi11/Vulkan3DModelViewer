@@ -26,7 +26,7 @@ struct QueueFamilyIndices {
 QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surface);
 
 struct SwapChainSupportDetails {
-	VkSurfaceCapabilitiesKHR capabilites;
+	VkSurfaceCapabilitiesKHR capabilities;
 	std::vector<VkSurfaceFormatKHR> formats;
 	std::vector<VkPresentModeKHR> presents;
 };

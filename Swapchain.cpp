@@ -18,14 +18,45 @@ void Swapchain::createSwapChain(VkPhysicalDevice phyDevice, VkDevice device, VkS
 	this->frameBufferWidth = frameBufferWidth;
 	this->frameBufferHeight = frameBufferHeight;
 
-	SwapChainSupportDetails swapChainDetails = querySwapChainSupport(phyDevice, surface);
+	SwapChainSupportDetails swapchainSupport = querySwapChainSupport(phyDevice, surface);
 
-	VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainDetails.formats);
-	VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainDetails.presents);
-	VkExtent2D extent = chooseSwapExtent(swapChainDetails.capabilites);
+	VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapchainSupport.formats);
+	VkPresentModeKHR presentMode = chooseSwapPresentMode(swapchainSupport.presents);
+	VkExtent2D extent = chooseSwapExtent(swapchainSupport.capabilities);
+
+	uint32_t imageCount = swapchainSupport.capabilities.minImageCount + 1;
+	if (swapchainSupport.capabilities.maxImageCount > 0 && imageCount > swapchainSupport.capabilities.maxImageCount) {
+		imageCount = swapchainSupport.capabilities.maxImageCount;
+	}
 
 	VkSwapchainCreateInfoKHR swapCreateInfo{};
+	swapCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+	swapCreateInfo.surface = surface;
+	swapCreateInfo.minImageCount = imageCount;
+	swapCreateInfo.imageFormat = surfaceFormat.format;
+	swapCreateInfo.imageColorSpace = surfaceFormat.colorSpace;
+	swapCreateInfo.imageExtent = extent;
+	swapCreateInfo.imageArrayLayers = 1;
+	swapCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
+	QueueFamilyIndices indices = findQueueFamilies(phyDevice, surface);
+	uint32_t queueFamilyIndices[] = { indices.graphicsFamily.value(), indices.presentFamily.value() };
+
+	if (indices.graphicsFamily != indices.presentFamily) {
+		swapCreateInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+		swapCreateInfo.queueFamilyIndexCount = 2;
+		swapCreateInfo.pQueueFamilyIndices = queueFamilyIndices;
+	}
+	else {
+		swapCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		swapCreateInfo.queueFamilyIndexCount = 0; // Optional
+		swapCreateInfo.pQueueFamilyIndices = nullptr; // Optional
+	}
+	swapCreateInfo.preTransform = swapchainSupport.capabilities.currentTransform;
+	swapCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+	swapCreateInfo.presentMode = presentMode;
+	swapCreateInfo.clipped = VK_TRUE;
+	swapCreateInfo.oldSwapchain = VK_NULL_HANDLE;
 
 	if (vkCreateSwapchainKHR(device, &swapCreateInfo, nullptr, &swapChain) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create swapchain");
@@ -57,7 +88,11 @@ VkSurfaceFormatKHR Swapchain::chooseSwapSurfaceFormat(const std::vector<VkSurfac
 }
 VkPresentModeKHR Swapchain::chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& avaiablePresentModes)
 {
-	return VkPresentModeKHR();
+	for (const auto& presentMode : avaiablePresentModes) {
+		if (presentMode == VK_PRESENT_MODE_MAILBOX_KHR)
+			return VK_PRESENT_MODE_MAILBOX_KHR;
+	}
+	return VK_PRESENT_MODE_FIFO_KHR;
 }
 VkExtent2D Swapchain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities)
 {
