@@ -2,10 +2,10 @@
 
 
 
-class Swapchain {
+class SwapchainManager {
 public:
-	Swapchain();
-	~Swapchain();
+	SwapchainManager();
+	~SwapchainManager();
 
 	VkSwapchainKHR get();
 	void createSwapChain(VkPhysicalDevice phyDevice, VkDevice device, VkSurfaceKHR surface,

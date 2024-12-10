@@ -36,7 +36,7 @@
     <ClCompile Include="ValidationLayers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Swapchain.cpp">
+    <ClCompile Include="SwapchainManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RendererCommon.cpp">
@@ -53,7 +53,7 @@
     <ClInclude Include="ValidationLayers.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Swapchain.hpp">
+    <ClInclude Include="SwapchainManager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

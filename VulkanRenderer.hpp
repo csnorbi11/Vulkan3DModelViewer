@@ -1,6 +1,6 @@
 #include "RendererCommon.h"
 #include "ValidationLayers.hpp"
-#include "Swapchain.hpp"
+#include "SwapchainManager.hpp"
 
 #include <vector>
 
@@ -28,7 +28,7 @@ private:
 	VkQueue graphicsQueue;
 	VkQueue presentQueue;
 
-	Swapchain swapchain;
+	SwapchainManager swapchainManager;
 
 
 private:

@@ -1,18 +1,18 @@
-#include "Swapchain.hpp"
+#include "SwapchainManager.hpp"
 
-Swapchain::Swapchain()
+SwapchainManager::SwapchainManager()
 {
 }
-Swapchain::~Swapchain()
+SwapchainManager::~SwapchainManager()
 {
 	cleanupSwapChain();
 }
 
-VkSwapchainKHR Swapchain::get()
+VkSwapchainKHR SwapchainManager::get()
 {
 	return swapChain;
 }
-void Swapchain::createSwapChain(VkPhysicalDevice phyDevice, VkDevice device, VkSurfaceKHR surface,
+void SwapchainManager::createSwapChain(VkPhysicalDevice phyDevice, VkDevice device, VkSurfaceKHR surface,
 	uint32_t frameBufferWidth, uint32_t frameBufferHeight)
 {
 	this->frameBufferWidth = frameBufferWidth;
@@ -62,7 +62,7 @@ void Swapchain::createSwapChain(VkPhysicalDevice phyDevice, VkDevice device, VkS
 		throw std::runtime_error("failed to create swapchain");
 	}
 }
-void Swapchain::recreateSwapChain(VkPhysicalDevice phyDevice, VkDevice device, VkSurfaceKHR surface,
+void SwapchainManager::recreateSwapChain(VkPhysicalDevice phyDevice, VkDevice device, VkSurfaceKHR surface,
 	uint32_t frameBufferWidth, uint32_t frameBufferHeight)
 {
 	this->frameBufferWidth = frameBufferWidth;
@@ -74,10 +74,10 @@ void Swapchain::recreateSwapChain(VkPhysicalDevice phyDevice, VkDevice device, V
 
 	createSwapChain(phyDevice, device, surface, frameBufferWidth, frameBufferHeight);
 }
-void Swapchain::cleanupSwapChain()
+void SwapchainManager::cleanupSwapChain()
 {
 }
-VkSurfaceFormatKHR Swapchain::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
+VkSurfaceFormatKHR SwapchainManager::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
 {
 	for (const auto& availableFormat : availableFormats) {
 		if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
@@ -86,7 +86,7 @@ VkSurfaceFormatKHR Swapchain::chooseSwapSurfaceFormat(const std::vector<VkSurfac
 	}
 	return availableFormats[0];
 }
-VkPresentModeKHR Swapchain::chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& avaiablePresentModes)
+VkPresentModeKHR SwapchainManager::chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& avaiablePresentModes)
 {
 	for (const auto& presentMode : avaiablePresentModes) {
 		if (presentMode == VK_PRESENT_MODE_MAILBOX_KHR)
@@ -94,7 +94,7 @@ VkPresentModeKHR Swapchain::chooseSwapPresentMode(const std::vector<VkPresentMod
 	}
 	return VK_PRESENT_MODE_FIFO_KHR;
 }
-VkExtent2D Swapchain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities)
+VkExtent2D SwapchainManager::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities)
 {
 	if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
 		return capabilities.currentExtent;

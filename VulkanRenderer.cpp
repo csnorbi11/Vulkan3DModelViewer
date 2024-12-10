@@ -10,7 +10,7 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window)
 	createLogicalDevice();
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
-	swapchain.createSwapChain(physicalDevice, device, surface,
+	swapchainManager.createSwapChain(physicalDevice, device, surface,
 		static_cast<uint32_t>(width),static_cast<uint32_t>(height));
 }
 VulkanRenderer::~VulkanRenderer()
