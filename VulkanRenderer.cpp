@@ -13,6 +13,13 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window)
 	swapchainManager = std::make_unique<SwapchainManager>(deviceManager->getPhysicalDevice(), deviceManager->getDevice(),
 		deviceManager->getDeviceExtensions(), deviceManager->getIndices(), surface, width, height,
 		deviceManager->getSampleCount());
+	depthBuffer = swapchainManager->getDepthBuffer();
+	msaa = swapchainManager->getMsaa();
+
+
+	frameBuffer = std::make_unique<Framebuffer>(swapchainManager->getImageViews(),
+		msaa.getImageView(), depthBuffer.getImageView(), VkRenderPass(),
+		swapchainManager->getImageExtent(), deviceManager->getDevice());
 }
 VulkanRenderer::~VulkanRenderer()
 {

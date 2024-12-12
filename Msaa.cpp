@@ -27,6 +27,11 @@ void Msaa::cleanup()
 	vkFreeMemory(device, imageMemory, nullptr);
 }
 
+const VkImageView& Msaa::getImageView()
+{
+	return imageView;
+}
+
 void Msaa::create()
 {
 	createImage(swapchainExtent.width, swapchainExtent.height, 1, swapchainImageFormat,

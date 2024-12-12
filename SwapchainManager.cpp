@@ -40,13 +40,21 @@ void SwapchainManager::cleanup()
 
 }
 
-const VkSwapchainKHR& SwapchainManager::get()
-{
-	return swapChain;
-}
 const VkExtent2D SwapchainManager::getImageExtent()
 {
 	return imageExtent;
+}
+const std::vector<VkImageView> SwapchainManager::getImageViews()
+{
+	return imageViews;
+}
+const DepthBuffer& SwapchainManager::getDepthBuffer()
+{
+	return *depthBuffer;
+}
+const Msaa& SwapchainManager::getMsaa()
+{
+	return *msaa;
 }
 void SwapchainManager::create()
 {

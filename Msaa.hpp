@@ -13,6 +13,8 @@ public:
 	void create();
 	void cleanup();
 
+	const VkImageView& getImageView();
+
 private:
 
 

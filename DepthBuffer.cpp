@@ -13,6 +13,9 @@ DepthBuffer::DepthBuffer(const VkPhysicalDevice& physicalDevice, const VkDevice&
 {
 	create();
 }
+DepthBuffer::DepthBuffer()
+{
+}
 DepthBuffer::~DepthBuffer()
 {
 }
@@ -32,6 +35,11 @@ void DepthBuffer::cleanup()
 	vkDestroyImageView(device, imageView, nullptr);
 	vkDestroyImage(device, image, nullptr);
 	vkFreeMemory(device, imageMemory, nullptr);
+}
+
+const VkImageView& DepthBuffer::getImageView()
+{
+	return imageView;
 }
 
 VkFormat DepthBuffer::findDepthFormat()

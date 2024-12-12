@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <string>
 #include <set>
+#include <array>
 
 #if NDEBUG
 const bool enableValidationLayers = false;

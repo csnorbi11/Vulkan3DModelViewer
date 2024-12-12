@@ -147,6 +147,7 @@
     <ClCompile Include="DepthBuffer.cpp" />
     <ClCompile Include="DeviceManager.cpp" />
     <ClCompile Include="DeviceManager.hpp" />
+    <ClCompile Include="Framebuffer.cpp" />
     <ClCompile Include="GlfwHandler.cpp" />
     <ClCompile Include="GlfwHandler.hpp" />
     <ClCompile Include="main.cpp" />
@@ -160,6 +161,7 @@
   <ItemGroup>
     <ClInclude Include="App.hpp" />
     <ClInclude Include="DepthBuffer.hpp" />
+    <ClInclude Include="Framebuffer.hpp" />
     <ClInclude Include="Msaa.hpp" />
     <ClInclude Include="SwapchainManager.hpp" />
     <ClInclude Include="ValidationLayers.hpp" />

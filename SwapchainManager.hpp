@@ -15,9 +15,10 @@ public:
 	void cleanup();
 	void recreate(uint32_t frameBufferWidth, uint32_t frameBufferHeight);
 
-	const VkSwapchainKHR& get();
 	const VkExtent2D getImageExtent();
- 
+	const std::vector<VkImageView> getImageViews();
+	const DepthBuffer& getDepthBuffer();
+	const Msaa& getMsaa();
 
 private:
 	void create();
