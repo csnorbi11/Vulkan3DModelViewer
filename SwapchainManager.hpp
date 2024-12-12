@@ -28,7 +28,7 @@ private:
 	void createImageViews();
 
 	VkSwapchainKHR swapChain;
-	VkFramebuffer framebuffer;
+
 
 	std::unique_ptr<DepthBuffer> depthBuffer;
 
@@ -36,6 +36,7 @@ private:
 	VkFormat imageFormat;
 	VkExtent2D imageExtent;
 	std::vector<VkImageView> imageViews;
+	uint32_t imagesCount;
 
 
 	VkSurfaceKHR surface;

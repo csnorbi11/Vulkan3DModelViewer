@@ -3,6 +3,9 @@
 DepthBuffer::DepthBuffer(const VkPhysicalDevice& physicalDevice, const VkDevice& device,
 	const VkExtent2D& swapchainExtent)
 	:
+	image(VK_NULL_HANDLE),
+	imageMemory(VK_NULL_HANDLE),
+	imageView(VK_NULL_HANDLE),
 	physicalDevice(physicalDevice),
 	device(device),
 	swapchainExtent(swapchainExtent)
@@ -25,6 +28,7 @@ void DepthBuffer::create()
 
 void DepthBuffer::cleanup()
 {
+	vkDestroyImageView(device, imageView, nullptr);
 	vkDestroyImage(device, image, nullptr);
 	vkFreeMemory(device, imageMemory, nullptr);
 }

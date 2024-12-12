@@ -26,6 +26,9 @@ SwapchainManager::SwapchainManager(const VkPhysicalDevice& phyDevice, const VkDe
 void SwapchainManager::cleanup()
 {
 	depthBuffer->cleanup();
+	for (uint32_t i = 0; i < imagesCount; i++) {
+		vkDestroyImageView(device, imageViews[i], nullptr);
+	}
 
 	vkDestroySwapchainKHR(device, swapChain, nullptr);
 
@@ -84,7 +87,10 @@ void SwapchainManager::create()
 		throw std::runtime_error("failed to create swapchain");
 	}
 
-	createImages(imageCount, surfaceFormat);
+	imageExtent = extent;
+	imagesCount = imageCount;
+
+	createImages(imagesCount, surfaceFormat);
 	createImageViews();
 }
 
