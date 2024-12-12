@@ -8,6 +8,8 @@ DeviceManager::~DeviceManager()
 }
 
 DeviceManager::DeviceManager(VkInstance instance, VkSurfaceKHR surface, const std::vector<const char*>& extensions)
+	:
+	msaaSamples(VK_SAMPLE_COUNT_1_BIT)
 {
 	pickPhysicalDevice(instance, surface);
 	createLogicalDevice(extensions);
@@ -42,6 +44,11 @@ const std::vector<const char*>& DeviceManager::getDeviceExtensions()
 	return deviceExtensions;
 }
 
+VkSampleCountFlagBits DeviceManager::getSampleCount()
+{
+	return msaaSamples;
+}
+
 void DeviceManager::pickPhysicalDevice(VkInstance instance, VkSurfaceKHR surface)
 {
 	uint32_t devicesCount = 0;
@@ -57,8 +64,7 @@ void DeviceManager::pickPhysicalDevice(VkInstance instance, VkSurfaceKHR surface
 		
 		if (isPhysicalDeviceSuitable(device, surface)) {
 			physicalDevice = device;
-
-
+			msaaSamples = getMaxUseableSampleCount();
 			break;
 		}
 	}
@@ -130,6 +136,20 @@ void DeviceManager::createLogicalDevice(const std::vector<const char*>& extensio
 	vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
 	vkGetDeviceQueue(device, indices.presentFamily.value(), 0, &presentQueue);
 
+}
+
+VkSampleCountFlagBits DeviceManager::getMaxUseableSampleCount()
+{
+	VkSampleCountFlags counts = phyDeviceProps.limits.framebufferColorSampleCounts &
+		phyDeviceProps.limits.framebufferDepthSampleCounts;
+	if (counts & VK_SAMPLE_COUNT_64_BIT) { return VK_SAMPLE_COUNT_64_BIT; }
+	if (counts & VK_SAMPLE_COUNT_32_BIT) { return VK_SAMPLE_COUNT_32_BIT; }
+	if (counts & VK_SAMPLE_COUNT_16_BIT) { return VK_SAMPLE_COUNT_16_BIT; }
+	if (counts & VK_SAMPLE_COUNT_8_BIT) { return VK_SAMPLE_COUNT_8_BIT; }
+	if (counts & VK_SAMPLE_COUNT_4_BIT) { return VK_SAMPLE_COUNT_4_BIT; }
+	if (counts & VK_SAMPLE_COUNT_2_BIT) { return VK_SAMPLE_COUNT_2_BIT; }
+
+	return VK_SAMPLE_COUNT_1_BIT;
 }
 
 

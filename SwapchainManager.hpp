@@ -1,6 +1,7 @@
 #pragma once
 #include "RendererCommon.h"
 #include "DepthBuffer.hpp"
+#include "Msaa.hpp"
 
 class SwapchainManager {
 public:
@@ -9,7 +10,8 @@ public:
 
 	SwapchainManager(const VkPhysicalDevice& phyDevice, const VkDevice& device,
 		const std::vector<const char*>& deviceExtensions, const QueueFamilyIndices indices,
-		VkSurfaceKHR& surface, uint32_t frameBufferWidth, uint32_t frameBufferHeight);
+		VkSurfaceKHR& surface, uint32_t frameBufferWidth, uint32_t frameBufferHeight,
+		VkSampleCountFlagBits sampleCount);
 	void cleanup();
 	void recreate(uint32_t frameBufferWidth, uint32_t frameBufferHeight);
 
@@ -31,6 +33,7 @@ private:
 
 
 	std::unique_ptr<DepthBuffer> depthBuffer;
+	std::unique_ptr<Msaa> msaa;
 
 	std::vector<VkImage> images;
 	VkFormat imageFormat;
@@ -42,6 +45,7 @@ private:
 	VkSurfaceKHR surface;
 	VkPhysicalDevice physicalDevice;
 	VkDevice device;
+	VkSampleCountFlagBits sampleCount;
 	std::vector<const char*> extensions;
 	QueueFamilyIndices indices;
 	uint32_t framebufferWidth, framebufferHeight;

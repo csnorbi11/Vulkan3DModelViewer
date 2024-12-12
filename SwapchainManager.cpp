@@ -9,7 +9,10 @@ SwapchainManager::~SwapchainManager()
 {
 }
 
-SwapchainManager::SwapchainManager(const VkPhysicalDevice& phyDevice, const VkDevice& device, const std::vector<const char*>& deviceExtensions, const QueueFamilyIndices indices, VkSurfaceKHR& surface, uint32_t frameBufferWidth, uint32_t frameBufferHeight)
+SwapchainManager::SwapchainManager(const VkPhysicalDevice& phyDevice, const VkDevice& device,
+	const std::vector<const char*>& deviceExtensions, const QueueFamilyIndices indices,
+	VkSurfaceKHR& surface, uint32_t frameBufferWidth, uint32_t frameBufferHeight,
+	VkSampleCountFlagBits sampleCount)
 	:
 	surface(surface),
 	physicalDevice(phyDevice),
@@ -17,14 +20,17 @@ SwapchainManager::SwapchainManager(const VkPhysicalDevice& phyDevice, const VkDe
 	extensions(extensions),
 	indices(indices),
 	framebufferWidth(frameBufferWidth),
-	framebufferHeight(frameBufferHeight)
+	framebufferHeight(frameBufferHeight),
+	sampleCount(sampleCount)
 {
 	create();
-	depthBuffer = std::make_unique<DepthBuffer>(physicalDevice, this->device, imageExtent);
+	depthBuffer = std::make_unique<DepthBuffer>(physicalDevice, this->device, imageExtent,sampleCount);
+	msaa = std::make_unique<Msaa>(physicalDevice, this->device, sampleCount, imageExtent, imageFormat);
 }
 
 void SwapchainManager::cleanup()
 {
+	msaa->cleanup();
 	depthBuffer->cleanup();
 	for (uint32_t i = 0; i < imagesCount; i++) {
 		vkDestroyImageView(device, imageViews[i], nullptr);
@@ -99,13 +105,16 @@ void SwapchainManager::recreate(uint32_t frameBufferWidth, uint32_t frameBufferH
 
 	vkDeviceWaitIdle(device);
 
-	
+
 
 	cleanup();
 
 	this->framebufferWidth = frameBufferWidth;
 	this->framebufferHeight = frameBufferHeight;
 	create();
+	msaa->create();
+	depthBuffer->create();
+
 }
 VkSurfaceFormatKHR SwapchainManager::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
 {

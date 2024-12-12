@@ -4,15 +4,16 @@
 
 class DepthBuffer {
 public:
-	DepthBuffer(const VkPhysicalDevice& physicalDevice, const VkDevice& device,
-		const VkExtent2D& swapchainExtent);
+	DepthBuffer();
 	~DepthBuffer();
 
+	DepthBuffer(const VkPhysicalDevice& physicalDevice, const VkDevice& device,
+		const VkExtent2D& swapchainExtent, VkSampleCountFlagBits sampleCount);
 
+	void create();
 	void cleanup();
 
 private:
-	void create();
 
 	VkFormat findDepthFormat();
 	bool hasScencilComponent(VkFormat format);
@@ -26,5 +27,6 @@ private:
 	VkPhysicalDevice physicalDevice;
 	VkDevice device;
 	VkExtent2D swapchainExtent;
+	VkSampleCountFlagBits sampleCount;
 };
 

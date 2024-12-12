@@ -15,6 +15,7 @@ public:
 	const QueueFamilyIndices& getIndices();
 	const VkDevice& getDevice();
 	const std::vector<const char*>& getDeviceExtensions();
+	VkSampleCountFlagBits getSampleCount();
 
 private:
 	void pickPhysicalDevice(VkInstance instance, VkSurfaceKHR surface);
@@ -22,6 +23,8 @@ private:
 	bool checkPhysicalDeviceExtensionSupport(VkPhysicalDevice device);
 
 	void createLogicalDevice(const std::vector<const char*>& extensions);
+
+	VkSampleCountFlagBits getMaxUseableSampleCount();
 
 
 	VkPhysicalDevice physicalDevice;
@@ -36,4 +39,5 @@ private:
 	VkQueue graphicsQueue;
 	VkQueue presentQueue;
 
+	VkSampleCountFlagBits msaaSamples;
 };

@@ -150,6 +150,7 @@
     <ClCompile Include="GlfwHandler.cpp" />
     <ClCompile Include="GlfwHandler.hpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Msaa.cpp" />
     <ClCompile Include="RendererCommon.cpp" />
     <ClCompile Include="RendererCommon.h" />
     <ClCompile Include="SwapchainManager.cpp" />
@@ -159,6 +160,7 @@
   <ItemGroup>
     <ClInclude Include="App.hpp" />
     <ClInclude Include="DepthBuffer.hpp" />
+    <ClInclude Include="Msaa.hpp" />
     <ClInclude Include="SwapchainManager.hpp" />
     <ClInclude Include="ValidationLayers.hpp" />
     <ClInclude Include="VulkanRenderer.hpp" />

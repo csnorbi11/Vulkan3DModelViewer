@@ -11,7 +11,8 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window)
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
 	swapchainManager = std::make_unique<SwapchainManager>(deviceManager->getPhysicalDevice(), deviceManager->getDevice(),
-		deviceManager->getDeviceExtensions(), deviceManager->getIndices(), surface, width, height);
+		deviceManager->getDeviceExtensions(), deviceManager->getIndices(), surface, width, height,
+		deviceManager->getSampleCount());
 }
 VulkanRenderer::~VulkanRenderer()
 {

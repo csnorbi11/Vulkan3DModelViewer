@@ -1,14 +1,15 @@
 #include "DepthBuffer.hpp"
 
 DepthBuffer::DepthBuffer(const VkPhysicalDevice& physicalDevice, const VkDevice& device,
-	const VkExtent2D& swapchainExtent)
+	const VkExtent2D& swapchainExtent, VkSampleCountFlagBits sampleCount)
 	:
 	image(VK_NULL_HANDLE),
 	imageMemory(VK_NULL_HANDLE),
 	imageView(VK_NULL_HANDLE),
 	physicalDevice(physicalDevice),
 	device(device),
-	swapchainExtent(swapchainExtent)
+	swapchainExtent(swapchainExtent),
+	sampleCount(sampleCount)
 {
 	create();
 }
@@ -20,7 +21,7 @@ void DepthBuffer::create()
 {
 	VkFormat depthFormat = findDepthFormat();
 
-	createImage(swapchainExtent.width, swapchainExtent.height, 1, depthFormat, VK_SAMPLE_COUNT_1_BIT,
+	createImage(swapchainExtent.width, swapchainExtent.height, 1, depthFormat, sampleCount,
 		VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
 		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image, imageMemory, device, physicalDevice);
 	imageView = createImageView(image, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, 1, device);
