@@ -4,11 +4,15 @@
 
 #include <memory>
 #include <stdexcept>
-#include <iostream>
-#include <vector>
-#include <optional>
 #include <algorithm>
+
+#include <fstream>
+#include <iostream>
+
 #include <string>
+#include <optional>
+
+#include <vector>
 #include <set>
 #include <array>
 
@@ -44,3 +48,5 @@ void createImage(uint32_t width, uint32_t height, uint32_t mipLevels, VkFormat f
 
 VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags,
 	uint32_t mipLevels, VkDevice device);
+
+std::vector<char> readFile(const std::string& filename);

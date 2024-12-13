@@ -4,6 +4,7 @@
 #include "SwapchainManager.hpp"
 #include "DeviceManager.hpp"
 #include "Framebuffer.hpp"
+#include "GraphicsPipeline.hpp"
 
 
 
@@ -30,6 +31,7 @@ private:
 	DepthBuffer depthBuffer;
 	Msaa msaa;
 
+	std::unique_ptr<GraphicsPipeline> graphicsPipeline;
 	std::unique_ptr<Framebuffer> frameBuffer;
 	
 };

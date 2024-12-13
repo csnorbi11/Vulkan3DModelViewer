@@ -8,11 +8,10 @@ DeviceManager::~DeviceManager()
 }
 
 DeviceManager::DeviceManager(VkInstance instance, VkSurfaceKHR surface, const std::vector<const char*>& extensions)
-	:
-	msaaSamples(VK_SAMPLE_COUNT_1_BIT)
 {
 	pickPhysicalDevice(instance, surface);
 	createLogicalDevice(extensions);
+	msaaSamples = getMaxUseableSampleCount();
 }
 void DeviceManager::cleanup()
 {

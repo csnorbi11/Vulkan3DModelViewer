@@ -14,6 +14,7 @@ public:
 	void cleanup();
 
 	const VkImageView& getImageView();
+	const VkFormat& getDepthFormat();
 
 private:
 
@@ -25,6 +26,7 @@ private:
 	VkImage image;
 	VkDeviceMemory imageMemory;
 	VkImageView imageView;
+	VkFormat format;
 
 	VkPhysicalDevice physicalDevice;
 	VkDevice device;

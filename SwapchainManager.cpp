@@ -40,6 +40,11 @@ void SwapchainManager::cleanup()
 
 }
 
+const VkFormat& SwapchainManager::getImageFormat()
+{
+	return imageFormat;
+}
+
 const VkExtent2D SwapchainManager::getImageExtent()
 {
 	return imageExtent;

@@ -22,12 +22,12 @@ DepthBuffer::~DepthBuffer()
 
 void DepthBuffer::create()
 {
-	VkFormat depthFormat = findDepthFormat();
+	format = findDepthFormat();
 
-	createImage(swapchainExtent.width, swapchainExtent.height, 1, depthFormat, sampleCount,
+	createImage(swapchainExtent.width, swapchainExtent.height, 1, format, sampleCount,
 		VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
 		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image, imageMemory, device, physicalDevice);
-	imageView = createImageView(image, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, 1, device);
+	imageView = createImageView(image, format, VK_IMAGE_ASPECT_DEPTH_BIT, 1, device);
 }
 
 void DepthBuffer::cleanup()
@@ -40,6 +40,11 @@ void DepthBuffer::cleanup()
 const VkImageView& DepthBuffer::getImageView()
 {
 	return imageView;
+}
+
+const VkFormat& DepthBuffer::getDepthFormat()
+{
+	return format;
 }
 
 VkFormat DepthBuffer::findDepthFormat()

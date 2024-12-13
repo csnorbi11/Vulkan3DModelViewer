@@ -9,7 +9,7 @@ Framebuffer::~Framebuffer()
 
 Framebuffer::Framebuffer(const std::vector<VkImageView>& swapchainImageViews,
 	const VkImageView& msaaImageView, const VkImageView depthImageView,
-	const VkRenderPass& renderpass, VkExtent2D swapchainExtent,
+	RenderPass& renderpass, VkExtent2D swapchainExtent,
 	const VkDevice device)
 	:
 	device(device)
@@ -25,7 +25,7 @@ Framebuffer::Framebuffer(const std::vector<VkImageView>& swapchainImageViews,
 
 		VkFramebufferCreateInfo framebufferInfo{};
 		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-		framebufferInfo.renderPass = renderpass;
+		framebufferInfo.renderPass = renderpass.getRenderPass();
 		framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
 		framebufferInfo.pAttachments = attachments.data();
 		framebufferInfo.width = swapchainExtent.width;

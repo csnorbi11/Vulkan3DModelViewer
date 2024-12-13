@@ -14,6 +14,7 @@ public:
 	void cleanup();
 
 	const VkImageView& getImageView();
+	const VkSampleCountFlagBits getSampleCount();
 
 private:
 

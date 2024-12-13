@@ -32,6 +32,11 @@ const VkImageView& Msaa::getImageView()
 	return imageView;
 }
 
+const VkSampleCountFlagBits Msaa::getSampleCount()
+{
+	return sampleCount;
+}
+
 void Msaa::create()
 {
 	createImage(swapchainExtent.width, swapchainExtent.height, 1, swapchainImageFormat,

@@ -16,13 +16,17 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window)
 	depthBuffer = swapchainManager->getDepthBuffer();
 	msaa = swapchainManager->getMsaa();
 
-
+	graphicsPipeline = std::make_unique<GraphicsPipeline>(deviceManager->getDevice(), swapchainManager->getImageExtent(),
+		msaa.getSampleCount(), swapchainManager->getImageFormat(), depthBuffer.getDepthFormat());
+	
 	frameBuffer = std::make_unique<Framebuffer>(swapchainManager->getImageViews(),
-		msaa.getImageView(), depthBuffer.getImageView(), VkRenderPass(),
+		msaa.getImageView(), depthBuffer.getImageView(), graphicsPipeline->getRenderPass(),
 		swapchainManager->getImageExtent(), deviceManager->getDevice());
 }
 VulkanRenderer::~VulkanRenderer()
 {
+	frameBuffer->cleanup();
+	graphicsPipeline->cleanup();
 	swapchainManager->cleanup();
 	deviceManager->cleanup();
 	if (enableValidationLayers) {
