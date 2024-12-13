@@ -144,6 +144,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="CommandBuffer.cpp" />
     <ClCompile Include="DepthBuffer.cpp" />
     <ClCompile Include="DeviceManager.cpp" />
     <ClCompile Include="DeviceManager.hpp" />
@@ -162,6 +163,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp" />
+    <ClInclude Include="CommandBuffer.hpp" />
     <ClInclude Include="DepthBuffer.hpp" />
     <ClInclude Include="Framebuffer.hpp" />
     <ClInclude Include="GraphicsPipeline.hpp" />
@@ -172,6 +174,7 @@
     <ClInclude Include="VulkanRenderer.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram.cd" />
     <None Include="shader.frag" />
     <None Include="shader.vert" />
     <None Include="shaderCompile.bat" />

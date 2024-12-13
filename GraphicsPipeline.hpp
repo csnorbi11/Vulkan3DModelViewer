@@ -1,3 +1,4 @@
+#pragma once
 #include "RendererCommon.h"
 #include "RenderPass.hpp"
 
