@@ -11,7 +11,7 @@ Framebuffer::~Framebuffer()
 
 Framebuffer::Framebuffer(const std::vector<VkImageView>& swapchainImageViews,
 	const VkImageView& msaaImageView, const VkImageView depthImageView,
-	RenderPass& renderpass, VkExtent2D swapchainExtent,
+	const VkRenderPass& renderpass, VkExtent2D swapchainExtent,
 	const VkDevice device)
 	:
 	device(device)
@@ -27,7 +27,7 @@ Framebuffer::Framebuffer(const std::vector<VkImageView>& swapchainImageViews,
 
 		VkFramebufferCreateInfo framebufferInfo{};
 		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-		framebufferInfo.renderPass = renderpass.getRenderPass();
+		framebufferInfo.renderPass = renderpass;
 		framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
 		framebufferInfo.pAttachments = attachments.data();
 		framebufferInfo.width = swapchainExtent.width;
@@ -48,4 +48,9 @@ void Framebuffer::cleanup()
 	for (auto framebuffer : swapchainFramebuffers) {
 		vkDestroyFramebuffer(device, framebuffer, nullptr);
 	}
+}
+
+const std::vector<VkFramebuffer>& Framebuffer::getSwapchainFramebuffers()
+{
+	return swapchainFramebuffers;
 }

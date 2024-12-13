@@ -13,7 +13,7 @@ public:
 
 	void cleanup();
 
-	void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+	void recordCommandBuffer(uint32_t imageIndex);
 	void setClearColor(VkClearValue newClearValue);
 private:
 

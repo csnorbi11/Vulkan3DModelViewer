@@ -5,7 +5,7 @@
 #include "DeviceManager.hpp"
 #include "Framebuffer.hpp"
 #include "GraphicsPipeline.hpp"
-
+#include "CommandBuffer.hpp"
 
 
 
@@ -35,5 +35,7 @@ private:
 
 	std::unique_ptr<GraphicsPipeline> graphicsPipeline;
 	std::unique_ptr<Framebuffer> frameBuffer;
+
+	std::unique_ptr<CommandBuffer> commandbuffer;
 	
 };

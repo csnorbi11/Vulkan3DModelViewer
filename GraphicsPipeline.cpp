@@ -192,6 +192,11 @@ RenderPass& GraphicsPipeline::getRenderPass()
 	return *renderpass;
 }
 
+const VkPipeline& GraphicsPipeline::getPipeline()
+{
+	return pipeline;
+}
+
 VkShaderModule GraphicsPipeline::createShaderModule(const std::vector<char>& code)
 {
 	VkShaderModuleCreateInfo createInfo{};

@@ -22,11 +22,16 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window)
 		msaa.getSampleCount(), swapchainManager->getImageFormat(), depthBuffer.getDepthFormat());
 
 	frameBuffer = std::make_unique<Framebuffer>(swapchainManager->getImageViews(),
-		msaa.getImageView(), depthBuffer.getImageView(), graphicsPipeline->getRenderPass(),
+		msaa.getImageView(), depthBuffer.getImageView(), graphicsPipeline->getRenderPass().getRenderPass(),
 		swapchainManager->getImageExtent(), deviceManager->getDevice());
+
+	commandbuffer = std::make_unique<CommandBuffer>(deviceManager->getDevice(), deviceManager->getIndices(),
+		graphicsPipeline->getRenderPass().getRenderPass(), frameBuffer->getSwapchainFramebuffers(),
+		swapchainManager->getImageExtent(), graphicsPipeline->getPipeline());
 }
 VulkanRenderer::~VulkanRenderer()
 {
+	commandbuffer->cleanup();
 	frameBuffer->cleanup();
 	graphicsPipeline->cleanup();
 	swapchainManager->cleanup();
