@@ -10,11 +10,13 @@ public:
 		VkSampleCountFlagBits sampleCount, const VkExtent2D& swapchainExtent,
 		const VkFormat& swapchainImageFormat);
 
-	void create();
+	void create(uint32_t width = 0, uint32_t height = 0);
 	void cleanup();
 
 	const VkImageView& getImageView();
 	const VkSampleCountFlagBits getSampleCount();
+
+	void updateExtent(const VkExtent2D toUpdate);
 
 private:
 

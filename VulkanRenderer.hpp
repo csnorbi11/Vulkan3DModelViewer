@@ -17,6 +17,8 @@ public:
 
 	void drawFrame();
 
+	bool framebufferResized;
+
 private:
 	void createInstance();
 	void createSurface(GLFWwindow* window);
@@ -26,7 +28,7 @@ private:
 	
 
 	GLFWwindow* window;
-	bool framebufferResized;
+	
 
 	VkInstance instance;
 	VkSurfaceKHR surface;

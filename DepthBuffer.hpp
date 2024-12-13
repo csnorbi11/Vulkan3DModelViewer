@@ -10,11 +10,12 @@ public:
 	DepthBuffer(const VkPhysicalDevice& physicalDevice, const VkDevice& device,
 		const VkExtent2D& swapchainExtent, VkSampleCountFlagBits sampleCount);
 
-	void create();
+	void create(uint32_t width = 0, uint32_t height = 0);
 	void cleanup();
 
 	const VkImageView& getImageView();
 	const VkFormat& getDepthFormat();
+
 
 private:
 

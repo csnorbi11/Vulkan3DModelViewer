@@ -46,8 +46,17 @@ const VkSampleCountFlagBits Msaa::getSampleCount()
 	return sampleCount;
 }
 
-void Msaa::create()
+void Msaa::updateExtent(const VkExtent2D toUpdate)
 {
+	swapchainExtent = toUpdate;
+}
+
+void Msaa::create(uint32_t width, uint32_t height)
+{
+	if (width != 0 && height != 0) {
+		swapchainExtent.width = width;
+		swapchainExtent.height = height;
+	}
 	createImage(swapchainExtent.width, swapchainExtent.height, 1, swapchainImageFormat,
 		sampleCount, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT |
 		VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image, imageMemory,

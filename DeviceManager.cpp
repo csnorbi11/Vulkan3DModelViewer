@@ -5,6 +5,7 @@ DeviceManager::DeviceManager(VkInstance instance, VkSurfaceKHR surface, const st
 	pickPhysicalDevice(instance, surface);
 	createLogicalDevice(extensions);
 	msaaSamples = getMaxUseableSampleCount();
+	std::cout << phyDeviceProps.deviceName << std::endl;
 }
 DeviceManager::~DeviceManager()
 {
@@ -90,8 +91,11 @@ bool DeviceManager::isPhysicalDeviceSuitable(VkPhysicalDevice device, VkSurfaceK
 		isSwapChainSuitable = !swapChainDetails.formats.empty() && !swapChainDetails.presents.empty();
 	}
 
+	VkPhysicalDeviceProperties deviceProperties;
+	vkGetPhysicalDeviceProperties(device, &deviceProperties);
+	bool isDedicated = deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU;
 
-	return indices.isComplete() && extensionsSupported && isSwapChainSuitable;
+	return indices.isComplete() && extensionsSupported && isSwapChainSuitable&& isDedicated;
 }
 
 void DeviceManager::createLogicalDevice(const std::vector<const char*>& extensions)

@@ -12,6 +12,7 @@ public:
 private:
 	void loop();
 
+	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
 	GlfwHandler glfwHandler;
 	VulkanRenderer renderer;

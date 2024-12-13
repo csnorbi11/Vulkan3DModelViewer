@@ -9,10 +9,13 @@ public:
 
 	Framebuffer(const std::vector<VkImageView>& swapchainImageViews,
 		const VkImageView& msaaImageView, const VkImageView depthImageView,
-		const VkRenderPass& renderpass, VkExtent2D swapchainExtent,
+		const VkRenderPass& renderpass, const VkExtent2D& swapchainExtent,
 		const VkDevice device);
 
 
+	void create(const std::vector<VkImageView>& swapchainImageViews, const VkImageView& msaaImageView,
+		const VkImageView depthImageView, const VkRenderPass& renderpass,
+		const VkExtent2D& swapchainExtent);
 	void cleanup();
 
 	const std::vector<VkFramebuffer>& getSwapchainFramebuffers();

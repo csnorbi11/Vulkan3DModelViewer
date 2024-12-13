@@ -100,24 +100,29 @@ void VulkanRenderer::createSurface(GLFWwindow* window)
 
 void VulkanRenderer::recreateSwapchain()
 {
-	vkDeviceWaitIdle(deviceManager->getDevice());
-
-
-	msaa.cleanup();
-	depthBuffer.cleanup();
-	swapchainManager->cleanup();
-
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
-	swapchainManager->recreate(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
-	msaa.create();
-	depthBuffer.create();
+	while (width == 0 || height == 0) {
+		glfwGetFramebufferSize(window, &width, &height);
+		glfwWaitEvents();
+	}
 
+	vkDeviceWaitIdle(deviceManager->getDevice());
+
+	frameBuffer->cleanup();
+	swapchainManager->cleanup();
+
+
+	
+	swapchainManager->recreate(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
+	frameBuffer->create(swapchainManager->getImageViews(), msaa.getImageView(),
+		depthBuffer.getImageView(), graphicsPipeline->getRenderPass().getRenderPass(),
+		swapchainManager->getImageExtent());
 }
 
 void VulkanRenderer::drawFrame()
 {
-	vkWaitForFences(deviceManager->getDevice(), 1, &syncObjects->inFlightFences[currentFrame],
+	vkWaitForFences(deviceManager->getDevice(), 1, &(syncObjects->inFlightFences[currentFrame]),
 		VK_TRUE, UINT64_MAX);
 
 	uint32_t imageIndex;
@@ -132,10 +137,10 @@ void VulkanRenderer::drawFrame()
 		throw std::runtime_error("faileed to acquire image from swapchain");
 	}
 
-	vkResetFences(deviceManager->getDevice(), 1, &syncObjects->inFlightFences[currentFrame]);
+	vkResetFences(deviceManager->getDevice(), 1, &(syncObjects->inFlightFences[currentFrame]));
 
 	vkResetCommandBuffer(commandbuffer->getCommandbuffers()[currentFrame], 0);
-	commandbuffer->recordCommandBuffer(imageIndex);
+	commandbuffer->recordCommandBuffer(currentFrame, imageIndex);
 
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

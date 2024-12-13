@@ -11,10 +11,18 @@ Framebuffer::~Framebuffer()
 
 Framebuffer::Framebuffer(const std::vector<VkImageView>& swapchainImageViews,
 	const VkImageView& msaaImageView, const VkImageView depthImageView,
-	const VkRenderPass& renderpass, VkExtent2D swapchainExtent,
+	const VkRenderPass& renderpass, const VkExtent2D& swapchainExtent,
 	const VkDevice device)
 	:
 	device(device)
+{
+	create(swapchainImageViews, msaaImageView, depthImageView, renderpass, swapchainExtent);
+}
+
+
+void Framebuffer::create(const std::vector<VkImageView>& swapchainImageViews,
+	const VkImageView& msaaImageView, const VkImageView depthImageView,
+	const VkRenderPass& renderpass, const VkExtent2D& swapchainExtent)
 {
 	swapchainFramebuffers.resize(swapchainImageViews.size());
 
@@ -45,6 +53,9 @@ Framebuffer::Framebuffer(const std::vector<VkImageView>& swapchainImageViews,
 
 void Framebuffer::cleanup()
 {
+	//for (size_t i = 0; i < swapchainFramebuffers.size(); i++) {
+	//	vkDestroyFramebuffer(device, swapchainFramebuffers[i], nullptr);
+	//}
 	for (auto framebuffer : swapchainFramebuffers) {
 		vkDestroyFramebuffer(device, framebuffer, nullptr);
 	}

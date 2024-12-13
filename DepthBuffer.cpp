@@ -29,8 +29,13 @@ DepthBuffer::~DepthBuffer()
 {
 }
 
-void DepthBuffer::create()
+void DepthBuffer::create(uint32_t width, uint32_t height)
 {
+	if (width != 0 && height != 0) {
+		swapchainExtent.width = width;
+		swapchainExtent.height = height;
+	}
+
 	format = findDepthFormat();
 
 	createImage(swapchainExtent.width, swapchainExtent.height, 1, format, sampleCount,

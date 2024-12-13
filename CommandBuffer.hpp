@@ -14,7 +14,7 @@ public:
 
 	void cleanup();
 
-	void recordCommandBuffer(uint32_t imageIndex);
+	void recordCommandBuffer(uint32_t currentFrame, uint32_t imageIndex);
 	void setClearColor(VkClearValue newClearValue);
 
 	std::vector<VkCommandBuffer>& getCommandbuffers();

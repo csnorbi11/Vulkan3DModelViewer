@@ -21,14 +21,14 @@ SwapchainManager::~SwapchainManager()
 }
 
 SwapchainManager::SwapchainManager(const VkPhysicalDevice& phyDevice, const VkDevice& device,
-	const std::vector<const char*>& deviceExtensions, const QueueFamilyIndices indices,
+	const std::vector<const char*>& deviceExtensions, const QueueFamilyIndices& indices,
 	VkSurfaceKHR& surface, uint32_t frameBufferWidth, uint32_t frameBufferHeight,
 	VkSampleCountFlagBits sampleCount)
 	:
 	surface(surface),
 	physicalDevice(phyDevice),
 	device(device),
-	extensions(extensions),
+	extensions(deviceExtensions),
 	indices(indices),
 	framebufferWidth(frameBufferWidth),
 	framebufferHeight(frameBufferHeight),
@@ -100,6 +100,7 @@ void SwapchainManager::create()
 	swapCreateInfo.imageArrayLayers = 1;
 	swapCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
+
 	uint32_t queueFamilyIndices[] = { indices.graphicsFamily.value(), indices.presentFamily.value() };
 
 	if (indices.graphicsFamily != indices.presentFamily) {
@@ -109,8 +110,6 @@ void SwapchainManager::create()
 	}
 	else {
 		swapCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		swapCreateInfo.queueFamilyIndexCount = 0; // Optional
-		swapCreateInfo.pQueueFamilyIndices = nullptr; // Optional
 	}
 	swapCreateInfo.preTransform = swapchainSupport.capabilities.currentTransform;
 	swapCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
@@ -122,8 +121,8 @@ void SwapchainManager::create()
 		throw std::runtime_error("failed to create swapchain");
 	}
 
+	imageFormat = surfaceFormat.format;
 	imageExtent = extent;
-	imagesCount = imageCount;
 
 	createImages(imagesCount, surfaceFormat);
 	createImageViews();
@@ -132,16 +131,11 @@ void SwapchainManager::create()
 void SwapchainManager::recreate(uint32_t frameBufferWidth, uint32_t frameBufferHeight)
 {
 
-	vkDeviceWaitIdle(device);
-
-
-
-	cleanup();
-
 	this->framebufferWidth = frameBufferWidth;
 	this->framebufferHeight = frameBufferHeight;
 	create();
-	
+	msaa->create(frameBufferWidth, frameBufferHeight);
+	depthBuffer->create(frameBufferWidth, frameBufferHeight);
 
 }
 VkSurfaceFormatKHR SwapchainManager::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)

@@ -10,7 +10,7 @@ public:
 	~SwapchainManager();
 
 	SwapchainManager(const VkPhysicalDevice& phyDevice, const VkDevice& device,
-		const std::vector<const char*>& deviceExtensions, const QueueFamilyIndices indices,
+		const std::vector<const char*>& deviceExtensions, const QueueFamilyIndices& indices,
 		VkSurfaceKHR& surface, uint32_t frameBufferWidth, uint32_t frameBufferHeight,
 		VkSampleCountFlagBits sampleCount);
 	void create();
