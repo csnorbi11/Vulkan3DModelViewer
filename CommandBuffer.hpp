@@ -9,19 +9,22 @@ public:
 
 	CommandBuffer(const VkDevice& device, const QueueFamilyIndices& indices,
 		const VkRenderPass& renderpass, const std::vector<VkFramebuffer>& swapchainFramebuffers,
-		const VkExtent2D& swapchainExtent, const VkPipeline& graphicsPipeline);
+		const VkExtent2D& swapchainExtent, const VkPipeline& graphicsPipeline,
+		const int MAX_FRAMES_IN_FLIGHT);
 
 	void cleanup();
 
 	void recordCommandBuffer(uint32_t imageIndex);
 	void setClearColor(VkClearValue newClearValue);
+
+	std::vector<VkCommandBuffer>& getCommandbuffers();
 private:
 
 
 
 	VkCommandPool commandPool;
-	VkCommandBuffer commandBuffer;
-	VkClearValue clearValue;
+	std::vector<VkCommandBuffer> commandBuffers;
+	std::vector <VkClearValue> clearValues;
 
 	VkDevice device;
 	VkRenderPass renderpass;

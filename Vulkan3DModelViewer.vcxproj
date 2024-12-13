@@ -158,6 +158,7 @@
     <ClCompile Include="RendererCommon.h" />
     <ClCompile Include="RenderPass.cpp" />
     <ClCompile Include="SwapchainManager.cpp" />
+    <ClCompile Include="SyncObjects.cpp" />
     <ClCompile Include="ValidationLayers.cpp" />
     <ClCompile Include="VulkanRenderer.cpp" />
   </ItemGroup>
@@ -170,6 +171,7 @@
     <ClInclude Include="Msaa.hpp" />
     <ClInclude Include="RenderPass.hpp" />
     <ClInclude Include="SwapchainManager.hpp" />
+    <ClInclude Include="SyncObjects.hpp" />
     <ClInclude Include="ValidationLayers.hpp" />
     <ClInclude Include="VulkanRenderer.hpp" />
   </ItemGroup>

@@ -73,6 +73,10 @@ const Msaa& SwapchainManager::getMsaa()
 {
 	return *msaa;
 }
+const VkSwapchainKHR& SwapchainManager::getSwapchain()
+{
+	return swapChain;
+}
 void SwapchainManager::create()
 {
 	SwapChainSupportDetails swapchainSupport = querySwapChainSupport(physicalDevice, surface);

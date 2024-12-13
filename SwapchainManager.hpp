@@ -22,6 +22,7 @@ public:
 	const std::vector<VkImageView> getImageViews();
 	const DepthBuffer& getDepthBuffer();
 	const Msaa& getMsaa();
+	const VkSwapchainKHR& getSwapchain();
 
 
 private:

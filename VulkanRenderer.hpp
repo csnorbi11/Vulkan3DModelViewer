@@ -6,7 +6,7 @@
 #include "Framebuffer.hpp"
 #include "GraphicsPipeline.hpp"
 #include "CommandBuffer.hpp"
-
+#include "SyncObjects.hpp"
 
 
 
@@ -15,13 +15,18 @@ public:
 	VulkanRenderer(GLFWwindow* window);
 	~VulkanRenderer();
 
+	void drawFrame();
+
 private:
 	void createInstance();
 	void createSurface(GLFWwindow* window);
 
 	void recreateSwapchain();
 
+	
+
 	GLFWwindow* window;
+	bool framebufferResized;
 
 	VkInstance instance;
 	VkSurfaceKHR surface;
@@ -38,4 +43,7 @@ private:
 
 	std::unique_ptr<CommandBuffer> commandbuffer;
 	
+	std::unique_ptr<SyncObjects> syncObjects;
+	uint32_t currentFrame;
+	const int MAX_FRAMES_IN_FLIGHT;
 };

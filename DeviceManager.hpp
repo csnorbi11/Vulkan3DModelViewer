@@ -15,6 +15,8 @@ public:
 	const VkDevice& getDevice();
 	const std::vector<const char*>& getDeviceExtensions();
 	VkSampleCountFlagBits getSampleCount();
+	const VkQueue& getPresentQueue();
+	const VkQueue& getGraphicsQueue();
 
 private:
 	void pickPhysicalDevice(VkInstance instance, VkSurfaceKHR surface);

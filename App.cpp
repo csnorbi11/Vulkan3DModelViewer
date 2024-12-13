@@ -23,6 +23,7 @@ void App::loop()
 {
 	while (!glfwWindowShouldClose(glfwHandler.window.get())) {
 		glfwPollEvents();
+		renderer.drawFrame();
 	}
 }
 

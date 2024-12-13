@@ -41,6 +41,16 @@ VkSampleCountFlagBits DeviceManager::getSampleCount()
 	return msaaSamples;
 }
 
+const VkQueue& DeviceManager::getPresentQueue()
+{
+	return presentQueue;
+}
+
+const VkQueue& DeviceManager::getGraphicsQueue()
+{
+	return graphicsQueue;
+}
+
 void DeviceManager::pickPhysicalDevice(VkInstance instance, VkSurfaceKHR surface)
 {
 	uint32_t devicesCount = 0;
