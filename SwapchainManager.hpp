@@ -2,6 +2,7 @@
 #include "RendererCommon.h"
 #include "DepthBuffer.hpp"
 #include "Msaa.hpp"
+#include "Framebuffer.hpp"
 
 class SwapchainManager {
 public:
@@ -12,6 +13,7 @@ public:
 		const std::vector<const char*>& deviceExtensions, const QueueFamilyIndices indices,
 		VkSurfaceKHR& surface, uint32_t frameBufferWidth, uint32_t frameBufferHeight,
 		VkSampleCountFlagBits sampleCount);
+	void create();
 	void cleanup();
 	void recreate(uint32_t frameBufferWidth, uint32_t frameBufferHeight);
 
@@ -21,8 +23,8 @@ public:
 	const DepthBuffer& getDepthBuffer();
 	const Msaa& getMsaa();
 
+
 private:
-	void create();
 	
 	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& avaiableFormats);
 	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& avaiablePresentModes);

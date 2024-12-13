@@ -1,6 +1,8 @@
 #include "VulkanRenderer.hpp"
 
 VulkanRenderer::VulkanRenderer(GLFWwindow* window)
+	:
+	window(window)
 {
 	validationLayers = std::make_unique<ValidationLayers>();
 	createInstance();
@@ -18,7 +20,7 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window)
 
 	graphicsPipeline = std::make_unique<GraphicsPipeline>(deviceManager->getDevice(), swapchainManager->getImageExtent(),
 		msaa.getSampleCount(), swapchainManager->getImageFormat(), depthBuffer.getDepthFormat());
-	
+
 	frameBuffer = std::make_unique<Framebuffer>(swapchainManager->getImageViews(),
 		msaa.getImageView(), depthBuffer.getImageView(), graphicsPipeline->getRenderPass(),
 		swapchainManager->getImageExtent(), deviceManager->getDevice());
@@ -83,6 +85,23 @@ void VulkanRenderer::createSurface(GLFWwindow* window)
 	if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS) {
 		throw std::runtime_error("filed to create surface");
 	}
+}
+
+void VulkanRenderer::recreateSwapchain()
+{
+	vkDeviceWaitIdle(deviceManager->getDevice());
+
+
+	msaa.cleanup();
+	depthBuffer.cleanup();
+	swapchainManager->cleanup();
+
+	int width, height;
+	glfwGetFramebufferSize(window, &width, &height);
+	swapchainManager->recreate(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
+	msaa.create();
+	depthBuffer.create();
+
 }
 
 

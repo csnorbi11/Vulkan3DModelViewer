@@ -15,6 +15,7 @@ public:
 
 	void cleanup();
 
+
 private:
 
 	std::vector<VkFramebuffer> swapchainFramebuffers;

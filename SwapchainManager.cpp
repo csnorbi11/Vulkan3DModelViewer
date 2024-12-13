@@ -32,6 +32,7 @@ void SwapchainManager::cleanup()
 {
 	msaa->cleanup();
 	depthBuffer->cleanup();
+	
 	for (uint32_t i = 0; i < imagesCount; i++) {
 		vkDestroyImageView(device, imageViews[i], nullptr);
 	}
@@ -125,8 +126,7 @@ void SwapchainManager::recreate(uint32_t frameBufferWidth, uint32_t frameBufferH
 	this->framebufferWidth = frameBufferWidth;
 	this->framebufferHeight = frameBufferHeight;
 	create();
-	msaa->create();
-	depthBuffer->create();
+	
 
 }
 VkSurfaceFormatKHR SwapchainManager::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)

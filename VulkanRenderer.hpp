@@ -19,7 +19,9 @@ private:
 	void createInstance();
 	void createSurface(GLFWwindow* window);
 
+	void recreateSwapchain();
 
+	GLFWwindow* window;
 
 	VkInstance instance;
 	VkSurfaceKHR surface;
