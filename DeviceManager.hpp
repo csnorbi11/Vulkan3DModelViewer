@@ -4,10 +4,9 @@
 
 class DeviceManager {
 public:
-	DeviceManager();
+	DeviceManager(VkInstance instance, VkSurfaceKHR surface, const std::vector<const char*>& extensions);
 	~DeviceManager();
 
-	DeviceManager(VkInstance instance, VkSurfaceKHR surface, const std::vector<const char*>& extensions);
 	void cleanup();
 
 	const VkPhysicalDevice& getPhysicalDevice();

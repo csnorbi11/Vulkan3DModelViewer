@@ -1,6 +1,10 @@
 #include "GraphicsPipeline.hpp"
 
 GraphicsPipeline::GraphicsPipeline()
+	:
+	device(VK_NULL_HANDLE),
+	pipeline(VK_NULL_HANDLE),
+	pipelineLayout(VK_NULL_HANDLE)
 {
 }
 GraphicsPipeline::~GraphicsPipeline()

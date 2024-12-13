@@ -1,18 +1,15 @@
 #include "DeviceManager.hpp"
 
-DeviceManager::DeviceManager()
-{
-}
-DeviceManager::~DeviceManager()
-{
-}
-
 DeviceManager::DeviceManager(VkInstance instance, VkSurfaceKHR surface, const std::vector<const char*>& extensions)
 {
 	pickPhysicalDevice(instance, surface);
 	createLogicalDevice(extensions);
 	msaaSamples = getMaxUseableSampleCount();
 }
+DeviceManager::~DeviceManager()
+{
+}
+
 void DeviceManager::cleanup()
 {
 	vkDestroyDevice(device, nullptr);
@@ -22,22 +19,18 @@ const VkPhysicalDevice& DeviceManager::getPhysicalDevice()
 {
 	return physicalDevice;
 }
-
 const VkPhysicalDeviceProperties& DeviceManager::getPhysicalDeviceProperties()
 {
 	return phyDeviceProps;
 }
-
 const QueueFamilyIndices& DeviceManager::getIndices()
 {
 	return indices;
 }
-
 const VkDevice& DeviceManager::getDevice()
 {
 	return device;
 }
-
 const std::vector<const char*>& DeviceManager::getDeviceExtensions()
 {
 	return deviceExtensions;
@@ -150,8 +143,6 @@ VkSampleCountFlagBits DeviceManager::getMaxUseableSampleCount()
 
 	return VK_SAMPLE_COUNT_1_BIT;
 }
-
-
 
 bool DeviceManager::checkPhysicalDeviceExtensionSupport(VkPhysicalDevice device)
 {

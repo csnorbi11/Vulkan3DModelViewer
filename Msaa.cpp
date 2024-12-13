@@ -1,6 +1,15 @@
 #include "Msaa.hpp"
 
 Msaa::Msaa()
+	:
+	image(VK_NULL_HANDLE),
+	imageMemory(VK_NULL_HANDLE),
+	imageView(VK_NULL_HANDLE),
+	sampleCount(VK_SAMPLE_COUNT_1_BIT),
+	physicalDevice(VK_NULL_HANDLE),
+	device(VK_NULL_HANDLE),
+	swapchainExtent({ 0,0 }),
+	swapchainImageFormat(VK_FORMAT_UNDEFINED)
 {
 }
 Msaa::~Msaa()

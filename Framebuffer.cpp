@@ -1,6 +1,8 @@
 #include "Framebuffer.hpp"
 
 Framebuffer::Framebuffer()
+	:
+	device(VK_NULL_HANDLE)
 {
 }
 Framebuffer::~Framebuffer()

@@ -1,6 +1,9 @@
 #include "RenderPass.hpp"
 
 RenderPass::RenderPass()
+	:
+	device(VK_NULL_HANDLE),
+	renderpass(VK_NULL_HANDLE)
 {
 }
 RenderPass::~RenderPass()
