@@ -37,8 +37,8 @@ private:
 	std::unique_ptr<DeviceManager> deviceManager;
 
 	std::unique_ptr<SwapchainManager> swapchainManager;
-	DepthBuffer depthBuffer;
-	Msaa msaa;
+	std::shared_ptr<DepthBuffer> depthBuffer;
+	std::shared_ptr<Msaa> msaa;
 
 	std::unique_ptr<GraphicsPipeline> graphicsPipeline;
 	std::unique_ptr<Framebuffer> frameBuffer;

@@ -53,11 +53,8 @@ void Framebuffer::create(const std::vector<VkImageView>& swapchainImageViews,
 
 void Framebuffer::cleanup()
 {
-	//for (size_t i = 0; i < swapchainFramebuffers.size(); i++) {
-	//	vkDestroyFramebuffer(device, swapchainFramebuffers[i], nullptr);
-	//}
-	for (auto framebuffer : swapchainFramebuffers) {
-		vkDestroyFramebuffer(device, framebuffer, nullptr);
+	for (size_t i = 0; i < swapchainFramebuffers.size(); i++) {
+		vkDestroyFramebuffer(device, swapchainFramebuffers[i], nullptr);
 	}
 }
 

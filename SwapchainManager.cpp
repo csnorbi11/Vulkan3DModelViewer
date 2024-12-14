@@ -35,8 +35,8 @@ SwapchainManager::SwapchainManager(const VkPhysicalDevice& phyDevice, const VkDe
 	sampleCount(sampleCount)
 {
 	create();
-	depthBuffer = std::make_unique<DepthBuffer>(physicalDevice, this->device, imageExtent,sampleCount);
-	msaa = std::make_unique<Msaa>(physicalDevice, this->device, sampleCount, imageExtent, imageFormat);
+	depthBuffer = std::make_shared<DepthBuffer>(physicalDevice, this->device, imageExtent,sampleCount);
+	msaa = std::make_shared<Msaa>(physicalDevice, this->device, sampleCount, imageExtent, imageFormat);
 }
 
 void SwapchainManager::cleanup()
@@ -65,13 +65,13 @@ const std::vector<VkImageView> SwapchainManager::getImageViews()
 {
 	return imageViews;
 }
-const DepthBuffer& SwapchainManager::getDepthBuffer()
+std::shared_ptr<DepthBuffer> SwapchainManager::getDepthBuffer()
 {
-	return *depthBuffer;
+	return depthBuffer;
 }
-const Msaa& SwapchainManager::getMsaa()
+std::shared_ptr<Msaa> SwapchainManager::getMsaa()
 {
-	return *msaa;
+	return msaa;
 }
 const VkSwapchainKHR& SwapchainManager::getSwapchain()
 {
@@ -175,8 +175,6 @@ void SwapchainManager::createImages(uint32_t& imageCount, VkSurfaceFormatKHR& su
 	images.resize(imageCount);
 	vkGetSwapchainImagesKHR(device, swapChain, &imageCount, images.data());
 
-	imageFormat = surfaceFormat.format;
-	imageExtent = imageExtent;
 }
 void SwapchainManager::createImageViews()
 {

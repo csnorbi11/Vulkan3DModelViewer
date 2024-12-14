@@ -105,6 +105,11 @@ void CommandBuffer::setClearColor(VkClearValue newClearValue)
 	clearValues[1] = newClearValue;
 }
 
+void CommandBuffer::updateFramebuffer(const std::vector<VkFramebuffer>& framebuffer)
+{
+	swapchainFramebuffers = framebuffer;
+}
+
 std::vector<VkCommandBuffer>& CommandBuffer::getCommandbuffers()
 {
 	return commandBuffers;
