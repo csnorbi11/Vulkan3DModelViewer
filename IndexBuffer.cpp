@@ -12,6 +12,10 @@ IndexBuffer::IndexBuffer(const VkDevice& device, const VkPhysicalDevice& physica
 	:
 	device(device)
 {
+	indices.push_back(0);
+	indices.push_back(1);
+	indices.push_back(2);
+
 	VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
 
 	VkBuffer stagingBuffer;
@@ -37,4 +41,9 @@ void IndexBuffer::cleanup()
 {
 	vkDestroyBuffer(device, buffer, nullptr);
 	vkFreeMemory(device, bufferMemory, nullptr);
+}
+
+const VkBuffer& IndexBuffer::getBuffer()
+{
+	return buffer;
 }

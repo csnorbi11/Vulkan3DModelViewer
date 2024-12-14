@@ -21,6 +21,8 @@ public:
 
 	void cleanup();
 
+	const VkBuffer& getBuffer();
+
 private:
 	std::vector<Vertex> vertices;
 

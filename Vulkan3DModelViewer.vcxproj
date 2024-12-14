@@ -160,6 +160,7 @@
     <ClCompile Include="RenderPass.cpp" />
     <ClCompile Include="SwapchainManager.cpp" />
     <ClCompile Include="SyncObjects.cpp" />
+    <ClCompile Include="UniformBuffer.cpp" />
     <ClCompile Include="ValidationLayers.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
     <ClCompile Include="VulkanRenderer.cpp" />
@@ -175,6 +176,7 @@
     <ClInclude Include="RenderPass.hpp" />
     <ClInclude Include="SwapchainManager.hpp" />
     <ClInclude Include="SyncObjects.hpp" />
+    <ClInclude Include="UniformBuffer.hpp" />
     <ClInclude Include="ValidationLayers.hpp" />
     <ClInclude Include="VertexBuffer.hpp" />
     <ClInclude Include="VulkanRenderer.hpp" />

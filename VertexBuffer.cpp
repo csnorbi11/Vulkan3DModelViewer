@@ -9,7 +9,6 @@ VkVertexInputBindingDescription Vertex::getBindingDescription()
 
 	return bindingDescription;
 }
-
 std::array<VkVertexInputAttributeDescription, 3> Vertex::getAttributeDescriptions()
 {
 	std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions{};
@@ -49,7 +48,18 @@ VertexBuffer::VertexBuffer(const VkDevice& device, const VkPhysicalDevice& physi
 	:
 	device(device)
 {
+	vertices.push_back(Vertex{});
+	vertices[0].position = { 0.0,0.5,0.0 };
+	vertices[0].texCoord = { 1.0,0.0 };
+	vertices.push_back(Vertex{});
+	vertices[1].position = { -0.5,-0.5,0.1 };
+	vertices[1].texCoord = { 0.0,1.0 };
+	vertices.push_back(Vertex{});
+	vertices[2].position = { 0.5,-0.5,0.6 };
+	vertices[2].texCoord = { 1.0,1.0 };
+
 	VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
+	
 
 	VkBuffer stagingBuffer;
 	VkDeviceMemory stagingBufferMemory;
@@ -75,4 +85,9 @@ void VertexBuffer::cleanup()
 {
 	vkDestroyBuffer(device, buffer, nullptr);
 	vkFreeMemory(device, bufferMemory, nullptr);
+}
+
+const VkBuffer& VertexBuffer::getBuffer()
+{
+	return buffer;
 }

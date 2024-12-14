@@ -30,12 +30,20 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window)
 
 	commandbuffer = std::make_unique<CommandBuffer>(deviceManager->getDevice(), deviceManager->getIndices(),
 		graphicsPipeline->getRenderPass().getRenderPass(), frameBuffer->getSwapchainFramebuffers(),
-		swapchainManager->getImageExtent(), graphicsPipeline->getPipeline(), MAX_FRAMES_IN_FLIGHT);
+		swapchainManager->getImageExtent(), graphicsPipeline->getPipeline(), graphicsPipeline->getLayout(), MAX_FRAMES_IN_FLIGHT);
 
 	syncObjects = std::make_unique<SyncObjects>(deviceManager->getDevice(), MAX_FRAMES_IN_FLIGHT);
+
+	vertexBuffer = std::make_unique<VertexBuffer>(deviceManager->getDevice(), deviceManager->getPhysicalDevice(),
+		commandbuffer->getCommandPool(), deviceManager->getGraphicsQueue());
+	indexBuffer = std::make_unique<IndexBuffer>(deviceManager->getDevice(), deviceManager->getPhysicalDevice(),
+		commandbuffer->getCommandPool(), deviceManager->getGraphicsQueue());
 }
 VulkanRenderer::~VulkanRenderer()
 {
+	indexBuffer->cleanup();
+	vertexBuffer->cleanup();
+
 	syncObjects->cleanup();
 	commandbuffer->cleanup();
 	frameBuffer->cleanup();
@@ -138,10 +146,10 @@ void VulkanRenderer::drawFrame()
 		throw std::runtime_error("faileed to acquire image from swapchain");
 	}
 
-	vkResetFences(deviceManager->getDevice(), 1, &(syncObjects->inFlightFences[currentFrame]));
+	vkResetFences(deviceManager->getDevice(), 1, &syncObjects->inFlightFences[currentFrame]);
 
 	vkResetCommandBuffer(commandbuffer->getCommandbuffers()[currentFrame], 0);
-	commandbuffer->recordCommandBuffer(currentFrame, imageIndex);
+	commandbuffer->recordCommandBuffer(currentFrame, imageIndex,vertexBuffer->getBuffer(),indexBuffer->getBuffer());
 
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

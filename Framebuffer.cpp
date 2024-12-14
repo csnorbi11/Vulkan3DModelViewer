@@ -10,7 +10,7 @@ Framebuffer::~Framebuffer()
 }
 
 Framebuffer::Framebuffer(const std::vector<VkImageView>& swapchainImageViews,
-	const VkImageView& msaaImageView, const VkImageView depthImageView,
+	const VkImageView& msaaImageView, const VkImageView& depthImageView,
 	const VkRenderPass& renderpass, const VkExtent2D& swapchainExtent,
 	const VkDevice device)
 	:
@@ -21,7 +21,7 @@ Framebuffer::Framebuffer(const std::vector<VkImageView>& swapchainImageViews,
 
 
 void Framebuffer::create(const std::vector<VkImageView>& swapchainImageViews,
-	const VkImageView& msaaImageView, const VkImageView depthImageView,
+	const VkImageView& msaaImageView, const VkImageView& depthImageView,
 	const VkRenderPass& renderpass, const VkExtent2D& swapchainExtent)
 {
 	swapchainFramebuffers.resize(swapchainImageViews.size());

@@ -7,7 +7,8 @@
 #include "GraphicsPipeline.hpp"
 #include "CommandBuffer.hpp"
 #include "SyncObjects.hpp"
-
+#include "VertexBuffer.hpp"
+#include "IndexBuffer.hpp"
 
 
 class VulkanRenderer {
@@ -27,7 +28,10 @@ private:
 
 	void recreateSwapchain();
 
-	
+	std::unique_ptr<VertexBuffer> vertexBuffer;
+	std::unique_ptr<IndexBuffer> indexBuffer;
+
+
 
 	GLFWwindow* window;
 	

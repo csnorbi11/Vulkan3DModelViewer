@@ -1,6 +1,7 @@
 #pragma once
 #include "RendererCommon.h"
 #include "RenderPass.hpp"
+#include "VertexBuffer.hpp"
 
 class GraphicsPipeline {
 public:
@@ -15,6 +16,7 @@ public:
 
 	RenderPass& getRenderPass();
 	const VkPipeline& getPipeline();
+	const VkPipelineLayout& getLayout();
 
 private:
 	VkShaderModule createShaderModule(const std::vector<char>& code);

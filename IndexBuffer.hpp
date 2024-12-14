@@ -12,6 +12,8 @@ public:
 
 	void cleanup();
 
+	const VkBuffer& getBuffer();
+
 private:
 	std::vector<uint32_t> indices;
 
