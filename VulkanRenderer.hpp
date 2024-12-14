@@ -17,6 +17,8 @@ public:
 
 	void drawFrame();
 
+	void wait();
+
 	bool framebufferResized;
 
 private:

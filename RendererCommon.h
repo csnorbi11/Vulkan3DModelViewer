@@ -2,6 +2,8 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+#include <glm/glm.hpp>
+
 #include <memory>
 #include <stdexcept>
 #include <algorithm>
@@ -50,3 +52,13 @@ VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags a
 	uint32_t mipLevels, VkDevice device);
 
 std::vector<char> readFile(const std::string& filename);
+
+void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
+	VkBuffer& buffer, VkDeviceMemory& bufferMemory, const VkDevice& device,
+	const VkPhysicalDevice& physicalDevice);
+void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size,
+	const VkCommandPool& commandPool, const VkDevice& device, const VkQueue& queue);
+
+VkCommandBuffer beginSingleTimeCommands(const VkCommandPool& commandPool, const VkDevice& device);
+void endSingleTimeCommands(VkCommandBuffer commandBuffer, const VkQueue& queue, 
+	const VkCommandPool& commandPool, const VkDevice& device);

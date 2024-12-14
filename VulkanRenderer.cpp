@@ -185,4 +185,9 @@ void VulkanRenderer::drawFrame()
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
+void VulkanRenderer::wait()
+{
+	vkDeviceWaitIdle(deviceManager->getDevice());
+}
+
 

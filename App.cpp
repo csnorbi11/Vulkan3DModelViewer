@@ -26,6 +26,7 @@ void App::loop()
 		glfwPollEvents();
 		renderer.drawFrame();
 	}
+	renderer.wait();
 }
 
 void App::framebufferResizeCallback(GLFWwindow* window, int width, int height)

@@ -152,6 +152,7 @@
     <ClCompile Include="GlfwHandler.cpp" />
     <ClCompile Include="GlfwHandler.hpp" />
     <ClCompile Include="GraphicsPipeline.cpp" />
+    <ClCompile Include="IndexBuffer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Msaa.cpp" />
     <ClCompile Include="RendererCommon.cpp" />
@@ -160,6 +161,7 @@
     <ClCompile Include="SwapchainManager.cpp" />
     <ClCompile Include="SyncObjects.cpp" />
     <ClCompile Include="ValidationLayers.cpp" />
+    <ClCompile Include="VertexBuffer.cpp" />
     <ClCompile Include="VulkanRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -168,11 +170,13 @@
     <ClInclude Include="DepthBuffer.hpp" />
     <ClInclude Include="Framebuffer.hpp" />
     <ClInclude Include="GraphicsPipeline.hpp" />
+    <ClInclude Include="IndexBuffer.hpp" />
     <ClInclude Include="Msaa.hpp" />
     <ClInclude Include="RenderPass.hpp" />
     <ClInclude Include="SwapchainManager.hpp" />
     <ClInclude Include="SyncObjects.hpp" />
     <ClInclude Include="ValidationLayers.hpp" />
+    <ClInclude Include="VertexBuffer.hpp" />
     <ClInclude Include="VulkanRenderer.hpp" />
   </ItemGroup>
   <ItemGroup>
