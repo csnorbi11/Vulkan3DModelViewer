@@ -20,8 +20,6 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window)
 		deviceManager->getSampleCount());
 	depthBuffer = swapchainManager->getDepthBuffer();
 	msaa = swapchainManager->getMsaa();
-	uniformBuffer = std::make_unique<UniformBuffer>(deviceManager->getDevice(), deviceManager->getPhysicalDevice(),
-		MAX_FRAMES_IN_FLIGHT, swapchainManager->getImageExtent());
 
 
 	graphicsPipeline = std::make_unique<GraphicsPipeline>(deviceManager->getDevice(), swapchainManager->getImageExtent(),
@@ -34,7 +32,7 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window)
 	commandbuffer = std::make_unique<CommandBuffer>(deviceManager->getDevice(),deviceManager->getIndices(),
 		graphicsPipeline->getRenderPass().getRenderPass(), frameBuffer->getSwapchainFramebuffers(),
 		swapchainManager->getImageExtent(),graphicsPipeline->getPipeline(),graphicsPipeline->getLayout(),
-		graphicsPipeline->getUniformBuffer().getSets(), MAX_FRAMES_IN_FLIGHT);
+		graphicsPipeline->getDescriptorSets(), MAX_FRAMES_IN_FLIGHT);
 
 	syncObjects = std::make_unique<SyncObjects>(deviceManager->getDevice(), MAX_FRAMES_IN_FLIGHT);
 
@@ -46,10 +44,11 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window)
 }
 VulkanRenderer::~VulkanRenderer()
 {
-	swapchainManager->cleanup();
 	indexBuffer->cleanup();
 	vertexBuffer->cleanup();
-	uniformBuffer->cleanup();
+
+	swapchainManager->cleanup();
+
 	
 	syncObjects->cleanup();
 	commandbuffer->cleanup();
@@ -159,7 +158,7 @@ void VulkanRenderer::drawFrame()
 	vkResetCommandBuffer(commandbuffer->getCommandbuffers()[currentFrame], 0);
 	commandbuffer->recordCommandBuffer(currentFrame, imageIndex,vertexBuffer->getBuffer(),indexBuffer->getBuffer());
 
-	uniformBuffer->update(currentFrame, currentFrame);
+	graphicsPipeline->getUniformBuffer().update(currentFrame, currentFrame);
 
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

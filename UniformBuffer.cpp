@@ -55,6 +55,11 @@ void UniformBuffer::update(uint32_t currentFrame, uint32_t currentImage)
 }
 void UniformBuffer::cleanup()
 {
+	for (size_t i = 0; i < uniformBuffers.size(); i++) {
+		vkDestroyBuffer(device, uniformBuffers[i], nullptr);
+		vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
+	}
+
 	vkDestroyDescriptorPool(device, descriptorPool, nullptr);
 
 	vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
@@ -63,7 +68,7 @@ const VkDescriptorSetLayout& UniformBuffer::getLayout()
 {
 	return descriptorSetLayout;
 }
-const const std::vector<VkDescriptorSet>& UniformBuffer::getSets()
+const std::vector<VkDescriptorSet>& UniformBuffer::getSets()
 {
 	return descriptorSets;
 }

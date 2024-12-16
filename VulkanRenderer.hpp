@@ -55,6 +55,4 @@ private:
 	std::unique_ptr<SyncObjects> syncObjects;
 	uint32_t currentFrame;
 	const int MAX_FRAMES_IN_FLIGHT;
-
-	std::unique_ptr<UniformBuffer> uniformBuffer;
 };
