@@ -10,14 +10,16 @@ CommandBuffer::~CommandBuffer()
 CommandBuffer::CommandBuffer(const VkDevice& device, const QueueFamilyIndices& indices,
 	const VkRenderPass& renderpass, const std::vector<VkFramebuffer>& swapchainFramebuffers,
 	const VkExtent2D& swapchainExtent, const VkPipeline& graphicsPipeline,
-	const VkPipelineLayout& pipelineLayout, const int MAX_FRAMES_IN_FLIGHT)
+	const VkPipelineLayout& pipelineLayout, const std::vector<VkDescriptorSet>& descriptorSets,
+	const int MAX_FRAMES_IN_FLIGHT)
 	:
 	device(device),
 	renderpass(renderpass),
 	swapchainFramebuffers(swapchainFramebuffers),
 	swapchainExtent(swapchainExtent),
 	graphicsPipeline(graphicsPipeline),
-	pipelineLayout(pipelineLayout)
+	pipelineLayout(pipelineLayout),
+	descriptorSets(descriptorSets)
 {
 	VkCommandPoolCreateInfo poolInfo{};
 	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -96,6 +98,7 @@ void CommandBuffer::recordCommandBuffer(uint32_t currentFrame, uint32_t imageInd
 	scissor.extent = swapchainExtent;
 	vkCmdSetScissor(commandBuffers[currentFrame], 0, 1, &scissor);
 
+	vkCmdBindDescriptorSets(commandBuffers[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[currentFrame], 0, nullptr);
 	vkCmdDrawIndexed(commandBuffers[currentFrame], static_cast<uint32_t>(3), 1, 0, 0, 0);
 
 	vkCmdEndRenderPass(commandBuffers[currentFrame]);

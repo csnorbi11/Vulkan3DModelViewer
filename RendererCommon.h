@@ -2,7 +2,10 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <memory>
 #include <stdexcept>
@@ -23,6 +26,16 @@ const bool enableValidationLayers = false;
 #else
 const bool enableValidationLayers = true;
 #endif
+
+struct Vertex {
+	glm::vec3 position;
+	glm::vec3 normal;
+	glm::vec2 texCoord;
+
+	static VkVertexInputBindingDescription getBindingDescription();
+	static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions();
+	bool operator==(const Vertex& other) const;
+};
 
 struct QueueFamilyIndices {
 	std::optional<uint32_t> graphicsFamily;
@@ -62,3 +75,4 @@ void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size,
 VkCommandBuffer beginSingleTimeCommands(const VkCommandPool& commandPool, const VkDevice& device);
 void endSingleTimeCommands(VkCommandBuffer commandBuffer, const VkQueue& queue, 
 	const VkCommandPool& commandPool, const VkDevice& device);
+

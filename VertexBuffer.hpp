@@ -1,15 +1,7 @@
 #pragma once
 #include "RendererCommon.h"
 
-struct Vertex {
-	glm::vec3 position;
-	glm::vec3 normal;
-	glm::vec2 texCoord;
 
-	static VkVertexInputBindingDescription getBindingDescription();
-	static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions();
-	bool operator==(const Vertex& other) const;
-};
 
 class VertexBuffer {
 public:

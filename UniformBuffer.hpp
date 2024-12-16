@@ -1,6 +1,8 @@
 #pragma once
 #include "RendererCommon.h"
 
+#include <chrono>
+
 struct UniformBufferObject {
 	glm::mat4 model;
 	glm::mat4 view;
@@ -12,15 +14,32 @@ public:
 	UniformBuffer();
 	~UniformBuffer();
 
-	UniformBuffer(const VkDevice& device, const VkPhysicalDevice& physicalDevice, unsigned int MAX_FRAMES_IN_FLIGHT);
+	UniformBuffer(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
+		const int MAX_FRAMES_IN_FLIGHT, const VkExtent2D& swapchainExtent);
 
-	void update();
+	
+	void update(uint32_t currentFrame, uint32_t currentImage);
+	void cleanup();
 
+	const VkDescriptorSetLayout& getLayout();
+	const std::vector<VkDescriptorSet>& getSets();
+
+	
 private:
+	void create(const int MAX_FRAMES_IN_FLIGHT, const VkPhysicalDevice& physicalDevice);
+	void createDescriptorSetLayout();
+	void createDescriptorPool(const int MAX_FRAMES_IN_FLIGHT);
+	void createDescriptorSets(const int MAX_FRAMES_IN_FLIGHT);
+
+
+	std::vector<VkDescriptorSet> descriptorSets;
+	VkDescriptorSetLayout descriptorSetLayout;
+	VkDescriptorPool descriptorPool;
+
 	std::vector<VkBuffer> uniformBuffers;
 	std::vector<VkDeviceMemory> uniformBuffersMemory;
 	std::vector<void*> uniformBuffersMapped;
 
 	VkDevice device;
-
+	VkExtent2D swapchainExtent;
 };

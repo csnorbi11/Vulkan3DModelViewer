@@ -13,11 +13,13 @@ GraphicsPipeline::~GraphicsPipeline()
 
 GraphicsPipeline::GraphicsPipeline(const VkDevice& device, const VkExtent2D& swapchainExtent,
 	VkSampleCountFlagBits sampleCount, const VkFormat& swapchainImageFormat,
-	const VkFormat& depthBufferFormat)
+	const VkFormat& depthBufferFormat, const VkPhysicalDevice& physicalDevice,
+	const int MAX_FRAMES_IN_FLIGHT)
 	:
 	device(device)
 {
 	renderpass = std::make_unique<RenderPass>(device, swapchainImageFormat, sampleCount, depthBufferFormat);
+	uniformBuffer = std::make_unique<UniformBuffer>(device, physicalDevice, MAX_FRAMES_IN_FLIGHT, swapchainExtent);
 
 	auto vertShaderCode = readFile("vert.spv");
 	auto fragShaderCode = readFile("frag.spv");
@@ -82,7 +84,7 @@ GraphicsPipeline::GraphicsPipeline(const VkDevice& device, const VkExtent2D& swa
 	rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
 	rasterizer.lineWidth = 1.0f;
 	//rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-	rasterizer.cullMode = VK_CULL_MODE_NONE;
+	rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
 	rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 	rasterizer.depthBiasEnable = VK_FALSE;
 	rasterizer.depthBiasConstantFactor = 0.0f; // Optional
@@ -142,6 +144,20 @@ GraphicsPipeline::GraphicsPipeline(const VkDevice& device, const VkExtent2D& swa
 	colorBlending.blendConstants[2] = 0.0f; // Optional
 	colorBlending.blendConstants[3] = 0.0f; // Optional
 
+	
+
+	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
+	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+	pipelineLayoutInfo.setLayoutCount = 1; // Optional
+	pipelineLayoutInfo.pSetLayouts = &uniformBuffer->getLayout(); // Optional
+	pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
+	pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
+
+
+	if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create pipeline layout!");
+	}
+
 	VkGraphicsPipelineCreateInfo pipelineInfo{};
 	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 	pipelineInfo.stageCount = 2;
@@ -156,19 +172,6 @@ GraphicsPipeline::GraphicsPipeline(const VkDevice& device, const VkExtent2D& swa
 	pipelineInfo.pDepthStencilState = &depthStencil;
 	pipelineInfo.pColorBlendState = &colorBlending;
 	pipelineInfo.pDynamicState = &dynamicState;
-
-	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pipelineLayoutInfo.setLayoutCount = 0; // Optional
-	pipelineLayoutInfo.pSetLayouts = nullptr; // Optional
-	pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
-	pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
-
-
-	if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create pipeline layout!");
-	}
-
 	pipelineInfo.layout = pipelineLayout;
 	pipelineInfo.renderPass = renderpass->getRenderPass();
 	pipelineInfo.subpass = 0;
@@ -203,6 +206,21 @@ const VkPipeline& GraphicsPipeline::getPipeline()
 const VkPipelineLayout& GraphicsPipeline::getLayout()
 {
 	return pipelineLayout;
+}
+
+UniformBuffer& GraphicsPipeline::getUniformBuffer()
+{
+	return *uniformBuffer;
+}
+
+const VkDescriptorSetLayout& GraphicsPipeline::getDescriptorSetLayout()
+{
+	return uniformBuffer->getLayout();
+}
+
+const std::vector<VkDescriptorSet>& GraphicsPipeline::getDescriptorSets()
+{
+	return uniformBuffer->getSets();
 }
 
 VkShaderModule GraphicsPipeline::createShaderModule(const std::vector<char>& code)

@@ -9,6 +9,7 @@
 #include "SyncObjects.hpp"
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
+#include "UniformBuffer.hpp"
 
 
 class VulkanRenderer {
@@ -54,4 +55,6 @@ private:
 	std::unique_ptr<SyncObjects> syncObjects;
 	uint32_t currentFrame;
 	const int MAX_FRAMES_IN_FLIGHT;
+
+	std::unique_ptr<UniformBuffer> uniformBuffer;
 };
