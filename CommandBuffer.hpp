@@ -18,7 +18,7 @@ public:
 	void recordCommandBuffer(uint32_t currentFrame, uint32_t imageIndex,
 		const VkBuffer& vertexBuffer, const VkBuffer& indexBuffer);
 	void setClearColor(VkClearValue newClearValue);
-	void updateFramebuffer(const std::vector<VkFramebuffer>& framebuffer);
+	void update(const std::vector<VkFramebuffer>& framebuffer, const VkExtent2D& extent);
 
 	std::vector<VkCommandBuffer>& getCommandbuffers();
 	const VkCommandPool& getCommandPool();

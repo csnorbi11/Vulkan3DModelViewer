@@ -172,6 +172,7 @@
     <ClInclude Include="Framebuffer.hpp" />
     <ClInclude Include="GraphicsPipeline.hpp" />
     <ClInclude Include="IndexBuffer.hpp" />
+    <ClInclude Include="ModelLoader.hpp" />
     <ClInclude Include="Msaa.hpp" />
     <ClInclude Include="RenderPass.hpp" />
     <ClInclude Include="SwapchainManager.hpp" />

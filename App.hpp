@@ -1,6 +1,7 @@
 #pragma once
 #include "GlfwHandler.hpp"
 #include "VulkanRenderer.hpp"
+#include "ModelLoader.hpp"
 
 class App {
 public:

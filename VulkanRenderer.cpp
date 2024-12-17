@@ -133,7 +133,7 @@ void VulkanRenderer::recreateSwapchain()
 	frameBuffer->create(swapchainManager->getImageViews(), msaa->getImageView(),
 		depthBuffer->getImageView(), graphicsPipeline->getRenderPass().getRenderPass(),
 		swapchainManager->getImageExtent());
-	commandbuffer->updateFramebuffer(frameBuffer->getSwapchainFramebuffers());
+	commandbuffer->update(frameBuffer->getSwapchainFramebuffers(),swapchainManager->getImageExtent());
 }
 
 void VulkanRenderer::drawFrame()
