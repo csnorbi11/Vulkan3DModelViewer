@@ -99,7 +99,7 @@ void CommandBuffer::recordCommandBuffer(uint32_t currentFrame, uint32_t imageInd
 	vkCmdSetScissor(commandBuffers[currentFrame], 0, 1, &scissor);
 
 	vkCmdBindDescriptorSets(commandBuffers[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[currentFrame], 0, nullptr);
-	vkCmdDrawIndexed(commandBuffers[currentFrame], static_cast<uint32_t>(3), 1, 0, 0, 0);
+	vkCmdDrawIndexed(commandBuffers[currentFrame], static_cast<uint32_t>(12), 1, 0, 0, 0);
 
 	vkCmdEndRenderPass(commandBuffers[currentFrame]);
 	if (vkEndCommandBuffer(commandBuffers[currentFrame]) != VK_SUCCESS) {
