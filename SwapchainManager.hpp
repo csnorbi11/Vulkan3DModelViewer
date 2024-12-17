@@ -20,9 +20,11 @@ public:
 	const VkFormat& getImageFormat();
 	const VkExtent2D getImageExtent();
 	const std::vector<VkImageView> getImageViews();
-	std::shared_ptr<DepthBuffer> getDepthBuffer();
-	std::shared_ptr<Msaa> getMsaa();
 	const VkSwapchainKHR& getSwapchain();
+	Msaa& getMsaa();
+	DepthBuffer& getDepthBuffer();
+	RenderPass& getRenderPass();
+	Framebuffer& getFramebuffer();
 
 
 private:
@@ -36,9 +38,10 @@ private:
 
 	VkSwapchainKHR swapChain;
 
-
-	std::shared_ptr<DepthBuffer> depthBuffer;
-	std::shared_ptr<Msaa> msaa;
+	std::unique_ptr<Framebuffer> framebuffer;
+	std::unique_ptr<DepthBuffer> depthBuffer;
+	std::unique_ptr<Msaa> msaa;
+	std::unique_ptr<RenderPass> renderpass;
 
 	std::vector<VkImage> images;
 	VkFormat imageFormat;

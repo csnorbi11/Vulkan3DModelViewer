@@ -13,12 +13,12 @@ GraphicsPipeline::~GraphicsPipeline()
 
 GraphicsPipeline::GraphicsPipeline(const VkDevice& device, const VkExtent2D& swapchainExtent,
 	VkSampleCountFlagBits sampleCount, const VkFormat& swapchainImageFormat,
-	const VkFormat& depthBufferFormat, const VkPhysicalDevice& physicalDevice,
+	const VkPhysicalDevice& physicalDevice, const VkRenderPass& renderpass,
 	const int MAX_FRAMES_IN_FLIGHT)
 	:
 	device(device)
 {
-	renderpass = std::make_unique<RenderPass>(device, swapchainImageFormat, sampleCount, depthBufferFormat);
+	
 	uniformBuffer = std::make_unique<UniformBuffer>(device, physicalDevice, MAX_FRAMES_IN_FLIGHT, swapchainExtent);
 
 	auto vertShaderCode = readFile("vert.spv");
@@ -172,7 +172,7 @@ GraphicsPipeline::GraphicsPipeline(const VkDevice& device, const VkExtent2D& swa
 	pipelineInfo.pColorBlendState = &colorBlending;
 	pipelineInfo.pDynamicState = &dynamicState;
 	pipelineInfo.layout = pipelineLayout;
-	pipelineInfo.renderPass = renderpass->getRenderPass();
+	pipelineInfo.renderPass = renderpass;
 	pipelineInfo.subpass = 0;
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
 	pipelineInfo.basePipelineIndex = -1; // Optional
@@ -189,13 +189,8 @@ void GraphicsPipeline::cleanup()
 {
 	vkDestroyPipeline(device, pipeline, nullptr);
 	vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
-	renderpass->cleanup();
+	
 	uniformBuffer->cleanup();
-}
-
-RenderPass& GraphicsPipeline::getRenderPass()
-{
-	return *renderpass;
 }
 
 const VkPipeline& GraphicsPipeline::getPipeline()

@@ -10,12 +10,11 @@ public:
 
 	GraphicsPipeline(const VkDevice& device, const VkExtent2D& swapchainExtent,
 		VkSampleCountFlagBits sampleCount, const VkFormat& swapchainImageFormat,
-		const VkFormat& depthBufferFormat, const VkPhysicalDevice& physicalDevice,
+		 const VkPhysicalDevice& physicalDevice, const VkRenderPass& renderpass,
 		const int MAX_FRAMES_IN_FLIGHT);
 
 	void cleanup();
 
-	RenderPass& getRenderPass();
 	const VkPipeline& getPipeline();
 	const VkPipelineLayout& getLayout();
 	UniformBuffer& getUniformBuffer();
@@ -27,7 +26,7 @@ private:
 
 	VkPipelineLayout pipelineLayout;
 	VkPipeline pipeline;
-	std::unique_ptr<RenderPass> renderpass;
+	
 	std::unique_ptr<UniformBuffer> uniformBuffer;
 
 	VkDevice device;

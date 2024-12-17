@@ -18,19 +18,15 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window)
 	swapchainManager = std::make_unique<SwapchainManager>(deviceManager->getPhysicalDevice(), deviceManager->getDevice(),
 		deviceManager->getDeviceExtensions(), deviceManager->getIndices(), surface, width, height,
 		deviceManager->getSampleCount());
-	depthBuffer = swapchainManager->getDepthBuffer();
-	msaa = swapchainManager->getMsaa();
 
 
 	graphicsPipeline = std::make_unique<GraphicsPipeline>(deviceManager->getDevice(), swapchainManager->getImageExtent(),
-		msaa->getSampleCount(), swapchainManager->getImageFormat(), depthBuffer->getDepthFormat(),
-		deviceManager->getPhysicalDevice(),MAX_FRAMES_IN_FLIGHT);
-	frameBuffer = std::make_unique<Framebuffer>(swapchainManager->getImageViews(),
-		msaa->getImageView(), depthBuffer->getImageView(), graphicsPipeline->getRenderPass().getRenderPass(),
-		swapchainManager->getImageExtent(), deviceManager->getDevice());
+		swapchainManager->getMsaa().getSampleCount(), swapchainManager->getImageFormat(),
+		deviceManager->getPhysicalDevice(), swapchainManager->getRenderPass().getRenderPass(),
+		MAX_FRAMES_IN_FLIGHT);
 	
 	commandbuffer = std::make_unique<CommandBuffer>(deviceManager->getDevice(),deviceManager->getIndices(),
-		graphicsPipeline->getRenderPass().getRenderPass(), frameBuffer->getSwapchainFramebuffers(),
+		swapchainManager->getRenderPass().getRenderPass(), swapchainManager->getFramebuffer().getSwapchainFramebuffers(),
 		swapchainManager->getImageExtent(),graphicsPipeline->getPipeline(),graphicsPipeline->getLayout(),
 		graphicsPipeline->getDescriptorSets(), MAX_FRAMES_IN_FLIGHT);
 
@@ -52,7 +48,6 @@ VulkanRenderer::~VulkanRenderer()
 	
 	syncObjects->cleanup();
 	commandbuffer->cleanup();
-	frameBuffer->cleanup();
 	graphicsPipeline->cleanup();
 	
 	
@@ -124,16 +119,16 @@ void VulkanRenderer::recreateSwapchain()
 
 	vkDeviceWaitIdle(deviceManager->getDevice());
 
-	frameBuffer->cleanup();
+	
 	swapchainManager->cleanup();
 	
 
 	
-	swapchainManager->recreate(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
+	/*swapchainManager->recreate(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
 	frameBuffer->create(swapchainManager->getImageViews(), msaa->getImageView(),
 		depthBuffer->getImageView(), graphicsPipeline->getRenderPass().getRenderPass(),
-		swapchainManager->getImageExtent());
-	commandbuffer->update(frameBuffer->getSwapchainFramebuffers(),swapchainManager->getImageExtent());
+		swapchainManager->getImageExtent());*/
+	commandbuffer->update(swapchainManager->getFramebuffer().getSwapchainFramebuffers(), swapchainManager->getImageExtent());
 }
 
 void VulkanRenderer::drawFrame()

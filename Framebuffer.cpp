@@ -12,7 +12,7 @@ Framebuffer::~Framebuffer()
 Framebuffer::Framebuffer(const std::vector<VkImageView>& swapchainImageViews,
 	const VkImageView& msaaImageView, const VkImageView& depthImageView,
 	const VkRenderPass& renderpass, const VkExtent2D& swapchainExtent,
-	const VkDevice device)
+	const VkDevice& device)
 	:
 	device(device)
 {

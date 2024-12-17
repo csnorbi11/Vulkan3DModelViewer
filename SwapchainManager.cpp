@@ -35,12 +35,18 @@ SwapchainManager::SwapchainManager(const VkPhysicalDevice& phyDevice, const VkDe
 	sampleCount(sampleCount)
 {
 	create();
-	depthBuffer = std::make_shared<DepthBuffer>(physicalDevice, this->device, imageExtent,sampleCount);
-	msaa = std::make_shared<Msaa>(physicalDevice, this->device, sampleCount, imageExtent, imageFormat);
+
+	depthBuffer = std::make_unique<DepthBuffer>(physicalDevice, this->device, imageExtent,sampleCount);
+	msaa = std::make_unique<Msaa>(physicalDevice, this->device, sampleCount, imageExtent, imageFormat);
+	renderpass = std::make_unique<RenderPass>(device, imageFormat, sampleCount, depthBuffer->getDepthFormat());
+	framebuffer = std::make_unique<Framebuffer>(imageViews, msaa->getImageView(), depthBuffer->getImageView(),
+		renderpass->getRenderPass(), imageExtent, device);
 }
 
 void SwapchainManager::cleanup()
 {
+	framebuffer->cleanup();
+
 	msaa->cleanup();
 	depthBuffer->cleanup();
 	
@@ -50,6 +56,8 @@ void SwapchainManager::cleanup()
 
 	vkDestroySwapchainKHR(device, swapChain, nullptr);
 
+
+	renderpass->cleanup();
 }
 
 const VkFormat& SwapchainManager::getImageFormat()
@@ -65,17 +73,25 @@ const std::vector<VkImageView> SwapchainManager::getImageViews()
 {
 	return imageViews;
 }
-std::shared_ptr<DepthBuffer> SwapchainManager::getDepthBuffer()
-{
-	return depthBuffer;
-}
-std::shared_ptr<Msaa> SwapchainManager::getMsaa()
-{
-	return msaa;
-}
 const VkSwapchainKHR& SwapchainManager::getSwapchain()
 {
 	return swapChain;
+}
+Msaa& SwapchainManager::getMsaa()
+{
+	return *msaa;
+}
+DepthBuffer& SwapchainManager::getDepthBuffer()
+{
+	return *depthBuffer;
+}
+RenderPass& SwapchainManager::getRenderPass()
+{
+	return *renderpass;
+}
+Framebuffer& SwapchainManager::getFramebuffer()
+{
+	return *framebuffer;
 }
 void SwapchainManager::create()
 {
