@@ -64,7 +64,6 @@ const VkFormat& SwapchainManager::getImageFormat()
 {
 	return imageFormat;
 }
-
 const VkExtent2D SwapchainManager::getImageExtent()
 {
 	return imageExtent;
@@ -152,6 +151,9 @@ void SwapchainManager::recreate(uint32_t frameBufferWidth, uint32_t frameBufferH
 	create();
 	msaa->create(frameBufferWidth, frameBufferHeight);
 	depthBuffer->create(frameBufferWidth, frameBufferHeight);
+	renderpass->create(imageFormat, sampleCount, depthBuffer->getDepthFormat(), device);
+	framebuffer->create(imageViews, msaa->getImageView(), depthBuffer->getImageView(),
+		renderpass->getRenderPass(), imageExtent);
 
 }
 VkSurfaceFormatKHR SwapchainManager::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)

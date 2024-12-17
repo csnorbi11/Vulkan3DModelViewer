@@ -15,6 +15,11 @@ RenderPass::RenderPass(const VkDevice& device, const VkFormat& swapchainImageFor
 	:
 	device(device)
 {
+	create(swapchainImageFormat, sampleCount, depthBufferFormat, device);
+}
+
+void RenderPass::create(const VkFormat& swapchainImageFormat, const VkSampleCountFlagBits& sampleCount, const VkFormat& depthBufferFormat, const VkDevice& device)
+{
 	VkAttachmentDescription colorAttachment{};
 	colorAttachment.format = swapchainImageFormat;
 	colorAttachment.samples = sampleCount;
@@ -65,7 +70,7 @@ RenderPass::RenderPass(const VkDevice& device, const VkFormat& swapchainImageFor
 	subpass.pResolveAttachments = &colorAttachmentResolveRef;
 
 	std::array<VkAttachmentDescription, 3> attachments = { colorAttachment, depthAttachment,
-	colorAttachmentResolve };
+		colorAttachmentResolve };
 	VkRenderPassCreateInfo renderPassInfo{};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
 	renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
@@ -88,6 +93,7 @@ RenderPass::RenderPass(const VkDevice& device, const VkFormat& swapchainImageFor
 		throw std::runtime_error("failed to create render pass!");
 	}
 }
+
 
 void RenderPass::cleanup()
 {

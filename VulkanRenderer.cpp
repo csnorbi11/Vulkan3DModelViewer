@@ -124,11 +124,8 @@ void VulkanRenderer::recreateSwapchain()
 	
 
 	
-	/*swapchainManager->recreate(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
-	frameBuffer->create(swapchainManager->getImageViews(), msaa->getImageView(),
-		depthBuffer->getImageView(), graphicsPipeline->getRenderPass().getRenderPass(),
-		swapchainManager->getImageExtent());*/
-	commandbuffer->update(swapchainManager->getFramebuffer().getSwapchainFramebuffers(), swapchainManager->getImageExtent());
+	swapchainManager->recreate(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
+	commandbuffer->update(*swapchainManager);
 }
 
 void VulkanRenderer::drawFrame()

@@ -113,11 +113,14 @@ void CommandBuffer::setClearColor(VkClearValue newClearValue)
 	clearValues[1] = newClearValue;
 }
 
-void CommandBuffer::update(const std::vector<VkFramebuffer>& framebuffer, const VkExtent2D& extent)
+void CommandBuffer::update(SwapchainManager& swapchainManager)
 {
-	swapchainFramebuffers = framebuffer;
-	swapchainExtent = extent;
+	swapchainExtent = swapchainManager.getImageExtent();
+	swapchainFramebuffers = swapchainManager.getFramebuffer().getSwapchainFramebuffers();
+	renderpass = swapchainManager.getRenderPass().getRenderPass();
 }
+
+
 
 std::vector<VkCommandBuffer>& CommandBuffer::getCommandbuffers()
 {
