@@ -31,8 +31,8 @@ void App::loop()
 
 void App::framebufferResizeCallback(GLFWwindow* window, int width, int height)
 {
-	auto app = reinterpret_cast<VulkanRenderer*>(glfwGetWindowUserPointer(window));
-	app->framebufferResized = true;
+	auto app = reinterpret_cast<App*>(glfwGetWindowUserPointer(window));
+	app->renderer.framebufferResized = true;
 }
 
 
