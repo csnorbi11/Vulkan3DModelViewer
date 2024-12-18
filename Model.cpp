@@ -15,6 +15,12 @@ Model::Model(const Model&& other)
 {
 }
 
+void Model::cleanup()
+{
+	vertexBuffer.cleanup();
+	indexBuffer.cleanup();
+}
+
 VertexBuffer& Model::getVertexBuffer()
 {
 	return vertexBuffer;

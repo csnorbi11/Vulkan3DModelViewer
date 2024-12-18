@@ -3,6 +3,11 @@
 
 
 
+ModelLoader::~ModelLoader()
+{
+	cleanup();
+}
+
 ModelLoader::ModelLoader(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
 	const VkCommandPool& commandPool, const VkQueue& queue,
 	std::shared_ptr<std::vector<Model>> models)
@@ -56,5 +61,12 @@ void ModelLoader::loadModel(const std::string PATH)
 	}
 
 	models->emplace_back(device, physicalDevice, commandPool, queue, vertices, indices);
-	std::cout << models->at(0).getIndexBuffer().getCount() << std::endl;
+}
+
+void ModelLoader::cleanup()
+{
+	for (auto& model : *models)
+	{
+		model.cleanup();
+	}
 }

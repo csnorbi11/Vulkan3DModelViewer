@@ -12,7 +12,8 @@ IndexBuffer::IndexBuffer(const VkDevice& device, const VkPhysicalDevice& physica
 	const VkCommandPool& commandPool, const VkQueue& queue,
 	const std::vector<uint32_t>& indices)
 	:
-	device(device)
+	device(device),
+	indices(indices)
 {
 	VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
 

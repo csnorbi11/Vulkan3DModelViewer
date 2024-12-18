@@ -14,6 +14,8 @@ public:
 		std::vector<Vertex> vertices, std::vector<uint32_t> indices);
 	Model(const Model&& other);
 
+	void cleanup();
+
 	VertexBuffer& getVertexBuffer();
 	IndexBuffer& getIndexBuffer();
 

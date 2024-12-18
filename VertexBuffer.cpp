@@ -48,7 +48,8 @@ VertexBuffer::VertexBuffer(const VkDevice& device, const VkPhysicalDevice& physi
 	const VkCommandPool& commandPool, const VkQueue& queue,
 	const std::vector<Vertex>& vertices)
 	:
-	device(device)
+	device(device),
+	vertices(vertices)
 {
 	VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 	
