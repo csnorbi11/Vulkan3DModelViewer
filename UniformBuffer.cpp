@@ -36,7 +36,7 @@ void UniformBuffer::create(const int MAX_FRAMES_IN_FLIGHT, const VkPhysicalDevic
 	}
 }
 
-void UniformBuffer::update(uint32_t currentFrame, uint32_t currentImage)
+void UniformBuffer::update(uint32_t currentFrame)
 {
 	static auto startTime = std::chrono::high_resolution_clock::now();
 

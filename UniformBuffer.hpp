@@ -18,7 +18,7 @@ public:
 		const int MAX_FRAMES_IN_FLIGHT, const VkExtent2D& swapchainExtent);
 
 	
-	void update(uint32_t currentFrame, uint32_t currentImage);
+	void update(uint32_t currentFrame);
 	void cleanup();
 
 	const VkDescriptorSetLayout& getLayout();
