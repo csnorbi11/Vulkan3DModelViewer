@@ -9,7 +9,8 @@ public:
 	~VertexBuffer();
 
 	VertexBuffer(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
-		const VkCommandPool& commandPool, const VkQueue& queue);
+		const VkCommandPool& commandPool, const VkQueue& queue,
+		const std::vector<Vertex>& vertices);
 
 	void cleanup();
 

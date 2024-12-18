@@ -17,5 +17,6 @@ private:
 
 	GlfwHandler glfwHandler;
 	VulkanRenderer renderer;
+	ModelLoader modelLoader;
 
 };

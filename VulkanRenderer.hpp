@@ -10,7 +10,7 @@
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
 #include "UniformBuffer.hpp"
-
+#include "Model.hpp"
 
 class VulkanRenderer {
 public:
@@ -23,14 +23,17 @@ public:
 
 	bool framebufferResized;
 
+	DeviceManager& getDeviceManager();
+	CommandBuffer& getCommandBuffer();
+	std::shared_ptr<std::vector<Model>> getModels();
+
 private:
 	void createInstance();
 	void createSurface(GLFWwindow* window);
 
 	void recreateSwapchain();
 
-	std::unique_ptr<VertexBuffer> vertexBuffer;
-	std::unique_ptr<IndexBuffer> indexBuffer;
+	std::shared_ptr<std::vector<Model>> models;
 
 
 

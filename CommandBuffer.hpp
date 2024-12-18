@@ -1,6 +1,7 @@
 #pragma once
 #include "RendererCommon.h"
 #include "SwapchainManager.hpp"
+#include "Model.hpp"
 
 class CommandBuffer {
 public:
@@ -16,7 +17,7 @@ public:
 	void cleanup();
 
 	void recordCommandBuffer(uint32_t currentFrame, uint32_t imageIndex,
-		const VkBuffer& vertexBuffer, const VkBuffer& indexBuffer);
+		Model& model);
 	void setClearColor(VkClearValue newClearValue);
 	void update(SwapchainManager& swapchainManager);
 

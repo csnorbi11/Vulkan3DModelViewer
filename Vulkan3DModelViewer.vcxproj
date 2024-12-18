@@ -154,6 +154,8 @@
     <ClCompile Include="GraphicsPipeline.cpp" />
     <ClCompile Include="IndexBuffer.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Model.cpp" />
+    <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="Msaa.cpp" />
     <ClCompile Include="RendererCommon.cpp" />
     <ClCompile Include="RendererCommon.h" />
@@ -172,6 +174,7 @@
     <ClInclude Include="Framebuffer.hpp" />
     <ClInclude Include="GraphicsPipeline.hpp" />
     <ClInclude Include="IndexBuffer.hpp" />
+    <ClInclude Include="Model.hpp" />
     <ClInclude Include="ModelLoader.hpp" />
     <ClInclude Include="Msaa.hpp" />
     <ClInclude Include="RenderPass.hpp" />

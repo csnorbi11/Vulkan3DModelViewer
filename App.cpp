@@ -3,8 +3,15 @@
 App::App()
 	:
 	glfwHandler(),
-	renderer(glfwHandler.window.get())
+	renderer(glfwHandler.window.get()),
+	modelLoader(renderer.getDeviceManager().getDevice(),
+		renderer.getDeviceManager().getPhysicalDevice(),
+		renderer.getCommandBuffer().getCommandPool(), 
+		renderer.getDeviceManager().getGraphicsQueue(),
+		renderer.getModels())
 {
+	modelLoader.loadModel("viking_room.obj");
+
 	glfwSetWindowUserPointer(glfwHandler.window.get(), this);
 	glfwSetWindowSizeCallback(glfwHandler.window.get(), framebufferResizeCallback);
 }

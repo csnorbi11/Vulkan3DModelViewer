@@ -44,23 +44,12 @@ VertexBuffer::~VertexBuffer()
 {
 }
 
-VertexBuffer::VertexBuffer(const VkDevice& device, const VkPhysicalDevice& physicalDevice, const VkCommandPool& commandPool, const VkQueue& queue)
+VertexBuffer::VertexBuffer(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
+	const VkCommandPool& commandPool, const VkQueue& queue,
+	const std::vector<Vertex>& vertices)
 	:
 	device(device)
 {
-	vertices.push_back(Vertex{});
-	vertices[0].position = { 0.0,0.5,0.0 };
-	vertices[0].texCoord = { 1.0,0.0 };
-	vertices.push_back(Vertex{});
-	vertices[1].position = { 0.0,-0.5,0.5 };
-	vertices[1].texCoord = { 0.0,1.0 };
-	vertices.push_back(Vertex{});
-	vertices[2].position = { -0.5,-0.5,-0.5 };
-	vertices[2].texCoord = { 1.0,1.0 };
-	vertices.push_back(Vertex{});
-	vertices[3].position = { 0.5,-0.5,-0.5 };
-	vertices[3].texCoord = { 1.0,0.0 };
-
 	VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 	
 

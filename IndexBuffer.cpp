@@ -8,26 +8,12 @@ IndexBuffer::~IndexBuffer()
 {
 }
 
-IndexBuffer::IndexBuffer(const VkDevice& device, const VkPhysicalDevice& physicalDevice, const VkCommandPool& commandPool, const VkQueue& queue)
+IndexBuffer::IndexBuffer(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
+	const VkCommandPool& commandPool, const VkQueue& queue,
+	const std::vector<uint32_t>& indices)
 	:
 	device(device)
 {
-	indices.push_back(0);
-	indices.push_back(1);
-	indices.push_back(2);
-
-	indices.push_back(1);
-	indices.push_back(2);
-	indices.push_back(3);
-	
-	indices.push_back(0);
-	indices.push_back(2);
-	indices.push_back(3);
-	
-	indices.push_back(3);
-	indices.push_back(1);
-	indices.push_back(0);
-
 	VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
 
 	VkBuffer stagingBuffer;
@@ -58,4 +44,9 @@ void IndexBuffer::cleanup()
 const VkBuffer& IndexBuffer::getBuffer()
 {
 	return buffer;
+}
+
+uint32_t IndexBuffer::getCount()
+{
+	return static_cast<uint32_t>(indices.size());
 }
