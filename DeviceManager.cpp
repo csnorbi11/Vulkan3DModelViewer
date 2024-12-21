@@ -5,7 +5,9 @@ DeviceManager::DeviceManager(VkInstance instance, VkSurfaceKHR surface, const st
 	pickPhysicalDevice(instance, surface);
 	createLogicalDevice(extensions);
 	msaaSamples = getMaxUseableSampleCount();
-	std::cout << phyDeviceProps.deviceName << std::endl;
+	minUniformBufferOffset = phyDeviceProps.limits.minUniformBufferOffsetAlignment;
+	std::cout << "minimum Uniform Buffer offset alignment: " << minUniformBufferOffset << std::endl;
+	std::cout << "max descriptor count: " << phyDeviceProps.limits.maxDescriptorSetUniformBuffers << std::endl;
 }
 DeviceManager::~DeviceManager()
 {

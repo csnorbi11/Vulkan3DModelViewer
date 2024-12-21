@@ -4,6 +4,7 @@
 
 Texture::~Texture()
 {
+	
 }
 
 Texture::Texture(const VkDevice& device, const VkPhysicalDevice& physicalDevice,

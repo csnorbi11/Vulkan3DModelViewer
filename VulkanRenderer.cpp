@@ -23,12 +23,12 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window)
 	graphicsPipeline = std::make_unique<GraphicsPipeline>(deviceManager->getDevice(), swapchainManager->getImageExtent(),
 		swapchainManager->getMsaa().getSampleCount(), swapchainManager->getImageFormat(),
 		deviceManager->getPhysicalDevice(), swapchainManager->getRenderPass().getRenderPass(),
-		MAX_FRAMES_IN_FLIGHT);
+		MAX_FRAMES_IN_FLIGHT,deviceManager->getPhysicalDeviceProperties());
 	
 	commandbuffer = std::make_unique<CommandBuffer>(deviceManager->getDevice(),deviceManager->getIndices(),
 		swapchainManager->getRenderPass().getRenderPass(), swapchainManager->getFramebuffer().getSwapchainFramebuffers(),
 		swapchainManager->getImageExtent(),graphicsPipeline->getPipeline(),graphicsPipeline->getLayout(),
-		graphicsPipeline->getDescriptorSets(), MAX_FRAMES_IN_FLIGHT);
+		graphicsPipeline->getDescriptorSets(), MAX_FRAMES_IN_FLIGHT,graphicsPipeline->getUniformBuffer().getDynamicAlignment());
 
 	syncObjects = std::make_unique<SyncObjects>(deviceManager->getDevice(), MAX_FRAMES_IN_FLIGHT);
 
@@ -145,7 +145,8 @@ void VulkanRenderer::drawFrame()
 	vkResetCommandBuffer(commandbuffer->getCommandbuffers()[currentFrame], 0);
 	commandbuffer->recordCommandBuffer(currentFrame, imageIndex,models->at(0));
 
-	graphicsPipeline->getUniformBuffer().update(currentFrame);
+	graphicsPipeline->getUniformBuffer().updateDynamic(currentFrame);
+	graphicsPipeline->getUniformBuffer().updateStatic(currentFrame);
 
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

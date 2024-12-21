@@ -22,6 +22,10 @@ Model::Model(const Model&& other)
 
 void Model::cleanup()
 {
+	for (auto& texture : textures)
+	{
+		texture.cleanup();
+	}
 	vertexBuffer.cleanup();
 	indexBuffer.cleanup();
 }

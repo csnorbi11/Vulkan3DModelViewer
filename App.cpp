@@ -29,11 +29,17 @@ void App::run()
 
 void App::loop()
 {
+	std::cout << "-------------------------------" << std::endl;
+	std::cout << "----------loop starts----------" << std::endl;
+	std::cout << "-------------------------------" << std::endl;
 	while (!glfwWindowShouldClose(glfwHandler.window.get())) {
 		glfwPollEvents();
 		renderer.drawFrame();
 	}
 	renderer.wait();
+	std::cout << "-------------------------------" << std::endl;
+	std::cout << "----------loop ends----------" << std::endl;
+	std::cout << "-------------------------------" << std::endl;
 }
 
 void App::framebufferResizeCallback(GLFWwindow* window, int width, int height)

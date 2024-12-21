@@ -12,7 +12,7 @@ public:
 		const VkRenderPass& renderpass, const std::vector<VkFramebuffer>& swapchainFramebuffers,
 		const VkExtent2D& swapchainExtent, const VkPipeline& graphicsPipeline,
 		const VkPipelineLayout& pipelineLayout, const std::vector<VkDescriptorSet>& descriptorSets,
-		const int MAX_FRAMES_IN_FLIGHT);
+		const int MAX_FRAMES_IN_FLIGHT, uint32_t dynamicAlignment);
 
 	void cleanup();
 
@@ -38,5 +38,6 @@ private:
 	VkPipeline graphicsPipeline;
 	VkPipelineLayout pipelineLayout;
 	std::vector<VkDescriptorSet> descriptorSets;
+	uint32_t dynamicAlignment;
 	
 };

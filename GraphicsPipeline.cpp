@@ -14,12 +14,12 @@ GraphicsPipeline::~GraphicsPipeline()
 GraphicsPipeline::GraphicsPipeline(const VkDevice& device, const VkExtent2D& swapchainExtent,
 	VkSampleCountFlagBits sampleCount, const VkFormat& swapchainImageFormat,
 	const VkPhysicalDevice& physicalDevice, const VkRenderPass& renderpass,
-	const int MAX_FRAMES_IN_FLIGHT)
+	const int MAX_FRAMES_IN_FLIGHT, VkPhysicalDeviceProperties properties)
 	:
 	device(device)
 {
 	
-	uniformBuffer = std::make_unique<UniformBuffer>(device, physicalDevice, MAX_FRAMES_IN_FLIGHT, swapchainExtent);
+	uniformBuffer = std::make_unique<UniformBuffer>(device, physicalDevice, MAX_FRAMES_IN_FLIGHT, swapchainExtent,properties);
 
 	auto vertShaderCode = readFile("vert.spv");
 	auto fragShaderCode = readFile("frag.spv");

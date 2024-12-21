@@ -41,4 +41,5 @@ private:
 	VkQueue presentQueue;
 
 	VkSampleCountFlagBits msaaSamples;
+	uint32_t minUniformBufferOffset;
 };

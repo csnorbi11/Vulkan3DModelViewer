@@ -11,7 +11,7 @@ CommandBuffer::CommandBuffer(const VkDevice& device, const QueueFamilyIndices& i
 	const VkRenderPass& renderpass, const std::vector<VkFramebuffer>& swapchainFramebuffers,
 	const VkExtent2D& swapchainExtent, const VkPipeline& graphicsPipeline,
 	const VkPipelineLayout& pipelineLayout, const std::vector<VkDescriptorSet>& descriptorSets,
-	const int MAX_FRAMES_IN_FLIGHT)
+	const int MAX_FRAMES_IN_FLIGHT, uint32_t dynamicAlignment)
 	:
 	device(device),
 	renderpass(renderpass),
@@ -19,7 +19,8 @@ CommandBuffer::CommandBuffer(const VkDevice& device, const QueueFamilyIndices& i
 	swapchainExtent(swapchainExtent),
 	graphicsPipeline(graphicsPipeline),
 	pipelineLayout(pipelineLayout),
-	descriptorSets(descriptorSets)
+	descriptorSets(descriptorSets),
+	dynamicAlignment(dynamicAlignment)
 {
 	VkCommandPoolCreateInfo poolInfo{};
 	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -69,7 +70,7 @@ void CommandBuffer::recordCommandBuffer(uint32_t currentFrame, uint32_t imageInd
 
 	VkRenderPassBeginInfo renderPassInfo{};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-	renderPassInfo.renderPass = renderpass;
+	renderPassInfo.renderPass = renderpass;	
 	renderPassInfo.framebuffer = swapchainFramebuffers[imageIndex];
 	renderPassInfo.renderArea.offset = { 0, 0 };
 	renderPassInfo.renderArea.extent = swapchainExtent;
@@ -78,11 +79,6 @@ void CommandBuffer::recordCommandBuffer(uint32_t currentFrame, uint32_t imageInd
 
 	vkCmdBeginRenderPass(commandBuffers[currentFrame], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 	vkCmdBindPipeline(commandBuffers[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
-
-	//VkBuffer vertexBuffers[] = { vertexBuffer };
-	VkDeviceSize offsets[] = { 0 };
-	vkCmdBindVertexBuffers(commandBuffers[currentFrame], 0, 1, &model.getVertexBuffer().getBuffer(), offsets);
-	vkCmdBindIndexBuffer(commandBuffers[currentFrame], model.getIndexBuffer().getBuffer(), 0, VK_INDEX_TYPE_UINT32);
 
 	VkViewport viewport{};
 	viewport.x = 0.0f;
@@ -98,7 +94,13 @@ void CommandBuffer::recordCommandBuffer(uint32_t currentFrame, uint32_t imageInd
 	scissor.extent = swapchainExtent;
 	vkCmdSetScissor(commandBuffers[currentFrame], 0, 1, &scissor);
 
-	vkCmdBindDescriptorSets(commandBuffers[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[currentFrame], 0, nullptr);
+	//VkBuffer vertexBuffers[] = { vertexBuffer };
+	VkDeviceSize offsets[] = { 0 };
+	uint32_t dynamicOffset = dynamicAlignment*0;
+	vkCmdBindVertexBuffers(commandBuffers[currentFrame], 0, 1, &model.getVertexBuffer().getBuffer(), offsets);
+	vkCmdBindIndexBuffer(commandBuffers[currentFrame], model.getIndexBuffer().getBuffer(), 0, VK_INDEX_TYPE_UINT32);
+
+	vkCmdBindDescriptorSets(commandBuffers[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[currentFrame], 1, &dynamicOffset);
 	vkCmdDrawIndexed(commandBuffers[currentFrame], model.getIndexBuffer().getCount(), 1, 0, 0, 0);
 
 	vkCmdEndRenderPass(commandBuffers[currentFrame]);
