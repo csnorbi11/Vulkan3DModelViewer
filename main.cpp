@@ -2,6 +2,7 @@
 
 #define TINYOBJLOADER_IMPLEMENTATION
 
+
 #include "App.hpp"
 
 int main() {

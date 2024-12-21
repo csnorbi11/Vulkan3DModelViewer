@@ -162,6 +162,7 @@
     <ClCompile Include="RenderPass.cpp" />
     <ClCompile Include="SwapchainManager.cpp" />
     <ClCompile Include="SyncObjects.cpp" />
+    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="UniformBuffer.cpp" />
     <ClCompile Include="ValidationLayers.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
@@ -180,6 +181,7 @@
     <ClInclude Include="RenderPass.hpp" />
     <ClInclude Include="SwapchainManager.hpp" />
     <ClInclude Include="SyncObjects.hpp" />
+    <ClInclude Include="Texture.hpp" />
     <ClInclude Include="UniformBuffer.hpp" />
     <ClInclude Include="ValidationLayers.hpp" />
     <ClInclude Include="VertexBuffer.hpp" />

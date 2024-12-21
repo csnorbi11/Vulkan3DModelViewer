@@ -8,9 +8,9 @@ App::App()
 		renderer.getDeviceManager().getPhysicalDevice(),
 		renderer.getCommandBuffer().getCommandPool(), 
 		renderer.getDeviceManager().getGraphicsQueue(),
-		renderer.getModels())
+		renderer.getModels(),renderer.getDeviceManager().getPhysicalDeviceProperties())
 {
-	modelLoader.loadModel("viking_room.obj");
+	modelLoader.loadModel("backpack.obj");
 
 	glfwSetWindowUserPointer(glfwHandler.window.get(), this);
 	glfwSetWindowSizeCallback(glfwHandler.window.get(), framebufferResizeCallback);

@@ -2,7 +2,7 @@
 #include "RendererCommon.h"
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
-
+#include "Texture.hpp"
 
 class Model {
 public:
@@ -11,7 +11,8 @@ public:
 
 	Model(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
 		const VkCommandPool& commandPool, const VkQueue& queue,
-		std::vector<Vertex> vertices, std::vector<uint32_t> indices);
+		std::vector<Vertex> vertices, std::vector<uint32_t> indices,
+		std::vector<Texture> textures);
 	Model(const Model&& other);
 
 	void cleanup();
@@ -22,4 +23,5 @@ public:
 private:
 	VertexBuffer vertexBuffer;
 	IndexBuffer indexBuffer;
+	std::vector<Texture> textures;
 };

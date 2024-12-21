@@ -7,12 +7,12 @@
 
 class ModelLoader {
 public:
-	ModelLoader()=default;
+	ModelLoader() = default;
 	~ModelLoader();
 
 	ModelLoader(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
 		const VkCommandPool& commandPool, const VkQueue& queue,
-		std::shared_ptr<std::vector<Model>> models);
+		std::shared_ptr<std::vector<Model>> models, const VkPhysicalDeviceProperties& properties);
 
 	void loadModel(const std::string PATH);
 	void cleanup();
@@ -22,6 +22,7 @@ private:
 
 
 	VkDevice device;
+	VkPhysicalDeviceProperties properties;
 	VkPhysicalDevice physicalDevice;
 	VkCommandPool commandPool;
 	VkQueue queue;

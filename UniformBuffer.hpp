@@ -15,7 +15,8 @@ public:
 	~UniformBuffer();
 
 	UniformBuffer(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
-		const int MAX_FRAMES_IN_FLIGHT, const VkExtent2D& swapchainExtent);
+		const int MAX_FRAMES_IN_FLIGHT, const VkExtent2D& swapchainExtent, VkImageView textureImageView,
+		VkSampler textureSampler);
 
 	
 	void update(uint32_t currentFrame);
@@ -29,7 +30,8 @@ private:
 	void create(const int MAX_FRAMES_IN_FLIGHT, const VkPhysicalDevice& physicalDevice);
 	void createDescriptorSetLayout();
 	void createDescriptorPool(const int MAX_FRAMES_IN_FLIGHT);
-	void createDescriptorSets(const int MAX_FRAMES_IN_FLIGHT);
+	void createDescriptorSets(const int MAX_FRAMES_IN_FLIGHT, VkImageView textureImageView,
+		VkSampler textureSampler);
 
 
 	std::vector<VkDescriptorSet> descriptorSets;

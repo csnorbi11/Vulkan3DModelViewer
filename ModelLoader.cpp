@@ -10,13 +10,14 @@ ModelLoader::~ModelLoader()
 
 ModelLoader::ModelLoader(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
 	const VkCommandPool& commandPool, const VkQueue& queue,
-	std::shared_ptr<std::vector<Model>> models)
+	std::shared_ptr<std::vector<Model>> models, const VkPhysicalDeviceProperties& properties)
 	:
 	device(device),
 	physicalDevice(physicalDevice),
 	commandPool(commandPool),
 	queue(queue),
-	models(models)
+	models(models),
+	properties(properties)
 {
 }
 
@@ -25,14 +26,16 @@ void ModelLoader::loadModel(const std::string PATH)
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
 	std::vector<tinyobj::material_t> materials;
-	std::string warn, err;
+	std::string warn;
 
 	std::vector<Vertex> vertices;
 	std::vector<uint32_t> indices;
+	std::vector<Texture> textures;
 
-	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &err, PATH.c_str())) {
-		throw std::runtime_error(err);
+	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, PATH.c_str())) {
+		throw std::runtime_error(warn);
 	}
+	std::cout << materials.size() << std::endl;
 
 	for (const auto& shape : shapes) {
 		for (const auto& index : shape.mesh.indices) {
@@ -60,7 +63,11 @@ void ModelLoader::loadModel(const std::string PATH)
 		}
 	}
 
-	models->emplace_back(device, physicalDevice, commandPool, queue, vertices, indices);
+	for (size_t i = 0; i < materials.size(); i++) {
+		textures.emplace_back(device, physicalDevice, commandPool, queue, materials[i].diffuse_texname,properties);
+	}
+
+	models->emplace_back(device, physicalDevice, commandPool, queue, vertices, indices,textures);
 }
 
 void ModelLoader::cleanup()
