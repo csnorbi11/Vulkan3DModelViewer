@@ -9,7 +9,7 @@ struct StaticUbo {
 };
 
 struct DynamicUbo {
-	glm::mat4 model;
+	glm::mat4* model{nullptr};
 };
 
 struct UniformBuffers {

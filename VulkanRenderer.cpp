@@ -143,7 +143,7 @@ void VulkanRenderer::drawFrame()
 	vkResetFences(deviceManager->getDevice(), 1, &syncObjects->inFlightFences[currentFrame]);
 
 	vkResetCommandBuffer(commandbuffer->getCommandbuffers()[currentFrame], 0);
-	commandbuffer->recordCommandBuffer(currentFrame, imageIndex,models->at(0));
+	commandbuffer->recordCommandBuffer(currentFrame, imageIndex,*models);
 
 	graphicsPipeline->getUniformBuffer().updateDynamic(currentFrame);
 	graphicsPipeline->getUniformBuffer().updateStatic(currentFrame);

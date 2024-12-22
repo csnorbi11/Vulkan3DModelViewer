@@ -1,6 +1,17 @@
 #include "UniformBuffer.hpp"
 
-
+void* alignedAlloc(size_t size, size_t alignment)
+{
+	void* data = nullptr;
+#if defined(_MSC_VER) || defined(__MINGW32__)
+	data = _aligned_malloc(size, alignment);
+#else
+	int res = posix_memalign(&data, alignment, size);
+	if (res != 0)
+		data = nullptr;
+#endif
+	return data;
+}
 UniformBuffer::UniformBuffer()
 {
 }
@@ -21,8 +32,11 @@ UniformBuffer::UniformBuffer(const VkDevice& device, const VkPhysicalDevice& phy
 	if (minUboAlignment > 0)
 		dynamicAlignment = (sizeof(glm::mat4) + minUboAlignment - 1) & ~(minUboAlignment - 1);
 
-	bufferSize = dynamicAlignment * MAX_FRAMES_IN_FLIGHT * 1;
+	bufferSize = dynamicAlignment * MAX_FRAMES_IN_FLIGHT * 2;
+	
 
+	dynamicUbo.model = (glm::mat4*)alignedAlloc(bufferSize, dynamicAlignment);
+	assert(dynamicUbo.model);
 
 	create(MAX_FRAMES_IN_FLIGHT, physicalDevice);
 	createDescriptorSetLayout();
@@ -67,15 +81,21 @@ void UniformBuffer::updateDynamic(uint32_t currentFrame)
 
 	auto currentTime = std::chrono::high_resolution_clock::now();
 	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+	uint32_t dim = static_cast<uint32_t>(pow(2, (1.0f / 3.0f)));
+	for (size_t i = 0; i < 2; i++) {
 
+		glm::mat4* modelMat = (glm::mat4*)(((uint64_t)dynamicUbo.model + (i * dynamicAlignment)));
+		*modelMat = glm::translate(glm::mat4(1.0), glm::vec3(i * 2, 0.0, 0.0));
+		*modelMat = glm::rotate(*modelMat, time * glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		*modelMat = glm::rotate(*modelMat, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	}
 
-	dynamicUbo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	dynamicUbo.model = glm::rotate(dynamicUbo.model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	dynamicUbo.model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	
+
 	
 
 
-	memcpy(uniformBuffers.dynamicBuffersMapped[currentFrame], &dynamicUbo.model, bufferSize);
+	memcpy(uniformBuffers.dynamicBuffersMapped[currentFrame], dynamicUbo.model, bufferSize);
 	VkMappedMemoryRange memoryRange{};
 	memoryRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
 	memoryRange.memory = uniformBuffers.dynamicBuffersMemory[currentFrame];
@@ -192,7 +212,8 @@ void UniformBuffer::createDescriptorSets(const int MAX_FRAMES_IN_FLIGHT)
 		VkDescriptorBufferInfo dynamicBufferInfo{};
 		dynamicBufferInfo.buffer = uniformBuffers.dynamicBuffers[i];
 		dynamicBufferInfo.offset = 0;
-		dynamicBufferInfo.range = sizeof(dynamicUbo);
+		dynamicBufferInfo.range = dynamicAlignment;
+		std::cout << "ezredik cout\t" << sizeof(&dynamicUbo.model) << std::endl;
 
 		std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 		VkWriteDescriptorSet dynamicDescriptorWrite{};

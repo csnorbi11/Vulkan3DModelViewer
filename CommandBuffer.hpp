@@ -17,7 +17,7 @@ public:
 	void cleanup();
 
 	void recordCommandBuffer(uint32_t currentFrame, uint32_t imageIndex,
-		Model& model);
+		std::vector<Model>& models);
 	void setClearColor(VkClearValue newClearValue);
 	void update(SwapchainManager& swapchainManager);
 
