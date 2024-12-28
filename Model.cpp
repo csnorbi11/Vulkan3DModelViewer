@@ -12,13 +12,6 @@ Model::Model(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
 
 }
 
-Model::Model(const Model&& other)
-	:
-	vertexBuffer(other.vertexBuffer),
-	indexBuffer(other.indexBuffer),
-	textures(other.textures)
-{
-}
 
 void Model::cleanup()
 {

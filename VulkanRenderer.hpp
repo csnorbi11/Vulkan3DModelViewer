@@ -20,12 +20,14 @@ public:
 	void drawFrame();
 
 	void wait();
+	void recieveModel(const Model& model);
+	void deleteModel(const Model& model);
 
 	bool framebufferResized;
 
 	DeviceManager& getDeviceManager();
 	CommandBuffer& getCommandBuffer();
-	std::shared_ptr<std::vector<Model>> getModels();
+	
 
 private:
 	void createInstance();
@@ -33,7 +35,7 @@ private:
 
 	void recreateSwapchain();
 
-	std::shared_ptr<std::vector<Model>> models;
+	std::vector<Model> models;
 
 	GLFWwindow* window;
 

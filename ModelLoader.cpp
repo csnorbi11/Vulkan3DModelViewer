@@ -5,23 +5,21 @@
 
 ModelLoader::~ModelLoader()
 {
-	cleanup();
 }
 
 ModelLoader::ModelLoader(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
 	const VkCommandPool& commandPool, const VkQueue& queue,
-	std::shared_ptr<std::vector<Model>> models, const VkPhysicalDeviceProperties& properties)
+	const VkPhysicalDeviceProperties& properties)
 	:
 	device(device),
 	physicalDevice(physicalDevice),
 	commandPool(commandPool),
 	queue(queue),
-	models(models),
 	properties(properties)
 {
 }
 
-void ModelLoader::loadModel(const std::string PATH)
+Model ModelLoader::loadModel(const std::string PATH)
 {
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
@@ -66,14 +64,6 @@ void ModelLoader::loadModel(const std::string PATH)
 	for (size_t i = 0; i < materials.size(); i++) {
 		textures.emplace_back(device, physicalDevice, commandPool, queue, materials[i].diffuse_texname,properties);
 	}
-
-	models->emplace_back(device, physicalDevice, commandPool, queue, vertices, indices,textures);
+	return Model(device, physicalDevice, commandPool, queue, vertices, indices, textures);
 }
 
-void ModelLoader::cleanup()
-{
-	for (auto& model : *models)
-	{
-		model.cleanup();
-	}
-}

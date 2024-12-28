@@ -32,11 +32,13 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window)
 
 	syncObjects = std::make_unique<SyncObjects>(deviceManager->getDevice(), MAX_FRAMES_IN_FLIGHT);
 
-	models = std::make_shared<std::vector<Model>>();
-
 }
 VulkanRenderer::~VulkanRenderer()
 {
+	for (auto& model : models)
+	{
+		model.cleanup();
+	}
 
 	swapchainManager->cleanup();
 
@@ -143,7 +145,7 @@ void VulkanRenderer::drawFrame()
 	vkResetFences(deviceManager->getDevice(), 1, &syncObjects->inFlightFences[currentFrame]);
 
 	vkResetCommandBuffer(commandbuffer->getCommandbuffers()[currentFrame], 0);
-	commandbuffer->recordCommandBuffer(currentFrame, imageIndex,*models);
+	commandbuffer->recordCommandBuffer(currentFrame, imageIndex,models);
 
 	graphicsPipeline->getUniformBuffer().updateDynamic(currentFrame);
 	graphicsPipeline->getUniformBuffer().updateStatic(currentFrame);
@@ -195,6 +197,11 @@ void VulkanRenderer::wait()
 	vkDeviceWaitIdle(deviceManager->getDevice());
 }
 
+void VulkanRenderer::recieveModel(const Model& model)
+{
+	models.push_back(model);
+}
+
 DeviceManager& VulkanRenderer::getDeviceManager()
 {
 	return *deviceManager;
@@ -203,9 +210,3 @@ CommandBuffer& VulkanRenderer::getCommandBuffer()
 {
 	return *commandbuffer;
 }
-
-std::shared_ptr<std::vector<Model>> VulkanRenderer::getModels()
-{
-	return models;
-}
-

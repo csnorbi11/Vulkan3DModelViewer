@@ -12,12 +12,11 @@ public:
 
 	ModelLoader(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
 		const VkCommandPool& commandPool, const VkQueue& queue,
-		std::shared_ptr<std::vector<Model>> models, const VkPhysicalDeviceProperties& properties);
+		const VkPhysicalDeviceProperties& properties);
 
-	void loadModel(const std::string PATH);
+	Model loadModel(const std::string PATH);
 	void cleanup();
 
-	std::shared_ptr<std::vector<Model>> models;
 private:
 
 

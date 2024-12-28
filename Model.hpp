@@ -13,7 +13,7 @@ public:
 		const VkCommandPool& commandPool, const VkQueue& queue,
 		std::vector<Vertex> vertices, std::vector<uint32_t> indices,
 		std::vector<Texture> textures);
-	Model(const Model&& other);
+
 
 	void cleanup();
 
