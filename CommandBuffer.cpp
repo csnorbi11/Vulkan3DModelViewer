@@ -1,8 +1,6 @@
 #include "CommandBuffer.hpp"
 
-CommandBuffer::CommandBuffer()
-{
-}
+
 CommandBuffer::~CommandBuffer()
 {
 }
@@ -10,7 +8,7 @@ CommandBuffer::~CommandBuffer()
 CommandBuffer::CommandBuffer(const VkDevice& device, const QueueFamilyIndices& indices,
 	const VkRenderPass& renderpass, const std::vector<VkFramebuffer>& swapchainFramebuffers,
 	const VkExtent2D& swapchainExtent, const VkPipeline& graphicsPipeline,
-	const VkPipelineLayout& pipelineLayout, const std::vector<VkDescriptorSet>& descriptorSets,
+	const VkPipelineLayout& pipelineLayout,
 	const int MAX_FRAMES_IN_FLIGHT, uint32_t dynamicAlignment)
 	:
 	device(device),
@@ -19,7 +17,6 @@ CommandBuffer::CommandBuffer(const VkDevice& device, const QueueFamilyIndices& i
 	swapchainExtent(swapchainExtent),
 	graphicsPipeline(graphicsPipeline),
 	pipelineLayout(pipelineLayout),
-	descriptorSets(descriptorSets),
 	dynamicAlignment(dynamicAlignment)
 {
 	VkCommandPoolCreateInfo poolInfo{};
@@ -102,7 +99,7 @@ void CommandBuffer::recordCommandBuffer(uint32_t currentFrame, uint32_t imageInd
 		vkCmdBindVertexBuffers(commandBuffers[currentFrame], 0, 1, &model.getVertexBuffer().getBuffer(), offsets);
 		vkCmdBindIndexBuffer(commandBuffers[currentFrame], model.getIndexBuffer().getBuffer(), 0, VK_INDEX_TYPE_UINT32);
 
-		vkCmdBindDescriptorSets(commandBuffers[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[currentFrame], 1, &dynamicOffset);
+		vkCmdBindDescriptorSets(commandBuffers[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &model.descriptorSets[currentFrame], 1, &dynamicOffset);
 		vkCmdDrawIndexed(commandBuffers[currentFrame], model.getIndexBuffer().getCount(), 1, 0, 0, 0);
 
 	}

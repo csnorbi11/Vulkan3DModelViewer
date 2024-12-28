@@ -19,7 +19,7 @@ ModelLoader::ModelLoader(const VkDevice& device, const VkPhysicalDevice& physica
 {
 }
 
-Model ModelLoader::loadModel(const std::string PATH)
+Model ModelLoader::loadModel(const std::string PATH, bool verticalFlipTexture)
 {
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
@@ -44,10 +44,15 @@ Model ModelLoader::loadModel(const std::string PATH)
 				attrib.vertices[3 * index.vertex_index + 1],
 				attrib.vertices[3 * index.vertex_index + 2]
 			};
-
-			vertex.texCoord = {
-				attrib.texcoords[2 * index.texcoord_index + 0],
-				attrib.texcoords[2 * index.texcoord_index + 1]
+			if (verticalFlipTexture)
+				vertex.texCoord = {
+					attrib.texcoords[2 * index.texcoord_index + 0],
+					1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
+			};
+			else
+				vertex.texCoord = {
+					attrib.texcoords[2 * index.texcoord_index + 0],
+					attrib.texcoords[2 * index.texcoord_index + 1]
 			};
 
 			vertex.normal = {

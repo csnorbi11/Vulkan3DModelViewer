@@ -15,6 +15,8 @@ public:
 
 	void cleanup();
 
+	const VkImageView& getImageView();
+	const VkSampler& getSampler();
 
 private:
 	void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);

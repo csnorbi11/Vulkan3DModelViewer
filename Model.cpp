@@ -32,3 +32,8 @@ IndexBuffer& Model::getIndexBuffer()
 {
 	return indexBuffer;
 }
+
+std::vector<Texture>& Model::getTextures()
+{
+	return textures;
+}

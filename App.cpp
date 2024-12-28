@@ -11,7 +11,7 @@ App::App()
 		renderer.getDeviceManager().getPhysicalDeviceProperties())
 {
 	renderer.recieveModel(modelLoader.loadModel("backpack.obj"));
-	renderer.recieveModel(modelLoader.loadModel("viking_room.obj"));
+	renderer.recieveModel(modelLoader.loadModel("viking_room.obj", true));
 
 
 	glfwSetWindowUserPointer(glfwHandler.window.get(), this);

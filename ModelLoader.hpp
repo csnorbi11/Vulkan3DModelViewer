@@ -14,8 +14,8 @@ public:
 		const VkCommandPool& commandPool, const VkQueue& queue,
 		const VkPhysicalDeviceProperties& properties);
 
-	Model loadModel(const std::string PATH);
-	void cleanup();
+	Model loadModel(const std::string PATH, bool verticalFlipTexture = false);
+
 
 private:
 

@@ -12,9 +12,6 @@ void* alignedAlloc(size_t size, size_t alignment)
 #endif
 	return data;
 }
-UniformBuffer::UniformBuffer()
-{
-}
 
 UniformBuffer::~UniformBuffer()
 {
@@ -33,7 +30,7 @@ UniformBuffer::UniformBuffer(const VkDevice& device, const VkPhysicalDevice& phy
 		dynamicAlignment = (sizeof(glm::mat4) + minUboAlignment - 1) & ~(minUboAlignment - 1);
 
 	bufferSize = dynamicAlignment * MAX_FRAMES_IN_FLIGHT * 2;
-	
+
 
 	dynamicUbo.model = (glm::mat4*)alignedAlloc(bufferSize, dynamicAlignment);
 	assert(dynamicUbo.model);
@@ -41,7 +38,6 @@ UniformBuffer::UniformBuffer(const VkDevice& device, const VkPhysicalDevice& phy
 	create(MAX_FRAMES_IN_FLIGHT, physicalDevice);
 	createDescriptorSetLayout();
 	createDescriptorPool(MAX_FRAMES_IN_FLIGHT);
-	createDescriptorSets(MAX_FRAMES_IN_FLIGHT);
 }
 
 void UniformBuffer::create(const int MAX_FRAMES_IN_FLIGHT, const VkPhysicalDevice& physicalDevice)
@@ -90,9 +86,9 @@ void UniformBuffer::updateDynamic(uint32_t currentFrame)
 		*modelMat = glm::rotate(*modelMat, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	}
 
-	
 
-	
+
+
 
 
 	memcpy(uniformBuffers.dynamicBuffersMapped[currentFrame], dynamicUbo.model, bufferSize);
@@ -116,13 +112,9 @@ void UniformBuffer::cleanup()
 
 	vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
 }
-const VkDescriptorSetLayout& UniformBuffer::getLayout()
+VkDescriptorSetLayout& UniformBuffer::getLayout()
 {
 	return descriptorSetLayout;
-}
-const std::vector<VkDescriptorSet>& UniformBuffer::getSets()
-{
-	return descriptorSets;
 }
 uint32_t UniformBuffer::getDynamicAlignment()
 {
@@ -137,13 +129,6 @@ void UniformBuffer::createDescriptorSetLayout()
 	uboLayoutBinding.pImmutableSamplers = nullptr;
 	uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
-	//VkDescriptorSetLayoutBinding samplerLayoutBinding{};
-	//samplerLayoutBinding.binding = 1;
-	//samplerLayoutBinding.descriptorCount = 1;
-	//samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	//samplerLayoutBinding.pImmutableSamplers = nullptr;
-	//samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
 	VkDescriptorSetLayoutBinding dynamicboLayoutBinding{};
 	dynamicboLayoutBinding.binding = 1;
 	dynamicboLayoutBinding.descriptorCount = 1;
@@ -151,7 +136,14 @@ void UniformBuffer::createDescriptorSetLayout()
 	dynamicboLayoutBinding.pImmutableSamplers = nullptr;
 	dynamicboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
-	std::array<VkDescriptorSetLayoutBinding, 2> bindings = { uboLayoutBinding, dynamicboLayoutBinding };
+	VkDescriptorSetLayoutBinding samplerLayoutBinding{};
+	samplerLayoutBinding.binding = 2;
+	samplerLayoutBinding.descriptorCount = 1;
+	samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	samplerLayoutBinding.pImmutableSamplers = nullptr;
+	samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+	std::array<VkDescriptorSetLayoutBinding, 3> bindings = { uboLayoutBinding, dynamicboLayoutBinding, samplerLayoutBinding };
 	VkDescriptorSetLayoutCreateInfo layoutInfo{};
 	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 	layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
@@ -161,32 +153,32 @@ void UniformBuffer::createDescriptorSetLayout()
 		throw std::runtime_error("failed to create descriptor set layout!");
 	}
 
-	
+
 }
 void UniformBuffer::createDescriptorPool(const int MAX_FRAMES_IN_FLIGHT)
 {
-	std::array<VkDescriptorPoolSize, 2> poolSizes{};
+	std::array<VkDescriptorPoolSize, 3> poolSizes{};
 	poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	poolSizes[0].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+	poolSizes[0].descriptorCount = 100;
 	poolSizes[1].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
-	poolSizes[1].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-	//poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	//poolSizes[1].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+	poolSizes[1].descriptorCount = 100;
+	poolSizes[2].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	poolSizes[2].descriptorCount = 100;
 
 	VkDescriptorPoolCreateInfo poolInfo{};
 	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 	poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
 	poolInfo.pPoolSizes = poolSizes.data();
-	poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+	poolInfo.maxSets = 100;
 
 	if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create descriptor pool!");
 	}
 }
-void UniformBuffer::createDescriptorSets(const int MAX_FRAMES_IN_FLIGHT)
+void UniformBuffer::createDescriptorSets(Model& model, const int MAX_FRAMES_IN_FLIGHT)
 {
-	std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT * 2);
-	for (size_t i = 0; i < layouts.size()/2; i++) {
+	std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT * 3);
+	for (size_t i = 0; i < layouts.size() / 2; i++) {
 		layouts[i] = descriptorSetLayout;
 		layouts[i + MAX_FRAMES_IN_FLIGHT] = descriptorSetLayout;
 	}
@@ -197,9 +189,8 @@ void UniformBuffer::createDescriptorSets(const int MAX_FRAMES_IN_FLIGHT)
 	allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 	allocInfo.pSetLayouts = layouts.data();
 
-	descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
-	dynamicDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
-	if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
+	model.descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
+	if (vkAllocateDescriptorSets(device, &allocInfo, model.descriptorSets.data()) != VK_SUCCESS) {
 		throw std::runtime_error("failed to allocate descriptor sets!");
 	}
 
@@ -215,21 +206,21 @@ void UniformBuffer::createDescriptorSets(const int MAX_FRAMES_IN_FLIGHT)
 		dynamicBufferInfo.range = dynamicAlignment;
 		std::cout << "ezredik cout\t" << sizeof(&dynamicUbo.model) << std::endl;
 
-		std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+		VkWriteDescriptorSet staticDescriptorWrite{};
 		VkWriteDescriptorSet dynamicDescriptorWrite{};
 
-		descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		descriptorWrites[0].dstSet = descriptorSets[i];
-		descriptorWrites[0].dstBinding = 0;
-		descriptorWrites[0].dstArrayElement = 0;
-		descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		descriptorWrites[0].descriptorCount = 1;
-		descriptorWrites[0].pBufferInfo = &staticBufferInfo;
-		descriptorWrites[0].pImageInfo = nullptr;
-		descriptorWrites[0].pTexelBufferView = nullptr;
+		staticDescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		staticDescriptorWrite.dstSet = model.descriptorSets[i];
+		staticDescriptorWrite.dstBinding = 0;
+		staticDescriptorWrite.dstArrayElement = 0;
+		staticDescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		staticDescriptorWrite.descriptorCount = 1;
+		staticDescriptorWrite.pBufferInfo = &staticBufferInfo;
+		staticDescriptorWrite.pImageInfo = nullptr;
+		staticDescriptorWrite.pTexelBufferView = nullptr;
 
 		dynamicDescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		dynamicDescriptorWrite.dstSet = descriptorSets[i];
+		dynamicDescriptorWrite.dstSet = model.descriptorSets[i];
 		dynamicDescriptorWrite.dstBinding = 1;
 		dynamicDescriptorWrite.dstArrayElement = 0;
 		dynamicDescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
@@ -238,16 +229,30 @@ void UniformBuffer::createDescriptorSets(const int MAX_FRAMES_IN_FLIGHT)
 		dynamicDescriptorWrite.pImageInfo = nullptr;
 		dynamicDescriptorWrite.pTexelBufferView = nullptr;
 
-		//descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		//descriptorWrites[1].dstSet = descriptorSets[i];
-		//descriptorWrites[1].dstBinding = 1;
-		//descriptorWrites[1].dstArrayElement = 0;
-		//descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		//descriptorWrites[1].descriptorCount = 1;
-		//descriptorWrites[1].pImageInfo = &imageInfo;
-
-		vkUpdateDescriptorSets(device, 1, &descriptorWrites[0], 0, nullptr);
+		vkUpdateDescriptorSets(device, 1, &staticDescriptorWrite, 0, nullptr);
 		vkUpdateDescriptorSets(device, 1, &dynamicDescriptorWrite, 0, nullptr);
-		//vkUpdateDescriptorSets(device, 1, &dynamicDescriptorWrites[0], 0, nullptr);
+
+		
+		if (model.getTextures().size() == 0)
+			continue;
+
+		VkDescriptorImageInfo imageInfo{};
+		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		imageInfo.imageView = model.getTextures()[0].getImageView();
+		imageInfo.sampler = model.getTextures()[0].getSampler();
+
+		VkWriteDescriptorSet textureDescriptorWrite{};
+		textureDescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		textureDescriptorWrite.dstSet = model.descriptorSets[i];
+		textureDescriptorWrite.dstBinding = 2;
+		textureDescriptorWrite.dstArrayElement = 0;
+		textureDescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		textureDescriptorWrite.descriptorCount = 1;
+		textureDescriptorWrite.pImageInfo = &imageInfo;
+
+		vkUpdateDescriptorSets(device, 1, &textureDescriptorWrite, 0, nullptr);
+		
+		
 	}
+
 }

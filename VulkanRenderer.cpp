@@ -19,26 +19,25 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window)
 		deviceManager->getDeviceExtensions(), deviceManager->getIndices(), surface, width, height,
 		deviceManager->getSampleCount());
 
+	uniformBuffer = std::make_unique<UniformBuffer>(deviceManager->getDevice(),
+		deviceManager->getPhysicalDevice(), MAX_FRAMES_IN_FLIGHT, swapchainManager->getImageExtent(), deviceManager->getPhysicalDeviceProperties());
 
 	graphicsPipeline = std::make_unique<GraphicsPipeline>(deviceManager->getDevice(), swapchainManager->getImageExtent(),
 		swapchainManager->getMsaa().getSampleCount(), swapchainManager->getImageFormat(),
 		deviceManager->getPhysicalDevice(), swapchainManager->getRenderPass().getRenderPass(),
-		MAX_FRAMES_IN_FLIGHT,deviceManager->getPhysicalDeviceProperties());
+		MAX_FRAMES_IN_FLIGHT,deviceManager->getPhysicalDeviceProperties(),*uniformBuffer);
 	
 	commandbuffer = std::make_unique<CommandBuffer>(deviceManager->getDevice(),deviceManager->getIndices(),
 		swapchainManager->getRenderPass().getRenderPass(), swapchainManager->getFramebuffer().getSwapchainFramebuffers(),
 		swapchainManager->getImageExtent(),graphicsPipeline->getPipeline(),graphicsPipeline->getLayout(),
-		graphicsPipeline->getDescriptorSets(), MAX_FRAMES_IN_FLIGHT,graphicsPipeline->getUniformBuffer().getDynamicAlignment());
+		 MAX_FRAMES_IN_FLIGHT,uniformBuffer->getDynamicAlignment());
 
 	syncObjects = std::make_unique<SyncObjects>(deviceManager->getDevice(), MAX_FRAMES_IN_FLIGHT);
 
 }
 VulkanRenderer::~VulkanRenderer()
 {
-	for (auto& model : models)
-	{
-		model.cleanup();
-	}
+	deleteAllModels();
 
 	swapchainManager->cleanup();
 
@@ -46,7 +45,7 @@ VulkanRenderer::~VulkanRenderer()
 	syncObjects->cleanup();
 	commandbuffer->cleanup();
 	graphicsPipeline->cleanup();
-	
+	uniformBuffer->cleanup();
 	
 	deviceManager->cleanup();
 	if (enableValidationLayers) {
@@ -147,8 +146,8 @@ void VulkanRenderer::drawFrame()
 	vkResetCommandBuffer(commandbuffer->getCommandbuffers()[currentFrame], 0);
 	commandbuffer->recordCommandBuffer(currentFrame, imageIndex,models);
 
-	graphicsPipeline->getUniformBuffer().updateDynamic(currentFrame);
-	graphicsPipeline->getUniformBuffer().updateStatic(currentFrame);
+	uniformBuffer->updateDynamic(currentFrame);
+	uniformBuffer->updateStatic(currentFrame);
 
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -200,6 +199,29 @@ void VulkanRenderer::wait()
 void VulkanRenderer::recieveModel(const Model& model)
 {
 	models.push_back(model);
+	uniformBuffer->createDescriptorSets(models.back(),MAX_FRAMES_IN_FLIGHT);
+}
+
+void VulkanRenderer::deleteModel(Model& model)
+{
+	model.cleanup();
+	for (auto it = models.begin(); it != models.end(); it++)
+	{
+		if (&(*it) == &model)
+		{
+			models.erase(it);
+			return;
+		}
+	}
+}
+
+void VulkanRenderer::deleteAllModels()
+{
+	for (auto& model : models)
+	{
+		model.cleanup();
+	}
+	models.clear();
 }
 
 DeviceManager& VulkanRenderer::getDeviceManager()

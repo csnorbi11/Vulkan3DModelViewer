@@ -1,12 +1,6 @@
 #include "GraphicsPipeline.hpp"
 
-GraphicsPipeline::GraphicsPipeline()
-	:
-	device(VK_NULL_HANDLE),
-	pipeline(VK_NULL_HANDLE),
-	pipelineLayout(VK_NULL_HANDLE)
-{
-}
+
 GraphicsPipeline::~GraphicsPipeline()
 {
 }
@@ -14,12 +8,12 @@ GraphicsPipeline::~GraphicsPipeline()
 GraphicsPipeline::GraphicsPipeline(const VkDevice& device, const VkExtent2D& swapchainExtent,
 	VkSampleCountFlagBits sampleCount, const VkFormat& swapchainImageFormat,
 	const VkPhysicalDevice& physicalDevice, const VkRenderPass& renderpass,
-	const int MAX_FRAMES_IN_FLIGHT, VkPhysicalDeviceProperties properties)
+	const int MAX_FRAMES_IN_FLIGHT, VkPhysicalDeviceProperties properties,
+	UniformBuffer& uniBuffer)
 	:
-	device(device)
+	device(device),
+	uniformBuffer(uniBuffer)
 {
-	
-	uniformBuffer = std::make_unique<UniformBuffer>(device, physicalDevice, MAX_FRAMES_IN_FLIGHT, swapchainExtent,properties);
 
 	auto vertShaderCode = readFile("vert.spv");
 	auto fragShaderCode = readFile("frag.spv");
@@ -148,7 +142,7 @@ GraphicsPipeline::GraphicsPipeline(const VkDevice& device, const VkExtent2D& swa
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	pipelineLayoutInfo.setLayoutCount = 1; // Optional
-	pipelineLayoutInfo.pSetLayouts = &uniformBuffer->getLayout(); // Optional
+	pipelineLayoutInfo.pSetLayouts = &uniformBuffer.getLayout(); // Optional
 	pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
 	pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
 
@@ -190,7 +184,6 @@ void GraphicsPipeline::cleanup()
 	vkDestroyPipeline(device, pipeline, nullptr);
 	vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
 	
-	uniformBuffer->cleanup();
 }
 
 const VkPipeline& GraphicsPipeline::getPipeline()
@@ -203,20 +196,6 @@ const VkPipelineLayout& GraphicsPipeline::getLayout()
 	return pipelineLayout;
 }
 
-UniformBuffer& GraphicsPipeline::getUniformBuffer()
-{
-	return *uniformBuffer;
-}
-
-const VkDescriptorSetLayout& GraphicsPipeline::getDescriptorSetLayout()
-{
-	return uniformBuffer->getLayout();
-}
-
-const std::vector<VkDescriptorSet>& GraphicsPipeline::getDescriptorSets()
-{
-	return uniformBuffer->getSets();
-}
 
 VkShaderModule GraphicsPipeline::createShaderModule(const std::vector<char>& code)
 {

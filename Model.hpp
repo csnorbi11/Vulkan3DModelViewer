@@ -19,6 +19,9 @@ public:
 
 	VertexBuffer& getVertexBuffer();
 	IndexBuffer& getIndexBuffer();
+	std::vector<Texture>& getTextures();
+
+	std::vector<VkDescriptorSet> descriptorSets;
 
 private:
 	VertexBuffer vertexBuffer;

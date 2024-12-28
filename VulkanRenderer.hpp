@@ -21,7 +21,8 @@ public:
 
 	void wait();
 	void recieveModel(const Model& model);
-	void deleteModel(const Model& model);
+	void deleteModel(Model& model);
+	void deleteAllModels();
 
 	bool framebufferResized;
 
@@ -45,6 +46,7 @@ private:
 	std::unique_ptr<ValidationLayers> validationLayers;
 	std::unique_ptr<DeviceManager> deviceManager;
 	std::unique_ptr<SwapchainManager> swapchainManager;
+	std::unique_ptr<UniformBuffer> uniformBuffer;
 	std::unique_ptr<GraphicsPipeline> graphicsPipeline;
 	std::unique_ptr<CommandBuffer> commandbuffer;
 	

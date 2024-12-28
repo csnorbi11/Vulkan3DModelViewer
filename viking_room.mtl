@@ -1,0 +1,9 @@
+# Blender MTL File: 'None'
+# Material Count: 1
+
+newmtl Scene_-_Root
+Kd 0.00000 0.00000 0.00000
+
+map_Kd viking_room.png
+
+
