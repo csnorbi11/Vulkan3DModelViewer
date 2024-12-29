@@ -169,9 +169,9 @@ VkPresentModeKHR SwapchainManager::chooseSwapPresentMode(const std::vector<VkPre
 {
 	for (const auto& presentMode : avaiablePresentModes) {
 		if (presentMode == VK_PRESENT_MODE_MAILBOX_KHR)
-			return VK_PRESENT_MODE_MAILBOX_KHR;
+			return VK_PRESENT_MODE_IMMEDIATE_KHR;
 	}
-	return VK_PRESENT_MODE_FIFO_KHR;
+	return VK_PRESENT_MODE_IMMEDIATE_KHR;
 }
 VkExtent2D SwapchainManager::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities)
 {

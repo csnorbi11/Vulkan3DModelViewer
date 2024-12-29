@@ -22,18 +22,17 @@ UniformBuffer::UniformBuffer(const VkDevice& device, const VkPhysicalDevice& phy
 	:
 	device(device),
 	swapchainExtent(swapchainExtent),
-	staticUbo{}
+	staticUbo{},
+	MAX_FRAMES_IN_FLIGHT(MAX_FRAMES_IN_FLIGHT),
+	physicalDevice(physicalDevice),
+	objectCount(0)
 {
 	size_t minUboAlignment = properties.limits.minUniformBufferOffsetAlignment;
 	dynamicAlignment = sizeof(glm::mat4);
 	if (minUboAlignment > 0)
 		dynamicAlignment = (sizeof(glm::mat4) + minUboAlignment - 1) & ~(minUboAlignment - 1);
-
-	bufferSize = dynamicAlignment * MAX_FRAMES_IN_FLIGHT * 2;
-
-
+	bufferSize = 0;
 	dynamicUbo.model = (glm::mat4*)alignedAlloc(bufferSize, dynamicAlignment);
-	assert(dynamicUbo.model);
 
 	create(MAX_FRAMES_IN_FLIGHT, physicalDevice);
 	createDescriptorSetLayout();
@@ -53,12 +52,32 @@ void UniformBuffer::create(const int MAX_FRAMES_IN_FLIGHT, const VkPhysicalDevic
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		createBuffer(sizeof(StaticUbo), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers.staticBuffers[i], uniformBuffers.staticBuffersMemory[i], device, physicalDevice);
-		createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers.dynamicBuffers[i], uniformBuffers.dynamicBuffersMemory[i], device, physicalDevice);
-
 		vkMapMemory(device, uniformBuffers.staticBuffersMemory[i], 0, sizeof(StaticUbo), 0, &uniformBuffers.staticBuffersMapped[i]);
-		vkMapMemory(device, uniformBuffers.dynamicBuffersMemory[i], 0, bufferSize, 0, &uniformBuffers.dynamicBuffersMapped[i]);
-
 	}
+}
+
+void UniformBuffer::recreateDynamicBuffer()
+{
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+		vkDestroyBuffer(device, uniformBuffers.dynamicBuffers[i], nullptr);
+		vkFreeMemory(device, uniformBuffers.dynamicBuffersMemory[i], nullptr);
+	}
+
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++){
+		createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers.dynamicBuffers[i], uniformBuffers.dynamicBuffersMemory[i], device, physicalDevice);
+		vkMapMemory(device, uniformBuffers.dynamicBuffersMemory[i], 0, bufferSize, 0, &uniformBuffers.dynamicBuffersMapped[i]);
+		
+	}
+
+}
+
+void UniformBuffer::calculateDynamicBuffer(const size_t objectCount)
+{
+	this->objectCount = objectCount;
+	bufferSize = dynamicAlignment * MAX_FRAMES_IN_FLIGHT * objectCount;
+	
+	dynamicUbo.model=(glm::mat4*)_aligned_realloc(dynamicUbo.model, bufferSize, dynamicAlignment);
+	assert(dynamicUbo.model);
 }
 
 void UniformBuffer::updateStatic(uint32_t currentFrame)
@@ -78,7 +97,7 @@ void UniformBuffer::updateDynamic(uint32_t currentFrame)
 	auto currentTime = std::chrono::high_resolution_clock::now();
 	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 	uint32_t dim = static_cast<uint32_t>(pow(2, (1.0f / 3.0f)));
-	for (size_t i = 0; i < 2; i++) {
+	for (size_t i = 0; i < objectCount; i++) {
 
 		glm::mat4* modelMat = (glm::mat4*)(((uint64_t)dynamicUbo.model + (i * dynamicAlignment)));
 		*modelMat = glm::translate(glm::mat4(1.0), glm::vec3(i * 2, 0.0, 0.0));
@@ -178,10 +197,9 @@ void UniformBuffer::createDescriptorPool(const int MAX_FRAMES_IN_FLIGHT)
 void UniformBuffer::createDescriptorSets(Model& model, const int MAX_FRAMES_IN_FLIGHT)
 {
 	std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT * 3);
-	for (size_t i = 0; i < layouts.size() / 2; i++) {
-		layouts[i] = descriptorSetLayout;
-		layouts[i + MAX_FRAMES_IN_FLIGHT] = descriptorSetLayout;
-	}
+	layouts[0] = descriptorSetLayout;
+	layouts[1] = descriptorSetLayout;
+	layouts[2] = descriptorSetLayout;
 
 	VkDescriptorSetAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;

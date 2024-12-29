@@ -11,7 +11,7 @@ App::App()
 		renderer.getDeviceManager().getPhysicalDeviceProperties())
 {
 	renderer.recieveModel(modelLoader.loadModel("backpack.obj"));
-	renderer.recieveModel(modelLoader.loadModel("viking_room.obj", true));
+	
 
 
 	glfwSetWindowUserPointer(glfwHandler.window.get(), this);
@@ -34,9 +34,24 @@ void App::loop()
 	std::cout << "-------------------------------" << std::endl;
 	std::cout << "----------loop starts----------" << std::endl;
 	std::cout << "-------------------------------" << std::endl;
+	bool a = true;
+	bool b = true;
+
 	while (!glfwWindowShouldClose(glfwHandler.window.get())) {
 		glfwPollEvents();
+		
+		if (glfwGetTime() > 5.0 &&a)
+		{
+			renderer.recieveModel(modelLoader.loadModel("viking_room.obj", true));
+			a = false;
+		}
+
+		
+		
+		
 		renderer.drawFrame();
+
+
 	}
 	renderer.wait();
 	std::cout << "-------------------------------" << std::endl;

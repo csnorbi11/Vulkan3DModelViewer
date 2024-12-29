@@ -32,7 +32,8 @@ public:
 
 	void createDescriptorSets(Model& model, const int MAX_FRAMES_IN_FLIGHT);
 
-	
+	void recreateDynamicBuffer();
+	void calculateDynamicBuffer(const size_t objectCount);
 	void updateStatic(uint32_t currentFrame);
 	void updateDynamic(uint32_t currentFrame);
 	void cleanup();
@@ -40,14 +41,13 @@ public:
 	VkDescriptorSetLayout& getLayout();
 	uint32_t getDynamicAlignment();
 
-	size_t objectCount;
-
 	
 private:
 	void create(const int MAX_FRAMES_IN_FLIGHT, const VkPhysicalDevice& physicalDevice);
 	void createDescriptorSetLayout();
 	void createDescriptorPool(const int MAX_FRAMES_IN_FLIGHT);
 
+	size_t objectCount;
 
 	size_t dynamicAlignment;
 	size_t bufferSize;
@@ -64,5 +64,7 @@ private:
 
 
 	VkDevice device;
+	VkPhysicalDevice physicalDevice;
 	VkExtent2D swapchainExtent;
+	const int MAX_FRAMES_IN_FLIGHT;
 };

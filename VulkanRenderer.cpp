@@ -33,7 +33,7 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window)
 		 MAX_FRAMES_IN_FLIGHT,uniformBuffer->getDynamicAlignment());
 
 	syncObjects = std::make_unique<SyncObjects>(deviceManager->getDevice(), MAX_FRAMES_IN_FLIGHT);
-
+	
 }
 VulkanRenderer::~VulkanRenderer()
 {
@@ -199,7 +199,10 @@ void VulkanRenderer::wait()
 void VulkanRenderer::recieveModel(const Model& model)
 {
 	models.push_back(model);
-	uniformBuffer->createDescriptorSets(models.back(),MAX_FRAMES_IN_FLIGHT);
+	uniformBuffer->calculateDynamicBuffer(models.size());
+	uniformBuffer->recreateDynamicBuffer();
+	for (auto& model : models)
+		uniformBuffer->createDescriptorSets(model,MAX_FRAMES_IN_FLIGHT);
 }
 
 void VulkanRenderer::deleteModel(Model& model)
