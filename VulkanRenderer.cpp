@@ -235,3 +235,18 @@ CommandBuffer& VulkanRenderer::getCommandBuffer()
 {
 	return *commandbuffer;
 }
+
+VkInstance& VulkanRenderer::getInstance()
+{
+	return instance;
+}
+
+UniformBuffer& VulkanRenderer::getUniformBuffer()
+{
+	return *uniformBuffer;
+}
+
+SwapchainManager& VulkanRenderer::getSwapchainManager()
+{
+	return *swapchainManager;
+}

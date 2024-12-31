@@ -28,6 +28,9 @@ public:
 
 	DeviceManager& getDeviceManager();
 	CommandBuffer& getCommandBuffer();
+	VkInstance& getInstance();
+	UniformBuffer& getUniformBuffer();
+	SwapchainManager& getSwapchainManager();
 	
 
 private:

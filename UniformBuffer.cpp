@@ -139,6 +139,10 @@ uint32_t UniformBuffer::getDynamicAlignment()
 {
 	return dynamicAlignment;
 }
+VkDescriptorPool& UniformBuffer::getDescriptorPool()
+{
+	return descriptorPool;
+}
 void UniformBuffer::createDescriptorSetLayout()
 {
 	VkDescriptorSetLayoutBinding uboLayoutBinding{};

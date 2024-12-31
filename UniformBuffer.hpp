@@ -40,6 +40,8 @@ public:
 
 	VkDescriptorSetLayout& getLayout();
 	uint32_t getDynamicAlignment();
+	VkDescriptorPool& getDescriptorPool();
+	
 
 	
 private:

@@ -1,4 +1,6 @@
 #include "CommandBuffer.hpp"
+#include <imgui.h>
+#include <backends/imgui_impl_vulkan.h>
 
 
 CommandBuffer::~CommandBuffer()
@@ -103,7 +105,8 @@ void CommandBuffer::recordCommandBuffer(uint32_t currentFrame, uint32_t imageInd
 		vkCmdDrawIndexed(commandBuffers[currentFrame], model.getIndexBuffer().getCount(), 1, 0, 0, 0);
 
 	}
-
+	ImGui::Render();
+	ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffers[currentFrame]);
 	vkCmdEndRenderPass(commandBuffers[currentFrame]);
 	if (vkEndCommandBuffer(commandBuffers[currentFrame]) != VK_SUCCESS) {
 		throw std::runtime_error("failed to record command buffer!");
