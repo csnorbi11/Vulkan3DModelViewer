@@ -11,10 +11,11 @@
 #include "IndexBuffer.hpp"
 #include "UniformBuffer.hpp"
 #include "Model.hpp"
+#include "Camera.hpp"
 
 class VulkanRenderer {
 public:
-	VulkanRenderer(GLFWwindow* window);
+	VulkanRenderer(GLFWwindow* window, const Camera& camera);
 	~VulkanRenderer();
 
 	void drawFrame();

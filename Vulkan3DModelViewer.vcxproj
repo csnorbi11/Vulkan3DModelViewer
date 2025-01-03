@@ -144,6 +144,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CommandBuffer.cpp" />
     <ClCompile Include="DepthBuffer.cpp" />
     <ClCompile Include="DeviceManager.cpp" />
@@ -178,6 +179,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp" />
+    <ClInclude Include="Camera.hpp" />
     <ClInclude Include="CommandBuffer.hpp" />
     <ClInclude Include="DepthBuffer.hpp" />
     <ClInclude Include="dirent.h" />

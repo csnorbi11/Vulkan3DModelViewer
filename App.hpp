@@ -21,5 +21,6 @@ private:
 	GlfwHandler glfwHandler;
 	VulkanRenderer renderer;
 	ModelLoader modelLoader;
+	Camera camera;
 
 };

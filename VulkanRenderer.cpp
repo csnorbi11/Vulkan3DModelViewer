@@ -1,6 +1,6 @@
 #include "VulkanRenderer.hpp"
 
-VulkanRenderer::VulkanRenderer(GLFWwindow* window)
+VulkanRenderer::VulkanRenderer(GLFWwindow* window, const Camera& camera)
 	:
 	window(window),
 	MAX_FRAMES_IN_FLIGHT(2),
@@ -20,20 +20,21 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window)
 		deviceManager->getSampleCount());
 
 	uniformBuffer = std::make_unique<UniformBuffer>(deviceManager->getDevice(),
-		deviceManager->getPhysicalDevice(), MAX_FRAMES_IN_FLIGHT, swapchainManager->getImageExtent(), deviceManager->getPhysicalDeviceProperties());
+		deviceManager->getPhysicalDevice(), MAX_FRAMES_IN_FLIGHT, swapchainManager->getImageExtent(), deviceManager->getPhysicalDeviceProperties(),
+		models, camera);
 
 	graphicsPipeline = std::make_unique<GraphicsPipeline>(deviceManager->getDevice(), swapchainManager->getImageExtent(),
 		swapchainManager->getMsaa().getSampleCount(), swapchainManager->getImageFormat(),
 		deviceManager->getPhysicalDevice(), swapchainManager->getRenderPass().getRenderPass(),
-		MAX_FRAMES_IN_FLIGHT,deviceManager->getPhysicalDeviceProperties(),*uniformBuffer);
-	
-	commandbuffer = std::make_unique<CommandBuffer>(deviceManager->getDevice(),deviceManager->getIndices(),
+		MAX_FRAMES_IN_FLIGHT, deviceManager->getPhysicalDeviceProperties(), *uniformBuffer);
+
+	commandbuffer = std::make_unique<CommandBuffer>(deviceManager->getDevice(), deviceManager->getIndices(),
 		swapchainManager->getRenderPass().getRenderPass(), swapchainManager->getFramebuffer().getSwapchainFramebuffers(),
-		swapchainManager->getImageExtent(),graphicsPipeline->getPipeline(),graphicsPipeline->getLayout(),
-		 MAX_FRAMES_IN_FLIGHT,uniformBuffer->getDynamicAlignment());
+		swapchainManager->getImageExtent(), graphicsPipeline->getPipeline(), graphicsPipeline->getLayout(),
+		MAX_FRAMES_IN_FLIGHT, uniformBuffer->getDynamicAlignment());
 
 	syncObjects = std::make_unique<SyncObjects>(deviceManager->getDevice(), MAX_FRAMES_IN_FLIGHT);
-	
+
 }
 VulkanRenderer::~VulkanRenderer()
 {
@@ -41,12 +42,12 @@ VulkanRenderer::~VulkanRenderer()
 
 	swapchainManager->cleanup();
 
-	
+
 	syncObjects->cleanup();
 	commandbuffer->cleanup();
 	graphicsPipeline->cleanup();
 	uniformBuffer->cleanup();
-	
+
 	deviceManager->cleanup();
 	if (enableValidationLayers) {
 		DestroyDebugUtilsMessengerEXT(instance, validationLayers->getDebugMessenger(), nullptr);
@@ -115,11 +116,11 @@ void VulkanRenderer::recreateSwapchain()
 
 	vkDeviceWaitIdle(deviceManager->getDevice());
 
-	
-	swapchainManager->cleanup();
-	
 
-	
+	swapchainManager->cleanup();
+
+
+
 	swapchainManager->recreate(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
 	commandbuffer->update(*swapchainManager);
 }
@@ -144,13 +145,12 @@ void VulkanRenderer::drawFrame()
 	vkResetFences(deviceManager->getDevice(), 1, &syncObjects->inFlightFences[currentFrame]);
 
 	vkResetCommandBuffer(commandbuffer->getCommandbuffers()[currentFrame], 0);
-	commandbuffer->recordCommandBuffer(currentFrame, imageIndex,models);
+	commandbuffer->recordCommandBuffer(currentFrame, imageIndex, models);
 
-	if (models.size() > 0)
-	{
-		uniformBuffer->updateDynamic(currentFrame);
-		uniformBuffer->updateStatic(currentFrame);
-	}
+
+	uniformBuffer->updateDynamic(currentFrame);
+	uniformBuffer->updateStatic(currentFrame);
+
 
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -202,10 +202,10 @@ void VulkanRenderer::wait()
 void VulkanRenderer::recieveModel(const Model& model)
 {
 	models.push_back(model);
-	uniformBuffer->calculateDynamicBuffer(models.size());
+	uniformBuffer->calculateDynamicBuffer();
 	uniformBuffer->recreateDynamicBuffer();
 	for (auto& model : models)
-		uniformBuffer->createDescriptorSets(model,MAX_FRAMES_IN_FLIGHT);
+		uniformBuffer->createDescriptorSets(model, MAX_FRAMES_IN_FLIGHT);
 }
 
 void VulkanRenderer::deleteModel(Model& model)

@@ -18,14 +18,16 @@ UniformBuffer::~UniformBuffer()
 }
 
 UniformBuffer::UniformBuffer(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
-	const int MAX_FRAMES_IN_FLIGHT, const VkExtent2D& swapchainExtent, VkPhysicalDeviceProperties properties)
+	const int MAX_FRAMES_IN_FLIGHT, const VkExtent2D& swapchainExtent, VkPhysicalDeviceProperties properties,
+	const std::vector<Model>& models, const Camera& camera)
 	:
 	device(device),
 	swapchainExtent(swapchainExtent),
 	staticUbo{},
 	MAX_FRAMES_IN_FLIGHT(MAX_FRAMES_IN_FLIGHT),
 	physicalDevice(physicalDevice),
-	objectCount(0)
+	models(models),
+	camera(camera)
 {
 	size_t minUboAlignment = properties.limits.minUniformBufferOffsetAlignment;
 	dynamicAlignment = sizeof(glm::mat4);
@@ -71,10 +73,9 @@ void UniformBuffer::recreateDynamicBuffer()
 
 }
 
-void UniformBuffer::calculateDynamicBuffer(const size_t objectCount)
+void UniformBuffer::calculateDynamicBuffer()
 {
-	this->objectCount = objectCount;
-	bufferSize = dynamicAlignment * MAX_FRAMES_IN_FLIGHT * objectCount;
+	bufferSize = dynamicAlignment * MAX_FRAMES_IN_FLIGHT * models.size();
 	
 	dynamicUbo.model=(glm::mat4*)_aligned_realloc(dynamicUbo.model, bufferSize, dynamicAlignment);
 	assert(dynamicUbo.model);
@@ -83,7 +84,7 @@ void UniformBuffer::calculateDynamicBuffer(const size_t objectCount)
 void UniformBuffer::updateStatic(uint32_t currentFrame)
 {
 
-	staticUbo.view = glm::lookAt(glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	staticUbo.view = camera.getViewMatrix();
 	staticUbo.proj = glm::perspective(glm::radians(80.0f), swapchainExtent.width / (float)swapchainExtent.height, 0.1f, 100.0f);
 	staticUbo.proj[1][1] *= -1;
 
@@ -91,23 +92,17 @@ void UniformBuffer::updateStatic(uint32_t currentFrame)
 }
 void UniformBuffer::updateDynamic(uint32_t currentFrame)
 {
-
-	static auto startTime = std::chrono::high_resolution_clock::now();
-
-	auto currentTime = std::chrono::high_resolution_clock::now();
-	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+	if (models.size() == 0)
+		return;
 	uint32_t dim = static_cast<uint32_t>(pow(2, (1.0f / 3.0f)));
-	for (size_t i = 0; i < objectCount; i++) {
+	for (size_t i = 0; i < models.size(); i++) {
 
 		glm::mat4* modelMat = (glm::mat4*)(((uint64_t)dynamicUbo.model + (i * dynamicAlignment)));
-		*modelMat = glm::translate(glm::mat4(1.0), glm::vec3(i * 2, 0.0, 0.0));
-		*modelMat = glm::rotate(*modelMat, time * glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		*modelMat = glm::rotate(*modelMat, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		*modelMat = glm::translate(glm::mat4(1.0), models[i].position);
+		*modelMat = glm::rotate(*modelMat, models[i].rotation.x,glm::vec3(1.0f,0.0f,0.0f));
+		*modelMat = glm::rotate(*modelMat, models[i].rotation.y,glm::vec3(0.0f,1.0f,0.0f));
+		*modelMat = glm::rotate(*modelMat, models[i].rotation.z,glm::vec3(0.0f,0.0f,1.0f));
 	}
-
-
-
-
 
 
 	memcpy(uniformBuffers.dynamicBuffersMapped[currentFrame], dynamicUbo.model, bufferSize);

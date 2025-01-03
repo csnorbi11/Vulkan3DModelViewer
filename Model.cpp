@@ -7,7 +7,9 @@ Model::Model(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
 	:
 	vertexBuffer(device,physicalDevice,commandPool,queue,vertices),
 	indexBuffer(device, physicalDevice, commandPool, queue,indices),
-	textures(textures)
+	textures(textures),
+	position(glm::vec3(0.0f)),
+	rotation(glm::vec3(0.0f))
 {
 
 }

@@ -23,6 +23,9 @@ public:
 
 	std::vector<VkDescriptorSet> descriptorSets;
 
+	glm::vec3 position;
+	glm::vec3 rotation;
+
 private:
 	VertexBuffer vertexBuffer;
 	IndexBuffer indexBuffer;

@@ -1,6 +1,7 @@
 #pragma once
 #include "RendererCommon.h"
 #include "Model.hpp"
+#include "Camera.hpp"
 
 #include <chrono>
 
@@ -28,12 +29,13 @@ public:
 	~UniformBuffer();
 
 	UniformBuffer(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
-		const int MAX_FRAMES_IN_FLIGHT, const VkExtent2D& swapchainExtent, VkPhysicalDeviceProperties properties);
+		const int MAX_FRAMES_IN_FLIGHT, const VkExtent2D& swapchainExtent, VkPhysicalDeviceProperties properties,
+		const std::vector<Model>& models, const Camera& camera);
 
 	void createDescriptorSets(Model& model, const int MAX_FRAMES_IN_FLIGHT);
 
 	void recreateDynamicBuffer();
-	void calculateDynamicBuffer(const size_t objectCount);
+	void calculateDynamicBuffer();
 	void updateStatic(uint32_t currentFrame);
 	void updateDynamic(uint32_t currentFrame);
 	void cleanup();
@@ -49,7 +51,9 @@ private:
 	void createDescriptorSetLayout();
 	void createDescriptorPool(const int MAX_FRAMES_IN_FLIGHT);
 
-	size_t objectCount;
+	const std::vector<Model>& models;
+
+	const Camera& camera;
 
 	size_t dynamicAlignment;
 	size_t bufferSize;

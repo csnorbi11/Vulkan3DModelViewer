@@ -6,7 +6,8 @@
 App::App()
 	:
 	glfwHandler(),
-	renderer(glfwHandler.window.get()),
+	camera(glfwHandler.window.get()),
+	renderer(glfwHandler.window.get(),camera),
 	modelLoader(renderer.getDeviceManager().getDevice(),
 		renderer.getDeviceManager().getPhysicalDevice(),
 		renderer.getCommandBuffer().getCommandPool(), 
@@ -62,8 +63,12 @@ void App::loop()
 	std::cout << "----------loop starts----------" << std::endl;
 	std::cout << "-------------------------------" << std::endl;
 
+	double startTime = 0;
+	double endTime = 0;
+	double deltaTime = 0;
 
 	while (!glfwWindowShouldClose(glfwHandler.window.get())) {
+		startTime = glfwGetTime();
 		glfwPollEvents();
 		ImGui_ImplVulkan_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
@@ -88,10 +93,15 @@ void App::loop()
 			// close
 			ImGuiFileDialog::Instance()->Close();
 		}
+
 		
-		
+		camera.update(deltaTime);
 		
 		renderer.drawFrame();
+
+
+		endTime = glfwGetTime();
+		deltaTime = endTime - startTime;
 	}
 	renderer.wait();
 	std::cout << "-------------------------------" << std::endl;
