@@ -12,7 +12,7 @@ public:
 	Model(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
 		const VkCommandPool& commandPool, const VkQueue& queue,
 		std::vector<Vertex> vertices, std::vector<uint32_t> indices,
-		std::vector<Texture> textures);
+		std::vector<Texture> textures, std::string name);
 
 
 	void cleanup();
@@ -25,6 +25,7 @@ public:
 
 	glm::vec3 position;
 	glm::vec3 rotation;
+	std::string name;
 
 private:
 	VertexBuffer vertexBuffer;

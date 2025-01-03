@@ -33,6 +33,7 @@ public:
 	UniformBuffer& getUniformBuffer();
 	SwapchainManager& getSwapchainManager();
 	
+	std::vector<Model> models;
 
 private:
 	void createInstance();
@@ -40,7 +41,6 @@ private:
 
 	void recreateSwapchain();
 
-	std::vector<Model> models;
 
 	GLFWwindow* window;
 

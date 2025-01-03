@@ -33,7 +33,6 @@ Model ModelLoader::loadModel(const std::string PATH, bool verticalFlipTexture)
 	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, PATH.c_str())) {
 		throw std::runtime_error(warn);
 	}
-	std::cout << materials.size() << std::endl;
 
 	for (const auto& shape : shapes) {
 		for (const auto& index : shape.mesh.indices) {
@@ -69,6 +68,9 @@ Model ModelLoader::loadModel(const std::string PATH, bool verticalFlipTexture)
 	for (size_t i = 0; i < materials.size(); i++) {
 		textures.emplace_back(device, physicalDevice, commandPool, queue, materials[i].diffuse_texname,properties);
 	}
-	return Model(device, physicalDevice, commandPool, queue, vertices, indices, textures);
+	size_t index = PATH.find_last_of("\\");
+	std::string name = PATH.substr(index + 1).c_str();
+	std::cout << name << std::endl;
+	return Model(device, physicalDevice, commandPool, queue, vertices, indices, textures, name);
 }
 

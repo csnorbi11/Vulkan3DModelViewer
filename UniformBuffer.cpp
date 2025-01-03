@@ -99,9 +99,9 @@ void UniformBuffer::updateDynamic(uint32_t currentFrame)
 
 		glm::mat4* modelMat = (glm::mat4*)(((uint64_t)dynamicUbo.model + (i * dynamicAlignment)));
 		*modelMat = glm::translate(glm::mat4(1.0), models[i].position);
-		*modelMat = glm::rotate(*modelMat, models[i].rotation.x,glm::vec3(1.0f,0.0f,0.0f));
-		*modelMat = glm::rotate(*modelMat, models[i].rotation.y,glm::vec3(0.0f,1.0f,0.0f));
-		*modelMat = glm::rotate(*modelMat, models[i].rotation.z,glm::vec3(0.0f,0.0f,1.0f));
+		*modelMat = glm::rotate(*modelMat, glm::radians(models[i].rotation.x),glm::vec3(1.0f,0.0f,0.0f));
+		*modelMat = glm::rotate(*modelMat, glm::radians(models[i].rotation.y),glm::vec3(0.0f,1.0f,0.0f));
+		*modelMat = glm::rotate(*modelMat, glm::radians(models[i].rotation.z),glm::vec3(0.0f,0.0f,1.0f));
 	}
 
 

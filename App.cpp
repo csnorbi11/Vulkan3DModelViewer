@@ -3,6 +3,10 @@
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_vulkan.h>
 
+inline void FlipPlane(bool *flip){
+	ImGui::Checkbox("Vertical Flip", flip);
+}
+
 App::App()
 	:
 	glfwHandler(),
@@ -66,23 +70,24 @@ void App::loop()
 	double startTime = 0;
 	double endTime = 0;
 	double deltaTime = 0;
-
+	int* a = new int(0);
 	while (!glfwWindowShouldClose(glfwHandler.window.get())) {
 		startTime = glfwGetTime();
 		glfwPollEvents();
 		ImGui_ImplVulkan_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
+		ImGui::SetNextWindowPos(ImVec2(0, 0));
+		ImGui::SetNextWindowSize(ImVec2(300, 100));
 		ImGui::NewFrame();
-		ImGui::ShowDemoWindow();
-		;
-		;
-		if (ImGui::Button("Open File Dialog")) {
+		if (ImGui::Button("Load Model")) {
 			IGFD::FileDialogConfig config;
 			config.path = ".";
 			ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".obj", config);
 		}
 		// display
 		if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
+			
+			
 			if (ImGuiFileDialog::Instance()->IsOk()) { // action if OK
 				std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
 				std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
@@ -93,6 +98,22 @@ void App::loop()
 			// close
 			ImGuiFileDialog::Instance()->Close();
 		}
+		int i = 1;
+		for (auto& model : renderer.models) {
+			ImGui::BeginChild(i, ImVec2(300, 200), true);
+			ImGui::LabelText("Name", model.name.c_str());
+			ImGui::DragFloat("x", &model.position.x,0.1f);
+			ImGui::DragFloat("y", &model.position.y, 0.1f);
+			ImGui::DragFloat("z", &model.position.z, 0.1f);
+			ImGui::DragFloat("yaw", &model.rotation.x, 0.1f);
+			ImGui::DragFloat("pitch", &model.rotation.y, 0.1f);
+			ImGui::DragFloat("roll", &model.rotation.z, 0.1f);
+			ImGui::EndChild();
+			i++;
+		}
+
+
+
 
 		
 		camera.update(deltaTime);
