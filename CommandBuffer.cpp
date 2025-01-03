@@ -105,6 +105,11 @@ void CommandBuffer::recordCommandBuffer(uint32_t currentFrame, uint32_t imageInd
 		vkCmdDrawIndexed(commandBuffers[currentFrame], model.getIndexBuffer().getCount(), 1, 0, 0, 0);
 
 	}
+
+
+
+
+
 	ImGui::Render();
 	ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffers[currentFrame]);
 	vkCmdEndRenderPass(commandBuffers[currentFrame]);

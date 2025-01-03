@@ -3,6 +3,9 @@
 #include "VulkanRenderer.hpp"
 #include "ModelLoader.hpp"
 
+#include "ImGuiFileDialogConfig.h"
+#include "ImGuiFileDialog.h"
+
 class App {
 public:
 	App();

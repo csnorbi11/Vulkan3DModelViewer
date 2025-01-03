@@ -56,7 +56,6 @@ void App::run()
 	loop();
 }
 
-
 void App::loop()
 {
 	std::cout << "-------------------------------" << std::endl;
@@ -70,13 +69,29 @@ void App::loop()
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 		ImGui::ShowDemoWindow();
+		;
+		;
+		if (ImGui::Button("Open File Dialog")) {
+			IGFD::FileDialogConfig config;
+			config.path = ".";
+			ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".obj", config);
+		}
+		// display
+		if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
+			if (ImGuiFileDialog::Instance()->IsOk()) { // action if OK
+				std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+				std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+				// action
+				renderer.recieveModel(modelLoader.loadModel(filePathName));
+			}
 
-
+			// close
+			ImGuiFileDialog::Instance()->Close();
+		}
 		
 		
 		
 		renderer.drawFrame();
-		
 	}
 	renderer.wait();
 	std::cout << "-------------------------------" << std::endl;

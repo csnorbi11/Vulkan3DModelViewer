@@ -146,8 +146,11 @@ void VulkanRenderer::drawFrame()
 	vkResetCommandBuffer(commandbuffer->getCommandbuffers()[currentFrame], 0);
 	commandbuffer->recordCommandBuffer(currentFrame, imageIndex,models);
 
-	uniformBuffer->updateDynamic(currentFrame);
-	uniformBuffer->updateStatic(currentFrame);
+	if (models.size() > 0)
+	{
+		uniformBuffer->updateDynamic(currentFrame);
+		uniformBuffer->updateStatic(currentFrame);
+	}
 
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
