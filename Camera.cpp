@@ -3,7 +3,9 @@
 
 Camera::Camera(GLFWwindow* window)
 	:
-	window(window)
+	window(window),
+	mouseSensitivity(1.0),
+	moveInput(glm::vec3(0.0))
 {
 }
 
@@ -15,18 +17,45 @@ glm::mat4 Camera::getViewMatrix() const
 	return glm::lookAt(pos, pos + fr, u);
 }
 
-void Camera::update(double deltaTime)
+void Camera::update(float deltaTime)
 {
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		position.x += deltaTime;
+		moveInput.z = 1;
 	else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		position.x -= deltaTime;
+		moveInput.z = -1;
+	else moveInput.z = 0;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		position.z += deltaTime;
+		moveInput.x = 1;
 	else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		position.z -= deltaTime;
+		moveInput.x = -1;
+	else moveInput.x = 0;
+
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		position.y += deltaTime;
+	else if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+		position.y -= deltaTime;
+
+	position += (front * moveInput.z + right * moveInput.x) * deltaTime;
 
 	calculateViewMatrix();
+}
+
+void Camera::processMouseInput(double xOffset, double yOffset)
+{
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) != GLFW_PRESS)
+		return;
+
+	xOffset *= mouseSensitivity;
+	yOffset *= mouseSensitivity;
+
+	rotation.y += xOffset;
+	rotation.x += yOffset;
+
+	if (rotation.x > 89.0f)
+		rotation.x = 89.0f;
+	if (rotation.x < -89.0f)
+		rotation.x = -89.0f;
+
 }
 
 void Camera::calculateViewMatrix()

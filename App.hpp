@@ -6,6 +6,8 @@
 #include "ImGuiFileDialogConfig.h"
 #include "ImGuiFileDialog.h"
 
+static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
+
 class App {
 public:
 	App();

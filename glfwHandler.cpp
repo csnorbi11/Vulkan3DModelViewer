@@ -12,9 +12,12 @@ GlfwHandler::GlfwHandler()
 	window = std::unique_ptr<GLFWwindow, GLFWwindowDeleter>(
 		glfwCreateWindow(WIDTH, HEIGHT, "Vulkan 3D Model Viewer", nullptr, nullptr));
 	
+
 }
 
 GlfwHandler::~GlfwHandler()
 {
 	glfwTerminate();
 }
+
+

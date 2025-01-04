@@ -3,8 +3,29 @@
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_vulkan.h>
 
-inline void FlipPlane(bool *flip){
-	ImGui::Checkbox("Vertical Flip", flip);
+double lastX;
+double lastY;
+
+double xOffset;
+double yOffset;
+
+Camera* globalCamera;
+
+void mouseCallback(GLFWwindow* window, double xpos, double ypos)
+{
+	if (globalCamera == nullptr)
+		return;
+
+	double xposCurrent = xpos;
+	double yposCurrent = ypos;
+
+	xOffset = xposCurrent - lastX;
+	yOffset = lastY - yposCurrent;
+
+	lastX = xposCurrent;
+	lastY = yposCurrent;
+
+	globalCamera->processMouseInput(xOffset, yOffset);
 }
 
 App::App()
@@ -22,7 +43,8 @@ App::App()
 	
 	glfwSetWindowUserPointer(glfwHandler.window.get(), this);
 	glfwSetWindowSizeCallback(glfwHandler.window.get(), framebufferResizeCallback);
-
+	glfwSetCursorPosCallback(glfwHandler.window.get(), mouseCallback);
+	globalCamera = &camera;
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();

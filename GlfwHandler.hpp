@@ -12,11 +12,13 @@ struct GLFWwindowDeleter {
 };
 
 struct GlfwHandler {
-	std::unique_ptr<GLFWwindow, GLFWwindowDeleter> window;
-	uint32_t WIDTH, HEIGHT;
-	
 	GlfwHandler();
 	~GlfwHandler();
-
 	
+	std::unique_ptr<GLFWwindow, GLFWwindowDeleter> window;
+	uint32_t WIDTH, HEIGHT;
+
+
 };
+
+
