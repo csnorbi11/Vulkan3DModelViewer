@@ -6,7 +6,7 @@
 class CommandBuffer {
 public:
 	CommandBuffer() = default;
-	~CommandBuffer();
+	~CommandBuffer() = default;
 
 	CommandBuffer(const VkDevice& device, const QueueFamilyIndices& indices,
 		const VkRenderPass& renderpass, const std::vector<VkFramebuffer>& swapchainFramebuffers,

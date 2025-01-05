@@ -5,8 +5,8 @@
 
 class ValidationLayers {
 public:
-	ValidationLayers();
-	~ValidationLayers();
+	ValidationLayers() = default;
+	~ValidationLayers() = default;
 
 	void setupDebugMessenger(VkInstance instance);
 	bool checkValidationLayerSupport();

@@ -6,7 +6,7 @@
 class GraphicsPipeline {
 public:
 	GraphicsPipeline() = default;
-	~GraphicsPipeline();
+	~GraphicsPipeline() = default;
 
 	GraphicsPipeline(const VkDevice& device, const VkExtent2D& swapchainExtent,
 		VkSampleCountFlagBits sampleCount, const VkFormat& swapchainImageFormat,

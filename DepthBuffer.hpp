@@ -4,8 +4,8 @@
 
 class DepthBuffer {
 public:
-	DepthBuffer();
-	~DepthBuffer();
+	DepthBuffer() = default;
+	~DepthBuffer() = default;
 
 	DepthBuffer(const VkPhysicalDevice& physicalDevice, const VkDevice& device,
 		const VkExtent2D& swapchainExtent, VkSampleCountFlagBits sampleCount);

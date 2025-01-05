@@ -6,7 +6,10 @@ Camera::Camera(GLFWwindow* window, glm::vec3 position)
 	window(window),
 	mouseSensitivity(1.0),
 	position(position),
-	moveInput(glm::vec3(0.0))
+	moveInput(glm::vec3(0.0f)),
+	up(glm::vec3(0.0f)),
+	right(glm::vec3(0.0f)),
+	front(glm::vec3(0.0f))
 {
 	//to make camera look to positive Z
 	rotation.y = 90.f;
@@ -28,7 +31,7 @@ void Camera::update(float deltaTime)
 
 	calculateViewMatrix();
 }
-void Camera::processMouseInput(double xOffset, double yOffset)
+void Camera::processMouseInput(float xOffset, float yOffset)
 {
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) != GLFW_PRESS)
 		return;

@@ -6,8 +6,8 @@
 
 class SwapchainManager {
 public:
-	SwapchainManager();
-	~SwapchainManager();
+	SwapchainManager() = default;
+	~SwapchainManager() = default;
 
 	SwapchainManager(const VkPhysicalDevice& phyDevice, const VkDevice& device,
 		const std::vector<const char*>& deviceExtensions, const QueueFamilyIndices& indices,

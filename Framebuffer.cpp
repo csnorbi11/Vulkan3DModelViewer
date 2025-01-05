@@ -1,14 +1,5 @@
 #include "Framebuffer.hpp"
 
-Framebuffer::Framebuffer()
-	:
-	device(VK_NULL_HANDLE)
-{
-}
-Framebuffer::~Framebuffer()
-{
-}
-
 Framebuffer::Framebuffer(const std::vector<VkImageView>& swapchainImageViews,
 	const VkImageView& msaaImageView, const VkImageView& depthImageView,
 	const VkRenderPass& renderpass, const VkExtent2D& swapchainExtent,

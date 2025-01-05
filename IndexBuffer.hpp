@@ -4,8 +4,8 @@
 
 class IndexBuffer {
 public:
-	IndexBuffer();
-	~IndexBuffer();
+	IndexBuffer() = default;
+	~IndexBuffer() = default;
 
 	IndexBuffer(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
 		const VkCommandPool& commandPool, const VkQueue& queue,

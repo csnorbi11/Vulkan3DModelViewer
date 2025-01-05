@@ -28,7 +28,7 @@ private:
 
 	std::string PATH;
 
-	uint32_t mipLevels;
+	float mipLevels;
 	VkImage textureImage;
 	VkDeviceMemory textureImaageMemory;
 	VkImageView textureImageView;

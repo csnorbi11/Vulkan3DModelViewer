@@ -8,7 +8,7 @@
 class ModelLoader {
 public:
 	ModelLoader() = default;
-	~ModelLoader();
+	~ModelLoader() = default;
 
 	ModelLoader(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
 		const VkCommandPool& commandPool, const VkQueue& queue,

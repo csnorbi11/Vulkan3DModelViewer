@@ -3,10 +3,6 @@
 #include <backends/imgui_impl_vulkan.h>
 
 
-CommandBuffer::~CommandBuffer()
-{
-}
-
 CommandBuffer::CommandBuffer(const VkDevice& device, const QueueFamilyIndices& indices,
 	const VkRenderPass& renderpass, const std::vector<VkFramebuffer>& swapchainFramebuffers,
 	const VkExtent2D& swapchainExtent, const VkPipeline& graphicsPipeline,
@@ -44,7 +40,7 @@ CommandBuffer::CommandBuffer(const VkDevice& device, const QueueFamilyIndices& i
 
 
 	clearValues.resize(MAX_FRAMES_IN_FLIGHT);
-	clearValues[0].color = { 0.2,0.2,0.2 };
+	clearValues[0].color = { 0.2f,0.2f,0.2f };
 	clearValues[1].depthStencil = { 1.0f,0 };
 }
 

@@ -3,8 +3,8 @@
 
 class Msaa {
 public:
-	Msaa();
-	~Msaa();
+	Msaa() = default;
+	~Msaa() = default;
 
 	Msaa(const VkPhysicalDevice& physicalDevice, const VkDevice& device,
 		VkSampleCountFlagBits sampleCount, const VkExtent2D& swapchainExtent,

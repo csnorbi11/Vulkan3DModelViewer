@@ -7,9 +7,6 @@ DeviceManager::DeviceManager(VkInstance instance, VkSurfaceKHR surface, const st
 	msaaSamples = getMaxUseableSampleCount();
 	minUniformBufferOffset = phyDeviceProps.limits.minUniformBufferOffsetAlignment;
 }
-DeviceManager::~DeviceManager()
-{
-}
 
 void DeviceManager::cleanup()
 {

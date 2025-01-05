@@ -14,7 +14,7 @@ public:
 	glm::mat4 getViewMatrix() const;
 	void update(float deltaTime);
 
-	void processMouseInput(double xOffset, double yOffset);
+	void processMouseInput(float xOffset, float yOffset);
 
 	double mouseSensitivity;
 

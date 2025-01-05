@@ -15,8 +15,10 @@
 
 class VulkanRenderer {
 public:
+	VulkanRenderer() = default;
+	~VulkanRenderer() = default;
+
 	VulkanRenderer(GLFWwindow* window, const Camera& camera);
-	~VulkanRenderer();
 
 	void drawFrame();
 

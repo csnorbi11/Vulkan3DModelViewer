@@ -1,13 +1,5 @@
 #include "SyncObjects.hpp"
 
-SyncObjects::SyncObjects()
-{
-
-}
-SyncObjects::~SyncObjects()
-{
-}
-
 SyncObjects::SyncObjects(const VkDevice& device, const int MAX_FRAMES_IN_FLIGHT)
     :
     device(device)

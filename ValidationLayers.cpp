@@ -1,16 +1,6 @@
 #include "ValidationLayers.hpp"
 
 
-
-ValidationLayers::ValidationLayers()
-	:
-	debugMessenger(VK_NULL_HANDLE)
-{}
-ValidationLayers::~ValidationLayers()
-{
-
-}
-
 void ValidationLayers::setupDebugMessenger(VkInstance instance)
 {
 	if (!enableValidationLayers)return;

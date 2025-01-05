@@ -1,12 +1,6 @@
 #include "ModelLoader.hpp"
 
 
-
-
-ModelLoader::~ModelLoader()
-{
-}
-
 ModelLoader::ModelLoader(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
 	const VkCommandPool& commandPool, const VkQueue& queue,
 	const VkPhysicalDeviceProperties& properties)
@@ -61,7 +55,7 @@ Model ModelLoader::loadModel(const std::string PATH, bool verticalFlipTexture)
 			};
 
 			vertices.push_back(vertex);
-			indices.push_back(indices.size());
+			indices.push_back(static_cast<uint32_t>(indices.size()));
 		}
 	}
 

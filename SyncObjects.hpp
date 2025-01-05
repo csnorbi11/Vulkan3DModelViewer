@@ -5,8 +5,8 @@
 
 class SyncObjects {
 public:
-	SyncObjects();
-	~SyncObjects();
+	SyncObjects() = default;
+	~SyncObjects() = default;
 
 	SyncObjects(const VkDevice& device, const int MAX_FRAMES_IN_FLIGHT);
 

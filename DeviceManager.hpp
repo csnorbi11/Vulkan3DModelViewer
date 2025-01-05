@@ -4,9 +4,11 @@
 
 class DeviceManager {
 public:
-	DeviceManager(VkInstance instance, VkSurfaceKHR surface, const std::vector<const char*>& extensions);
-	~DeviceManager();
+	DeviceManager() = default;
+	~DeviceManager() = default;
 
+	DeviceManager(VkInstance instance, VkSurfaceKHR surface, const std::vector<const char*>& extensions);
+	
 	void cleanup();
 
 	const VkPhysicalDevice& getPhysicalDevice();
@@ -41,5 +43,5 @@ private:
 	VkQueue presentQueue;
 
 	VkSampleCountFlagBits msaaSamples;
-	uint32_t minUniformBufferOffset;
+	VkDeviceSize minUniformBufferOffset;
 };

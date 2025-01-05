@@ -1,25 +1,6 @@
 #include "SwapchainManager.hpp"
 
 
-
-SwapchainManager::SwapchainManager()
-	:
-	swapChain(VK_NULL_HANDLE),
-	imageFormat(VK_FORMAT_UNDEFINED),
-	imageExtent({0,0}),
-	sampleCount(VK_SAMPLE_COUNT_1_BIT),
-	device(VK_NULL_HANDLE),
-	surface(VK_NULL_HANDLE),
-	physicalDevice(VK_NULL_HANDLE),
-	imagesCount(0),
-	framebufferWidth(0),
-	framebufferHeight(0)
-{
-}
-SwapchainManager::~SwapchainManager()
-{
-}
-
 SwapchainManager::SwapchainManager(const VkPhysicalDevice& phyDevice, const VkDevice& device,
 	const std::vector<const char*>& deviceExtensions, const QueueFamilyIndices& indices,
 	VkSurfaceKHR& surface, uint32_t frameBufferWidth, uint32_t frameBufferHeight,

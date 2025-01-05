@@ -4,8 +4,8 @@
 
 class RenderPass {
 public:
-	RenderPass();
-	~RenderPass();
+	RenderPass() = default;
+	~RenderPass() = default;
 
 	RenderPass(const VkDevice& device,const VkFormat& swapchainImageFormat,
 	const VkSampleCountFlagBits& sampleCount, const VkFormat& depthBufferFormat);

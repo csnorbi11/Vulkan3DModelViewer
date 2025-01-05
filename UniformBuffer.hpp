@@ -55,7 +55,7 @@ private:
 
 	const Camera& camera;
 
-	size_t dynamicAlignment;
+	uint32_t dynamicAlignment;
 	size_t bufferSize;
 
 	StaticUbo staticUbo;

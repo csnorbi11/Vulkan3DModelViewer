@@ -1,12 +1,5 @@
 #include "IndexBuffer.hpp"
 
-IndexBuffer::IndexBuffer()
-{
-}
-
-IndexBuffer::~IndexBuffer()
-{
-}
 
 IndexBuffer::IndexBuffer(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
 	const VkCommandPool& commandPool, const VkQueue& queue,

@@ -16,8 +16,8 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 	if (globalCamera == nullptr)
 		return;
 
-	double xposCurrent = xpos;
-	double yposCurrent = ypos;
+	float xposCurrent = xpos;
+	float yposCurrent = ypos;
 
 	xOffset = xposCurrent - lastX;
 	yOffset = lastY - yposCurrent;
@@ -31,7 +31,7 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 App::App()
 	:
 	glfwHandler(),
-	camera(glfwHandler.window.get(),{0.0,0.0,-3.0}),
+	camera(glfwHandler.window.get(), { 0.0,0.0,-3.0 }),
 	renderer(glfwHandler.window.get(), camera),
 	modelLoader(renderer.getDeviceManager().getDevice(),
 		renderer.getDeviceManager().getPhysicalDevice(),
@@ -49,31 +49,7 @@ App::App()
 
 }
 
-void App::initImGui()
-{
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
-	ImGui_ImplGlfw_InitForVulkan(glfwHandler.window.get(), true);
-	ImGui_ImplVulkan_InitInfo initInfo = {};
-	initInfo.Instance = renderer.getInstance();
-	initInfo.PhysicalDevice = renderer.getDeviceManager().getPhysicalDevice();
-	initInfo.Device = renderer.getDeviceManager().getDevice();
-	initInfo.QueueFamily = renderer.getDeviceManager().getIndices().graphicsFamily.value();
-	initInfo.Queue = renderer.getDeviceManager().getGraphicsQueue();
-	initInfo.PipelineCache = VK_NULL_HANDLE;
-	initInfo.DescriptorPool = renderer.getUniformBuffer().getDescriptorPool();
-	initInfo.Allocator = nullptr;
-	initInfo.MinImageCount = 2;
-	initInfo.ImageCount = 2;
-	initInfo.MSAASamples = renderer.getSwapchainManager().getMsaa().getSampleCount();
-	initInfo.RenderPass = renderer.getSwapchainManager().getRenderPass().getRenderPass();
-	initInfo.CheckVkResultFn = nullptr;
-	ImGui_ImplVulkan_Init(&initInfo);
-	ImGui_ImplVulkan_CreateFontsTexture();
-}
 
 App::~App()
 {
@@ -110,7 +86,7 @@ void App::loop()
 
 
 
-		camera.update(deltaTime);
+		camera.update(static_cast<float>(deltaTime));
 
 		renderer.drawFrame();
 
@@ -122,6 +98,31 @@ void App::loop()
 
 }
 
+void App::initImGui()
+{
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
+	ImGui_ImplGlfw_InitForVulkan(glfwHandler.window.get(), true);
+	ImGui_ImplVulkan_InitInfo initInfo = {};
+	initInfo.Instance = renderer.getInstance();
+	initInfo.PhysicalDevice = renderer.getDeviceManager().getPhysicalDevice();
+	initInfo.Device = renderer.getDeviceManager().getDevice();
+	initInfo.QueueFamily = renderer.getDeviceManager().getIndices().graphicsFamily.value();
+	initInfo.Queue = renderer.getDeviceManager().getGraphicsQueue();
+	initInfo.PipelineCache = VK_NULL_HANDLE;
+	initInfo.DescriptorPool = renderer.getUniformBuffer().getDescriptorPool();
+	initInfo.Allocator = nullptr;
+	initInfo.MinImageCount = 2;
+	initInfo.ImageCount = 2;
+	initInfo.MSAASamples = renderer.getSwapchainManager().getMsaa().getSampleCount();
+	initInfo.RenderPass = renderer.getSwapchainManager().getRenderPass().getRenderPass();
+	initInfo.CheckVkResultFn = nullptr;
+	ImGui_ImplVulkan_Init(&initInfo);
+	ImGui_ImplVulkan_CreateFontsTexture();
+}
 void App::ModelPropertiesGUI()
 {
 	int i = 1;
@@ -149,7 +150,6 @@ void App::ModelPropertiesGUI()
 		i++;
 	}
 }
-
 void App::ModelLoaderDialog(bool& flipY)
 {
 	if (ImGui::Button("Load Model")) {

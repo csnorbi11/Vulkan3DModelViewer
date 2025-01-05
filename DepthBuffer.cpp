@@ -13,21 +13,7 @@ DepthBuffer::DepthBuffer(const VkPhysicalDevice& physicalDevice, const VkDevice&
 {
 	create();
 }
-DepthBuffer::DepthBuffer()
-	:
-	image(VK_NULL_HANDLE),
-	imageMemory(VK_NULL_HANDLE),
-	imageView(VK_NULL_HANDLE),
-	format(VK_FORMAT_UNDEFINED),
-	physicalDevice(VK_NULL_HANDLE),
-	device(VK_NULL_HANDLE),
-	swapchainExtent({0,0}),
-	sampleCount(VK_SAMPLE_COUNT_1_BIT)
-{
-}
-DepthBuffer::~DepthBuffer()
-{
-}
+
 
 void DepthBuffer::create(uint32_t width, uint32_t height)
 {

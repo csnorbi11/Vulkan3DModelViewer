@@ -1,10 +1,6 @@
 #include "GraphicsPipeline.hpp"
 
 
-GraphicsPipeline::~GraphicsPipeline()
-{
-}
-
 GraphicsPipeline::GraphicsPipeline(const VkDevice& device, const VkExtent2D& swapchainExtent,
 	VkSampleCountFlagBits sampleCount, const VkFormat& swapchainImageFormat,
 	const VkPhysicalDevice& physicalDevice, const VkRenderPass& renderpass,

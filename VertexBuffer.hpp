@@ -5,8 +5,8 @@
 
 class VertexBuffer {
 public:
-	VertexBuffer();
-	~VertexBuffer();
+	VertexBuffer() = default;
+	~VertexBuffer() = default;
 
 	VertexBuffer(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
 		const VkCommandPool& commandPool, const VkQueue& queue,

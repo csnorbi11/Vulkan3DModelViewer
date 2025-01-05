@@ -36,13 +36,6 @@ bool Vertex::operator==(const Vertex& other) const
 	return position == other.position && texCoord == other.texCoord && normal == other.normal;
 }
 
-VertexBuffer::VertexBuffer()
-{
-
-}
-VertexBuffer::~VertexBuffer()
-{
-}
 
 VertexBuffer::VertexBuffer(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
 	const VkCommandPool& commandPool, const VkQueue& queue,

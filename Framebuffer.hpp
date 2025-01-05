@@ -4,8 +4,8 @@
 
 class Framebuffer {
 public:
-	Framebuffer();
-	~Framebuffer();
+	Framebuffer() = default;
+	~Framebuffer() = default;
 
 	Framebuffer(const std::vector<VkImageView>& swapchainImageViews,
 		const VkImageView& msaaImageView, const VkImageView& depthImageView,
