@@ -42,7 +42,6 @@ VulkanRenderer::~VulkanRenderer()
 
 	swapchainManager->cleanup();
 
-
 	syncObjects->cleanup();
 	commandbuffer->cleanup();
 	graphicsPipeline->cleanup();
@@ -116,10 +115,7 @@ void VulkanRenderer::recreateSwapchain()
 
 	vkDeviceWaitIdle(deviceManager->getDevice());
 
-
 	swapchainManager->cleanup();
-
-
 
 	swapchainManager->recreate(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
 	commandbuffer->update(*swapchainManager);

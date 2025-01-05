@@ -70,7 +70,6 @@ Model ModelLoader::loadModel(const std::string PATH, bool verticalFlipTexture)
 	}
 	size_t index = PATH.find_last_of("\\");
 	std::string name = PATH.substr(index + 1).c_str();
-	std::cout << name << std::endl;
 	return Model(device, physicalDevice, commandPool, queue, vertices, indices, textures, name);
 }
 

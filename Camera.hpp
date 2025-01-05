@@ -6,19 +6,23 @@
 
 class Camera {
 public:
-	Camera()=default;
+	Camera() = default;
 	~Camera() = default;
 
-	Camera(GLFWwindow* window);
+	Camera(GLFWwindow* window, glm::vec3 position = glm::vec3(0));
 
 	glm::mat4 getViewMatrix() const;
 	void update(float deltaTime);
+
 	void processMouseInput(double xOffset, double yOffset);
-	
+
 	double mouseSensitivity;
 
 private:
 	void calculateViewMatrix();
+
+	void AscendDescent(float deltaTime);
+	void movementInput();
 
 	GLFWwindow* window;
 

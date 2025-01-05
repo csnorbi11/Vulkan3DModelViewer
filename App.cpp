@@ -31,16 +31,15 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 App::App()
 	:
 	glfwHandler(),
-	camera(glfwHandler.window.get()),
-	renderer(glfwHandler.window.get(),camera),
+	camera(glfwHandler.window.get(),{0.0,0.0,-3.0}),
+	renderer(glfwHandler.window.get(), camera),
 	modelLoader(renderer.getDeviceManager().getDevice(),
 		renderer.getDeviceManager().getPhysicalDevice(),
-		renderer.getCommandBuffer().getCommandPool(), 
+		renderer.getCommandBuffer().getCommandPool(),
 		renderer.getDeviceManager().getGraphicsQueue(),
 		renderer.getDeviceManager().getPhysicalDeviceProperties())
 {
-	renderer.recieveModel(modelLoader.loadModel("backpack.obj"));
-	
+
 	glfwSetWindowUserPointer(glfwHandler.window.get(), this);
 	glfwSetWindowSizeCallback(glfwHandler.window.get(), framebufferResizeCallback);
 	glfwSetCursorPosCallback(glfwHandler.window.get(), mouseCallback);
@@ -85,14 +84,11 @@ void App::run()
 
 void App::loop()
 {
-	std::cout << "-------------------------------" << std::endl;
-	std::cout << "----------loop starts----------" << std::endl;
-	std::cout << "-------------------------------" << std::endl;
 
 	double startTime = 0;
 	double endTime = 0;
 	double deltaTime = 0;
-	int* a = new int(0);
+	bool flipY = false;
 	while (!glfwWindowShouldClose(glfwHandler.window.get())) {
 		startTime = glfwGetTime();
 		glfwPollEvents();
@@ -106,29 +102,36 @@ void App::loop()
 			config.path = ".";
 			ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".obj", config);
 		}
-		// display
+		ImGui::Checkbox("Flip Y", &flipY);
 		if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
-			
-			
-			if (ImGuiFileDialog::Instance()->IsOk()) { // action if OK
+
+
+			if (ImGuiFileDialog::Instance()->IsOk()) { 
 				std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
 				std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
-				// action
-				renderer.recieveModel(modelLoader.loadModel(filePathName));
+				renderer.recieveModel(modelLoader.loadModel(filePathName, flipY));
 			}
-
-			// close
 			ImGuiFileDialog::Instance()->Close();
 		}
 		int i = 1;
 		for (auto& model : renderer.models) {
-			ImGui::BeginChild(i, ImVec2(300, 200), true);
+			ImGui::BeginChild(i, ImVec2(300, 300), true);
 			ImGui::LabelText("Name", model.name.c_str());
-			ImGui::DragFloat("x", &model.position.x,0.1f);
+			if (ImGui::Button("Delete")) {
+				renderer.models.erase(renderer.models.begin() + i - 1);
+				break;
+			}
+			if (ImGui::Button("Reset Position")) {
+				model.position = glm::vec3(0.0f);
+			}
+			if (ImGui::Button("Reset Rotation")) {
+				model.rotation = glm::vec3(0.0f);
+			}
+			ImGui::DragFloat("x", &model.position.x, 0.1f);
 			ImGui::DragFloat("y", &model.position.y, 0.1f);
 			ImGui::DragFloat("z", &model.position.z, 0.1f);
-			ImGui::DragFloat("yaw", &model.rotation.x, 0.1f);
-			ImGui::DragFloat("pitch", &model.rotation.y, 0.1f);
+			ImGui::DragFloat("pitch", &model.rotation.x, 0.1f);
+			ImGui::DragFloat("yaw", &model.rotation.y, 0.1f);
 			ImGui::DragFloat("roll", &model.rotation.z, 0.1f);
 			ImGui::EndChild();
 			i++;
@@ -137,9 +140,9 @@ void App::loop()
 
 
 
-		
+
 		camera.update(deltaTime);
-		
+
 		renderer.drawFrame();
 
 
@@ -147,9 +150,7 @@ void App::loop()
 		deltaTime = endTime - startTime;
 	}
 	renderer.wait();
-	std::cout << "-------------------------------" << std::endl;
-	std::cout << "----------loop ends----------" << std::endl;
-	std::cout << "-------------------------------" << std::endl;
+
 }
 
 void App::framebufferResizeCallback(GLFWwindow* window, int width, int height)

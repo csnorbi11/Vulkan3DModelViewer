@@ -221,7 +221,6 @@ void UniformBuffer::createDescriptorSets(Model& model, const int MAX_FRAMES_IN_F
 		dynamicBufferInfo.buffer = uniformBuffers.dynamicBuffers[i];
 		dynamicBufferInfo.offset = 0;
 		dynamicBufferInfo.range = dynamicAlignment;
-		std::cout << "ezredik cout\t" << sizeof(&dynamicUbo.model) << std::endl;
 
 		VkWriteDescriptorSet staticDescriptorWrite{};
 		VkWriteDescriptorSet dynamicDescriptorWrite{};
