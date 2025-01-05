@@ -3,6 +3,7 @@
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_vulkan.h>
 
+
 double lastX;
 double lastY;
 
@@ -16,8 +17,8 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 	if (globalCamera == nullptr)
 		return;
 
-	float xposCurrent = xpos;
-	float yposCurrent = ypos;
+	double xposCurrent = xpos;
+	double yposCurrent = ypos;
 
 	xOffset = xposCurrent - lastX;
 	yOffset = lastY - yposCurrent;

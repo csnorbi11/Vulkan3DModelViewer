@@ -16,7 +16,7 @@
 class VulkanRenderer {
 public:
 	VulkanRenderer() = default;
-	~VulkanRenderer() = default;
+	~VulkanRenderer();
 
 	VulkanRenderer(GLFWwindow* window, const Camera& camera);
 

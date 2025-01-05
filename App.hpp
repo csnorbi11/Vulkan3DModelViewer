@@ -11,8 +11,8 @@ static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 class App {
 public:
 
-	App() = default;
-	~App() = default;
+	App();
+	~App();
 
 	void run();
 
