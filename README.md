@@ -1,5 +1,10 @@
 <img src="https://github.com/csnorbi11/Vulkan3DModelViewer/blob/master/screenshot_1.png?raw=true">
 
+<p align="center">
+  <img align="center" src="https://img.shields.io/badge/Platform-Windows-brightgreen">
+  <img align="center" src="https://img.shields.io/badge/language-C%2B%2B17-brightgreen">
+</p>
+
 # Vulkan3DModelViewer
 This project is a 3D model viewer and it's purpose to get started with Vulkan and improve myself as a software developer.
 
