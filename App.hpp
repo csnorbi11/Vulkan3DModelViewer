@@ -11,12 +11,17 @@ static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 class App {
 public:
 	App();
+	
 	~App();
 
 	void run();
 
 private:
 	void loop();
+
+	void initImGui();
+	void ModelLoaderDialog(bool& flipY);
+	void ModelPropertiesGUI();
 
 	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 

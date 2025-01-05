@@ -45,6 +45,12 @@ App::App()
 	glfwSetCursorPosCallback(glfwHandler.window.get(), mouseCallback);
 	globalCamera = &camera;
 
+	initImGui();
+
+}
+
+void App::initImGui()
+{
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
@@ -67,7 +73,6 @@ App::App()
 	initInfo.CheckVkResultFn = nullptr;
 	ImGui_ImplVulkan_Init(&initInfo);
 	ImGui_ImplVulkan_CreateFontsTexture();
-
 }
 
 App::~App()
@@ -92,50 +97,14 @@ void App::loop()
 	while (!glfwWindowShouldClose(glfwHandler.window.get())) {
 		startTime = glfwGetTime();
 		glfwPollEvents();
+
 		ImGui_ImplVulkan_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::SetNextWindowPos(ImVec2(0, 0));
 		ImGui::SetNextWindowSize(ImVec2(300, 100));
 		ImGui::NewFrame();
-		if (ImGui::Button("Load Model")) {
-			IGFD::FileDialogConfig config;
-			config.path = ".";
-			ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".obj", config);
-		}
-		ImGui::Checkbox("Flip Y", &flipY);
-		if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
-
-
-			if (ImGuiFileDialog::Instance()->IsOk()) { 
-				std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-				std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
-				renderer.recieveModel(modelLoader.loadModel(filePathName, flipY));
-			}
-			ImGuiFileDialog::Instance()->Close();
-		}
-		int i = 1;
-		for (auto& model : renderer.models) {
-			ImGui::BeginChild(i, ImVec2(300, 300), true);
-			ImGui::LabelText("Name", model.name.c_str());
-			if (ImGui::Button("Delete")) {
-				renderer.models.erase(renderer.models.begin() + i - 1);
-				break;
-			}
-			if (ImGui::Button("Reset Position")) {
-				model.position = glm::vec3(0.0f);
-			}
-			if (ImGui::Button("Reset Rotation")) {
-				model.rotation = glm::vec3(0.0f);
-			}
-			ImGui::DragFloat("x", &model.position.x, 0.1f);
-			ImGui::DragFloat("y", &model.position.y, 0.1f);
-			ImGui::DragFloat("z", &model.position.z, 0.1f);
-			ImGui::DragFloat("pitch", &model.rotation.x, 0.1f);
-			ImGui::DragFloat("yaw", &model.rotation.y, 0.1f);
-			ImGui::DragFloat("roll", &model.rotation.z, 0.1f);
-			ImGui::EndChild();
-			i++;
-		}
+		ModelLoaderDialog(flipY);
+		ModelPropertiesGUI();
 
 
 
@@ -151,6 +120,54 @@ void App::loop()
 	}
 	renderer.wait();
 
+}
+
+void App::ModelPropertiesGUI()
+{
+	int i = 1;
+	for (auto& model : renderer.models) {
+		ImGui::BeginChild(i, ImVec2(300, 300), true);
+		ImGui::LabelText("Name", model.name.c_str());
+		if (ImGui::Button("Delete")) {
+			renderer.models.erase(renderer.models.begin() + i - 1);
+			ImGui::EndChild();
+			break;
+		}
+		if (ImGui::Button("Reset Position")) {
+			model.position = glm::vec3(0.0f);
+		}
+		if (ImGui::Button("Reset Rotation")) {
+			model.rotation = glm::vec3(0.0f);
+		}
+		ImGui::DragFloat("x", &model.position.x, 0.1f);
+		ImGui::DragFloat("y", &model.position.y, 0.1f);
+		ImGui::DragFloat("z", &model.position.z, 0.1f);
+		ImGui::DragFloat("pitch", &model.rotation.x, 0.1f);
+		ImGui::DragFloat("yaw", &model.rotation.y, 0.1f);
+		ImGui::DragFloat("roll", &model.rotation.z, 0.1f);
+		ImGui::EndChild();
+		i++;
+	}
+}
+
+void App::ModelLoaderDialog(bool& flipY)
+{
+	if (ImGui::Button("Load Model")) {
+		IGFD::FileDialogConfig config;
+		config.path = ".";
+		ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".obj", config);
+	}
+	ImGui::Checkbox("Flip Y", &flipY);
+	if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
+
+
+		if (ImGuiFileDialog::Instance()->IsOk()) {
+			std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+			std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+			renderer.recieveModel(modelLoader.loadModel(filePathName, flipY));
+		}
+		ImGuiFileDialog::Instance()->Close();
+	}
 }
 
 void App::framebufferResizeCallback(GLFWwindow* window, int width, int height)
