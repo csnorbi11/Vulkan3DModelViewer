@@ -65,10 +65,10 @@ void UniformBuffer::recreateDynamicBuffer()
 		vkFreeMemory(device, uniformBuffers.dynamicBuffersMemory[i], nullptr);
 	}
 
-	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++){
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers.dynamicBuffers[i], uniformBuffers.dynamicBuffersMemory[i], device, physicalDevice);
 		vkMapMemory(device, uniformBuffers.dynamicBuffersMemory[i], 0, bufferSize, 0, &uniformBuffers.dynamicBuffersMapped[i]);
-		
+
 	}
 
 }
@@ -76,8 +76,8 @@ void UniformBuffer::recreateDynamicBuffer()
 void UniformBuffer::calculateDynamicBuffer()
 {
 	bufferSize = dynamicAlignment * MAX_FRAMES_IN_FLIGHT * models.size();
-	
-	dynamicUbo.model=(glm::mat4*)_aligned_realloc(dynamicUbo.model, bufferSize, dynamicAlignment);
+
+	dynamicUbo.model = (glm::mat4*)_aligned_realloc(dynamicUbo.model, bufferSize, dynamicAlignment);
 	assert(dynamicUbo.model);
 }
 
@@ -99,9 +99,10 @@ void UniformBuffer::updateDynamic(uint32_t currentFrame)
 
 		glm::mat4* modelMat = (glm::mat4*)(((uint64_t)dynamicUbo.model + (i * dynamicAlignment)));
 		*modelMat = glm::translate(glm::mat4(1.0), models[i].position);
-		*modelMat = glm::rotate(*modelMat, glm::radians(models[i].rotation.x),glm::vec3(1.0f,0.0f,0.0f));
-		*modelMat = glm::rotate(*modelMat, glm::radians(models[i].rotation.y),glm::vec3(0.0f,1.0f,0.0f));
-		*modelMat = glm::rotate(*modelMat, glm::radians(models[i].rotation.z),glm::vec3(0.0f,0.0f,1.0f));
+		*modelMat = glm::rotate(*modelMat, glm::radians(models[i].rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		*modelMat = glm::rotate(*modelMat, glm::radians(models[i].rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		*modelMat = glm::rotate(*modelMat, glm::radians(models[i].rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+		*modelMat = glm::scale(*modelMat, models[i].scale);
 	}
 
 
@@ -248,7 +249,7 @@ void UniformBuffer::createDescriptorSets(Model& model, const int MAX_FRAMES_IN_F
 		vkUpdateDescriptorSets(device, 1, &staticDescriptorWrite, 0, nullptr);
 		vkUpdateDescriptorSets(device, 1, &dynamicDescriptorWrite, 0, nullptr);
 
-		
+
 		if (model.getTextures().size() == 0)
 			continue;
 
@@ -267,8 +268,8 @@ void UniformBuffer::createDescriptorSets(Model& model, const int MAX_FRAMES_IN_F
 		textureDescriptorWrite.pImageInfo = &imageInfo;
 
 		vkUpdateDescriptorSets(device, 1, &textureDescriptorWrite, 0, nullptr);
-		
-		
+
+
 	}
 
 }

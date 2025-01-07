@@ -63,7 +63,6 @@ Model ModelLoader::loadModel(const std::string PATH, bool verticalFlipTexture)
 				};
 			}
 
-			vertex.diffuseColor = glm::vec3(0.4, 0.2, 0.5);
 
 			vertices.push_back(vertex);
 			indices.push_back(static_cast<uint32_t>(indices.size()));
@@ -71,23 +70,12 @@ Model ModelLoader::loadModel(const std::string PATH, bool verticalFlipTexture)
 	}
 	bool hasTexture = false;
 	for (size_t i = 0; i < materials.size(); i++) {
-		std::cout << materials[i].diffuse[0] << ":" << materials[i].diffuse[1] << ":" << materials[i].diffuse[2] << std::endl;
 		if (materials[i].diffuse_texname != "") {
-			try {
-				textures.emplace_back(device, physicalDevice, commandPool, queue, path + materials[i].diffuse_texname, properties);
-				hasTexture = true;
-			}
-			catch (const char* e) {
-				std::cout << e << std::endl;
-			}
-			
+
+			textures.emplace_back(device, physicalDevice, commandPool, queue, path + materials[i].diffuse_texname, properties);
+
 		}
 
-
-
-		//if (!hasTexture) {
-		//	textures.emplace_back(device, physicalDevice, commandPool, queue, "white.png", properties);
-		//}
 	}
 
 	return Model(device, physicalDevice, commandPool, queue, vertices, indices, textures, fileName);
