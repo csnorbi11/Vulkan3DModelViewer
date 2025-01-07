@@ -24,46 +24,72 @@ Model ModelLoader::loadModel(const std::string PATH, bool verticalFlipTexture)
 	std::vector<uint32_t> indices;
 	std::vector<Texture> textures;
 
-	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, PATH.c_str())) {
+	size_t index = PATH.find_last_of("\\");
+	std::string fileName = PATH.substr(index + 1).c_str();
+	std::string path = PATH.substr(0, index + 1).c_str();
+
+
+	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, PATH.c_str(), path.c_str())) {
 		throw std::runtime_error(warn);
 	}
+
 
 	for (const auto& shape : shapes) {
 		for (const auto& index : shape.mesh.indices) {
 			Vertex vertex{};
-
 			vertex.position = {
 				attrib.vertices[3 * index.vertex_index + 0],
 				attrib.vertices[3 * index.vertex_index + 1],
 				attrib.vertices[3 * index.vertex_index + 2]
 			};
-			if (verticalFlipTexture)
-				vertex.texCoord = {
-					attrib.texcoords[2 * index.texcoord_index + 0],
-					1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
-			};
-			else
-				vertex.texCoord = {
-					attrib.texcoords[2 * index.texcoord_index + 0],
-					attrib.texcoords[2 * index.texcoord_index + 1]
-			};
+			if (attrib.texcoords.size() != 0) {
+				if (verticalFlipTexture)
+					vertex.texCoord = {
+						attrib.texcoords[2 * index.texcoord_index + 0],
+						1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
+				};
+				else
+					vertex.texCoord = {
+						attrib.texcoords[2 * index.texcoord_index + 0],
+						attrib.texcoords[2 * index.texcoord_index + 1]
+				};
+			}
 
-			vertex.normal = {
-				attrib.normals[3 * index.normal_index + 0],
-				attrib.normals[3 * index.normal_index + 1],
-				attrib.normals[3 * index.normal_index + 2]
-			};
+			if (attrib.normals.size() != 0) {
+				vertex.normal = {
+					attrib.normals[3 * index.normal_index + 0],
+					attrib.normals[3 * index.normal_index + 1],
+					attrib.normals[3 * index.normal_index + 2]
+				};
+			}
+
+			vertex.diffuseColor = glm::vec3(0.4, 0.2, 0.5);
 
 			vertices.push_back(vertex);
 			indices.push_back(static_cast<uint32_t>(indices.size()));
 		}
 	}
-
+	bool hasTexture = false;
 	for (size_t i = 0; i < materials.size(); i++) {
-		textures.emplace_back(device, physicalDevice, commandPool, queue, materials[i].diffuse_texname,properties);
+		std::cout << materials[i].diffuse[0] << ":" << materials[i].diffuse[1] << ":" << materials[i].diffuse[2] << std::endl;
+		if (materials[i].diffuse_texname != "") {
+			try {
+				textures.emplace_back(device, physicalDevice, commandPool, queue, path + materials[i].diffuse_texname, properties);
+				hasTexture = true;
+			}
+			catch (const char* e) {
+				std::cout << e << std::endl;
+			}
+			
+		}
+
+
+
+		//if (!hasTexture) {
+		//	textures.emplace_back(device, physicalDevice, commandPool, queue, "white.png", properties);
+		//}
 	}
-	size_t index = PATH.find_last_of("\\");
-	std::string name = PATH.substr(index + 1).c_str();
-	return Model(device, physicalDevice, commandPool, queue, vertices, indices, textures, name);
+
+	return Model(device, physicalDevice, commandPool, queue, vertices, indices, textures, fileName);
 }
 

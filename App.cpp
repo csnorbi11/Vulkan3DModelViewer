@@ -147,6 +147,9 @@ void App::ModelPropertiesGUI()
 		ImGui::DragFloat("pitch", &model.rotation.x, 0.1f);
 		ImGui::DragFloat("yaw", &model.rotation.y, 0.1f);
 		ImGui::DragFloat("roll", &model.rotation.z, 0.1f);
+		ImGui::DragFloat("ScaleX: ", &model.scale.x, 0.1f, 0.0f, 1.0f);
+		ImGui::DragFloat("ScaleY", &model.scale.y, 0.1f, 0.0f, 1.0f);
+		ImGui::DragFloat("ScaleZ", &model.scale.z, 0.1f, 0.0f, 1.0f);
 		ImGui::EndChild();
 		i++;
 	}
