@@ -8,6 +8,8 @@
 
 static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 
+typedef ImVec2 ImWindowSize;
+
 class App {
 public:
 
@@ -19,6 +21,8 @@ public:
 private:
 	void loop();
 
+	void ModelHandlerWIndow(bool& flipY);
+
 	void initImGui();
 	void ModelLoaderDialog(bool& flipY);
 	void ModelPropertiesGUI();
@@ -29,5 +33,7 @@ private:
 	VulkanRenderer renderer;
 	ModelLoader modelLoader;
 	Camera camera;
+
+	ImWindowSize modelWindowSize;
 
 };

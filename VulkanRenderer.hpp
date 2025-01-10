@@ -18,7 +18,8 @@ public:
 	VulkanRenderer() = default;
 	~VulkanRenderer();
 
-	VulkanRenderer(GLFWwindow* window, const Camera& camera);
+	VulkanRenderer(GLFWwindow* window, int& windowWidth, int& windowHeight,
+		const Camera& camera);
 
 	void drawFrame();
 
@@ -34,7 +35,7 @@ public:
 	VkInstance& getInstance();
 	UniformBuffer& getUniformBuffer();
 	SwapchainManager& getSwapchainManager();
-	
+
 	std::vector<Model> models;
 
 private:
@@ -45,6 +46,8 @@ private:
 
 
 	GLFWwindow* window;
+	int& windowWidth;
+	int& windowHeight;
 
 	VkInstance instance;
 	VkSurfaceKHR surface;
@@ -55,7 +58,7 @@ private:
 	std::unique_ptr<UniformBuffer> uniformBuffer;
 	std::unique_ptr<GraphicsPipeline> graphicsPipeline;
 	std::unique_ptr<CommandBuffer> commandbuffer;
-	
+
 	std::unique_ptr<SyncObjects> syncObjects;
 	uint32_t currentFrame;
 	const int MAX_FRAMES_IN_FLIGHT;

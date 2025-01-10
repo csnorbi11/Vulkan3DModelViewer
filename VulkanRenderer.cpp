@@ -1,11 +1,14 @@
 #include "VulkanRenderer.hpp"
 
-VulkanRenderer::VulkanRenderer(GLFWwindow* window, const Camera& camera)
+VulkanRenderer::VulkanRenderer(GLFWwindow* window, int& windowWidth, int& windowHeight,
+	const Camera& camera)
 	:
 	window(window),
 	MAX_FRAMES_IN_FLIGHT(2),
 	currentFrame(0),
-	framebufferResized(false)
+	framebufferResized(false),
+	windowWidth(windowWidth),
+	windowHeight(windowHeight)
 {
 	validationLayers = std::make_unique<ValidationLayers>();
 	createInstance();
@@ -106,10 +109,9 @@ void VulkanRenderer::createSurface(GLFWwindow* window)
 
 void VulkanRenderer::recreateSwapchain()
 {
-	int width, height;
-	glfwGetFramebufferSize(window, &width, &height);
-	while (width == 0 || height == 0) {
-		glfwGetFramebufferSize(window, &width, &height);
+	glfwGetFramebufferSize(window, &windowWidth, &windowHeight);
+	while (windowWidth == 0 || windowHeight == 0) {
+		glfwGetFramebufferSize(window, &windowWidth, &windowHeight);
 		glfwWaitEvents();
 	}
 
@@ -117,7 +119,7 @@ void VulkanRenderer::recreateSwapchain()
 
 	swapchainManager->cleanup();
 
-	swapchainManager->recreate(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
+	swapchainManager->recreate(static_cast<uint32_t>(windowWidth), static_cast<uint32_t>(windowHeight));
 	commandbuffer->update(*swapchainManager);
 }
 

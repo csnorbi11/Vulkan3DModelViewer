@@ -16,7 +16,7 @@ struct GlfwHandler {
 	~GlfwHandler();
 	
 	std::unique_ptr<GLFWwindow, GLFWwindowDeleter> window;
-	uint32_t WIDTH, HEIGHT;
+	int WIDTH, HEIGHT;
 
 
 };

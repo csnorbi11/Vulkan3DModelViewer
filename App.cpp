@@ -33,7 +33,7 @@ App::App()
 	:
 	glfwHandler(),
 	camera(glfwHandler.window.get(), { 0.0,0.0,-3.0 }),
-	renderer(glfwHandler.window.get(), camera),
+	renderer(glfwHandler.window.get(), glfwHandler.WIDTH, glfwHandler.HEIGHT, camera),
 	modelLoader(renderer.getDeviceManager().getDevice(),
 		renderer.getDeviceManager().getPhysicalDevice(),
 		renderer.getCommandBuffer().getCommandPool(),
@@ -77,14 +77,15 @@ void App::loop()
 
 		ImGui_ImplVulkan_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
-		ImGui::SetNextWindowPos(ImVec2(0, 0));
-		ImGui::SetNextWindowSize(ImVec2(300, 100));
+
 		ImGui::NewFrame();
-		ModelLoaderDialog(flipY);
-		ModelPropertiesGUI();
+		ModelHandlerWIndow(flipY);
 
+		ImGui::Begin("Menu");
+		
+		ImGui::End();
 
-
+		ImGui::EndFrame();
 
 
 		camera.update(static_cast<float>(deltaTime));
@@ -96,6 +97,21 @@ void App::loop()
 		deltaTime = endTime - startTime;
 	}
 	renderer.wait();
+
+}
+
+void App::ModelHandlerWIndow(bool& flipY)
+{
+
+	ImGui::Begin("Model Loader/Transformer");
+	modelWindowSize = ImWindowSize(glfwHandler.WIDTH / 4, glfwHandler.HEIGHT);
+	std::cout << "window: " << glfwHandler.WIDTH << ":" << glfwHandler.HEIGHT << "\t" <<
+		modelWindowSize.x << ":" << modelWindowSize.y << std::endl;
+	ImGui::SetWindowSize(modelWindowSize);
+	ImGui::SetWindowPos(ImVec2(0, 0));
+	ModelLoaderDialog(flipY);
+	ModelPropertiesGUI();
+	ImGui::End();
 
 }
 
@@ -128,7 +144,7 @@ void App::ModelPropertiesGUI()
 {
 	int i = 1;
 	for (auto& model : renderer.models) {
-		ImGui::BeginChild(i, ImVec2(300, 300), true);
+		ImGui::BeginChild(i, modelWindowSize, true);
 		ImGui::LabelText("Name", model.name.c_str());
 		if (ImGui::Button("Delete")) {
 			renderer.models.erase(renderer.models.begin() + i - 1);
