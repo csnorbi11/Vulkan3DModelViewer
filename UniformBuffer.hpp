@@ -58,6 +58,8 @@ private:
 	uint32_t dynamicAlignment;
 	size_t bufferSize;
 
+	const uint32_t MAX_MODEL_COUNT;
+
 	StaticUbo staticUbo;
 	DynamicUbo dynamicUbo;
 

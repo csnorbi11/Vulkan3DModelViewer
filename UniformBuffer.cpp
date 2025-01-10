@@ -27,7 +27,8 @@ UniformBuffer::UniformBuffer(const VkDevice& device, const VkPhysicalDevice& phy
 	MAX_FRAMES_IN_FLIGHT(MAX_FRAMES_IN_FLIGHT),
 	physicalDevice(physicalDevice),
 	models(models),
-	camera(camera)
+	camera(camera),
+	MAX_MODEL_COUNT(1000)
 {
 	size_t minUboAlignment = properties.limits.minUniformBufferOffsetAlignment;
 	dynamicAlignment = sizeof(glm::mat4);
@@ -39,6 +40,7 @@ UniformBuffer::UniformBuffer(const VkDevice& device, const VkPhysicalDevice& phy
 	create(MAX_FRAMES_IN_FLIGHT, physicalDevice);
 	createDescriptorSetLayout();
 	createDescriptorPool(MAX_FRAMES_IN_FLIGHT);
+
 }
 
 void UniformBuffer::create(const int MAX_FRAMES_IN_FLIGHT, const VkPhysicalDevice& physicalDevice)
@@ -178,17 +180,18 @@ void UniformBuffer::createDescriptorPool(const int MAX_FRAMES_IN_FLIGHT)
 {
 	std::array<VkDescriptorPoolSize, 3> poolSizes{};
 	poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	poolSizes[0].descriptorCount = 100;
+	poolSizes[0].descriptorCount = UINT32_MAX;
 	poolSizes[1].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
-	poolSizes[1].descriptorCount = 100;
+	poolSizes[1].descriptorCount = UINT32_MAX;
 	poolSizes[2].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	poolSizes[2].descriptorCount = 100;
+	poolSizes[2].descriptorCount = UINT32_MAX;
 
 	VkDescriptorPoolCreateInfo poolInfo{};
 	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 	poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
 	poolInfo.pPoolSizes = poolSizes.data();
-	poolInfo.maxSets = 100;
+	poolInfo.maxSets = MAX_MODEL_COUNT;
+	poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
 
 	if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create descriptor pool!");
