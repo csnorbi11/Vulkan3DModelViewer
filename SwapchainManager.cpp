@@ -1,44 +1,38 @@
 #include "SwapchainManager.hpp"
 
 
-SwapchainManager::SwapchainManager(const VkPhysicalDevice& phyDevice, const VkDevice& device,
-	const std::vector<const char*>& deviceExtensions, const QueueFamilyIndices& indices,
-	VkSurfaceKHR& surface, uint32_t frameBufferWidth, uint32_t frameBufferHeight,
-	VkSampleCountFlagBits sampleCount)
+SwapchainManager::SwapchainManager(DeviceManager& deviceManager,
+	VkSurfaceKHR surface, uint32_t frameBufferWidth, uint32_t frameBufferHeight)
 	:
 	surface(surface),
-	physicalDevice(phyDevice),
-	device(device),
-	extensions(deviceExtensions),
-	indices(indices),
-	framebufferWidth(frameBufferWidth),
-	framebufferHeight(frameBufferHeight),
-	sampleCount(sampleCount)
+	deviceManager(deviceManager),
+	framebufferWidth(framebufferWidth),
+	framebufferHeight(frameBufferHeight)
 {
 	create();
 
-	depthBuffer = std::make_unique<DepthBuffer>(physicalDevice, this->device, imageExtent,sampleCount);
-	msaa = std::make_unique<Msaa>(physicalDevice, this->device, sampleCount, imageExtent, imageFormat);
-	renderpass = std::make_unique<RenderPass>(device, imageFormat, sampleCount, depthBuffer->getDepthFormat());
-	framebuffer = std::make_unique<Framebuffer>(imageViews, msaa->getImageView(), depthBuffer->getImageView(),
-		renderpass->getRenderPass(), imageExtent, device);
+	depthBuffer = std::make_unique<DepthBuffer>(deviceManager, imageExtent);
+	msaa = std::make_unique<Msaa>(deviceManager, imageExtent, imageFormat);
+	renderpass = std::make_unique<RenderPass>(deviceManager.getDevice(), imageFormat, deviceManager.getSampleCount(), depthBuffer->getDepthFormat());
+	framebuffer = std::make_unique<Framebuffer>(deviceManager.getDevice(), imageViews, msaa->getImageView(), depthBuffer->getImageView(),
+		renderpass->getRenderPass(), imageExtent);
 }
 
 void SwapchainManager::cleanup()
 {
-	framebuffer->cleanup();
+	framebuffer->cleanup(deviceManager.getDevice());
 
-	msaa->cleanup();
-	depthBuffer->cleanup();
+	msaa->cleanup(deviceManager.getDevice());
+	depthBuffer->cleanup(deviceManager.getDevice());
 	
 	for (uint32_t i = 0; i < imagesCount; i++) {
-		vkDestroyImageView(device, imageViews[i], nullptr);
+		vkDestroyImageView(deviceManager.getDevice(), imageViews[i], nullptr);
 	}
 
-	vkDestroySwapchainKHR(device, swapChain, nullptr);
+	vkDestroySwapchainKHR(deviceManager.getDevice(), swapChain, nullptr);
 
 
-	renderpass->cleanup();
+	renderpass->cleanup(deviceManager.getDevice());
 }
 
 const VkFormat& SwapchainManager::getImageFormat()
@@ -75,7 +69,7 @@ Framebuffer& SwapchainManager::getFramebuffer()
 }
 void SwapchainManager::create()
 {
-	SwapChainSupportDetails swapchainSupport = querySwapChainSupport(physicalDevice, surface);
+	SwapChainSupportDetails swapchainSupport = querySwapChainSupport(deviceManager.getPhysicalDevice(), surface);
 
 	VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapchainSupport.formats);
 	VkPresentModeKHR presentMode = chooseSwapPresentMode(swapchainSupport.presents);
@@ -97,9 +91,9 @@ void SwapchainManager::create()
 	swapCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
 
-	uint32_t queueFamilyIndices[] = { indices.graphicsFamily.value(), indices.presentFamily.value() };
+	uint32_t queueFamilyIndices[] = { deviceManager.getIndices().graphicsFamily.value(), deviceManager.getIndices().presentFamily.value()};
 
-	if (indices.graphicsFamily != indices.presentFamily) {
+	if (deviceManager.getIndices().graphicsFamily != deviceManager.getIndices().presentFamily) {
 		swapCreateInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
 		swapCreateInfo.queueFamilyIndexCount = 2;
 		swapCreateInfo.pQueueFamilyIndices = queueFamilyIndices;
@@ -113,7 +107,7 @@ void SwapchainManager::create()
 	swapCreateInfo.clipped = VK_TRUE;
 	swapCreateInfo.oldSwapchain = VK_NULL_HANDLE;
 
-	if (vkCreateSwapchainKHR(device, &swapCreateInfo, nullptr, &swapChain) != VK_SUCCESS) {
+	if (vkCreateSwapchainKHR(deviceManager.getDevice(), &swapCreateInfo, nullptr, &swapChain) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create swapchain");
 	}
 
@@ -130,10 +124,10 @@ void SwapchainManager::recreate(uint32_t frameBufferWidth, uint32_t frameBufferH
 	this->framebufferWidth = frameBufferWidth;
 	this->framebufferHeight = frameBufferHeight;
 	create();
-	msaa->create(frameBufferWidth, frameBufferHeight);
-	depthBuffer->create(frameBufferWidth, frameBufferHeight);
-	renderpass->create(imageFormat, sampleCount, depthBuffer->getDepthFormat(), device);
-	framebuffer->create(imageViews, msaa->getImageView(), depthBuffer->getImageView(),
+	msaa->create(deviceManager, frameBufferWidth, frameBufferHeight);
+	depthBuffer->create(deviceManager,frameBufferWidth, frameBufferHeight);
+	renderpass->create(deviceManager.getDevice(), deviceManager.getSampleCount(), depthBuffer->getDepthFormat(), imageFormat);
+	framebuffer->create(deviceManager.getDevice(), imageViews, msaa->getImageView(), depthBuffer->getImageView(),
 		renderpass->getRenderPass(), imageExtent);
 
 }
@@ -170,9 +164,9 @@ VkExtent2D SwapchainManager::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& ca
 
 void SwapchainManager::createImages(uint32_t& imageCount, VkSurfaceFormatKHR& surfaceFormat)
 {
-	vkGetSwapchainImagesKHR(device, swapChain, &imageCount, nullptr);
+	vkGetSwapchainImagesKHR(deviceManager.getDevice(), swapChain, &imageCount, nullptr);
 	images.resize(imageCount);
-	vkGetSwapchainImagesKHR(device, swapChain, &imageCount, images.data());
+	vkGetSwapchainImagesKHR(deviceManager.getDevice(), swapChain, &imageCount, images.data());
 
 }
 void SwapchainManager::createImageViews()
@@ -180,7 +174,7 @@ void SwapchainManager::createImageViews()
 	imageViews.resize(images.size());
 
 	for (size_t i = 0; i < imageViews.size(); i++) {
-		imageViews[i] = createImageView(images[i], imageFormat, VK_IMAGE_ASPECT_COLOR_BIT, 1, device);
+		imageViews[i] = createImageView(images[i], imageFormat, VK_IMAGE_ASPECT_COLOR_BIT, 1, deviceManager.getDevice());
 	}
 
 

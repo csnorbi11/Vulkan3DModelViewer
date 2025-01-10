@@ -1,17 +1,18 @@
 #pragma once
 #include "RendererCommon.h"
+#include "DeviceManager.hpp"
 
 class Msaa {
 public:
 	Msaa() = default;
 	~Msaa() = default;
 
-	Msaa(const VkPhysicalDevice& physicalDevice, const VkDevice& device,
-		VkSampleCountFlagBits sampleCount, const VkExtent2D& swapchainExtent,
-		const VkFormat& swapchainImageFormat);
+	Msaa(DeviceManager& deviceManager, VkExtent2D swapchainExtent,
+		VkFormat swapchainImageFormat);
 
-	void create(uint32_t width = 0, uint32_t height = 0);
-	void cleanup();
+	void create(DeviceManager& deviceManager,
+		uint32_t width = 0, uint32_t height = 0);
+	void cleanup(VkDevice device);
 
 	const VkImageView& getImageView();
 	const VkSampleCountFlagBits getSampleCount();
@@ -27,8 +28,6 @@ private:
 	VkDeviceMemory imageMemory;
 	VkSampleCountFlagBits sampleCount;
 
-	VkPhysicalDevice physicalDevice;
-	VkDevice device;
 	VkExtent2D swapchainExtent;
 	VkFormat swapchainImageFormat;
 };

@@ -1,17 +1,17 @@
 #pragma once
 #include "RendererCommon.h"
-
+#include "DeviceManager.hpp"
 
 class IndexBuffer {
 public:
 	IndexBuffer() = default;
 	~IndexBuffer() = default;
 
-	IndexBuffer(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
-		const VkCommandPool& commandPool, const VkQueue& queue,
-		const std::vector<uint32_t>& indices);
+	IndexBuffer(DeviceManager& deviceManager,
+		VkCommandPool commandPool,
+		std::vector<uint32_t> indices);
 
-	void cleanup();
+	void cleanup(VkDevice device);
 
 	const VkBuffer& getBuffer();
 	uint32_t getCount();
@@ -21,6 +21,4 @@ private:
 
 	VkBuffer buffer;
 	VkDeviceMemory bufferMemory;
-
-	VkDevice device;
 };

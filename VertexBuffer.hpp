@@ -1,6 +1,6 @@
 #pragma once
 #include "RendererCommon.h"
-
+#include "DeviceManager.hpp"
 
 
 class VertexBuffer {
@@ -8,11 +8,10 @@ public:
 	VertexBuffer() = default;
 	~VertexBuffer() = default;
 
-	VertexBuffer(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
-		const VkCommandPool& commandPool, const VkQueue& queue,
+	VertexBuffer(DeviceManager& deviceManager, VkCommandPool& commandPool,
 		const std::vector<Vertex>& vertices);
 
-	void cleanup();
+	void cleanup(VkDevice device);
 
 	const VkBuffer& getBuffer();
 
@@ -21,6 +20,4 @@ private:
 
 	VkBuffer buffer;
 	VkDeviceMemory bufferMemory;
-
-	VkDevice device;
 };

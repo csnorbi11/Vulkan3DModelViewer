@@ -8,24 +8,20 @@ public:
 	GraphicsPipeline() = default;
 	~GraphicsPipeline() = default;
 
-	GraphicsPipeline(const VkDevice& device, const VkExtent2D& swapchainExtent,
-		VkSampleCountFlagBits sampleCount, const VkFormat& swapchainImageFormat,
-		const VkPhysicalDevice& physicalDevice, const VkRenderPass& renderpass,
+	GraphicsPipeline(VkDevice device, VkExtent2D swapchainExtent,
+		VkSampleCountFlagBits sampleCount, VkFormat swapchainImageFormat,
+		VkPhysicalDevice physicalDevice, VkRenderPass renderpass,
 		const int MAX_FRAMES_IN_FLIGHT, VkPhysicalDeviceProperties properties,
-		UniformBuffer& uniBuffer);
+		UniformBuffer uniformBuffer);
 
-	void cleanup();
+	void cleanup(VkDevice device);
 
 	const VkPipeline& getPipeline();
 	const VkPipelineLayout& getLayout();
 
 private:
-	VkShaderModule createShaderModule(const std::vector<char>& code);
+	VkShaderModule createShaderModule(VkDevice device, const std::vector<char>& code);
 
 	VkPipelineLayout pipelineLayout;
 	VkPipeline pipeline;
-
-	UniformBuffer& uniformBuffer;
-
-	VkDevice device;
 };

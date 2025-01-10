@@ -20,7 +20,6 @@ private:
 	void loop();
 
 	void MenuWindow();
-
 	void ModelHandlerWIndow(bool& flipY);
 
 	void initImGui();

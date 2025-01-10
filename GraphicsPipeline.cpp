@@ -1,21 +1,18 @@
 #include "GraphicsPipeline.hpp"
 
 
-GraphicsPipeline::GraphicsPipeline(const VkDevice& device, const VkExtent2D& swapchainExtent,
-	VkSampleCountFlagBits sampleCount, const VkFormat& swapchainImageFormat,
-	const VkPhysicalDevice& physicalDevice, const VkRenderPass& renderpass,
+GraphicsPipeline::GraphicsPipeline(VkDevice device, VkExtent2D swapchainExtent,
+	VkSampleCountFlagBits sampleCount, VkFormat swapchainImageFormat,
+	VkPhysicalDevice physicalDevice, VkRenderPass renderpass,
 	const int MAX_FRAMES_IN_FLIGHT, VkPhysicalDeviceProperties properties,
-	UniformBuffer& uniBuffer)
-	:
-	device(device),
-	uniformBuffer(uniBuffer)
+	UniformBuffer uniformBuffer)
 {
 
 	auto vertShaderCode = readFile("vert.spv");
 	auto fragShaderCode = readFile("frag.spv");
 
-	VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
-	VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
+	VkShaderModule vertShaderModule = createShaderModule(device, vertShaderCode);
+	VkShaderModule fragShaderModule = createShaderModule(device, fragShaderCode);
 
 
 	VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
@@ -175,7 +172,7 @@ GraphicsPipeline::GraphicsPipeline(const VkDevice& device, const VkExtent2D& swa
 	vkDestroyShaderModule(device, fragShaderModule, nullptr);
 }
 
-void GraphicsPipeline::cleanup()
+void GraphicsPipeline::cleanup(VkDevice device)
 {
 	vkDestroyPipeline(device, pipeline, nullptr);
 	vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
@@ -193,7 +190,7 @@ const VkPipelineLayout& GraphicsPipeline::getLayout()
 }
 
 
-VkShaderModule GraphicsPipeline::createShaderModule(const std::vector<char>& code)
+VkShaderModule GraphicsPipeline::createShaderModule(VkDevice device, const std::vector<char>& code)
 {
 	VkShaderModuleCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;

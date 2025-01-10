@@ -1,19 +1,16 @@
 #include "Framebuffer.hpp"
 
-Framebuffer::Framebuffer(const std::vector<VkImageView>& swapchainImageViews,
-	const VkImageView& msaaImageView, const VkImageView& depthImageView,
-	const VkRenderPass& renderpass, const VkExtent2D& swapchainExtent,
-	const VkDevice& device)
-	:
-	device(device)
+Framebuffer::Framebuffer(VkDevice device, const std::vector<VkImageView>& swapchainImageViews,
+	VkImageView msaaImageView, VkImageView depthImageView,
+	VkRenderPass renderpass, VkExtent2D swapchainExtent)
 {
-	create(swapchainImageViews, msaaImageView, depthImageView, renderpass, swapchainExtent);
+	create(device, swapchainImageViews, msaaImageView, depthImageView, renderpass, swapchainExtent);
 }
 
 
-void Framebuffer::create(const std::vector<VkImageView>& swapchainImageViews,
-	const VkImageView& msaaImageView, const VkImageView& depthImageView,
-	const VkRenderPass& renderpass, const VkExtent2D& swapchainExtent)
+void Framebuffer::create(VkDevice device, const std::vector<VkImageView>& swapchainImageViews, VkImageView msaaImageView,
+	VkImageView depthImageView, VkRenderPass renderpass,
+	VkExtent2D swapchainExtent)
 {
 	swapchainFramebuffers.resize(swapchainImageViews.size());
 
@@ -33,7 +30,7 @@ void Framebuffer::create(const std::vector<VkImageView>& swapchainImageViews,
 		framebufferInfo.height = swapchainExtent.height;
 		framebufferInfo.layers = 1;
 
-		if (vkCreateFramebuffer(this->device, &framebufferInfo, nullptr, &swapchainFramebuffers[i]) != VK_SUCCESS) {
+		if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &swapchainFramebuffers[i]) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create framebuffer");
 		}
 
@@ -42,7 +39,7 @@ void Framebuffer::create(const std::vector<VkImageView>& swapchainImageViews,
 
 
 
-void Framebuffer::cleanup()
+void Framebuffer::cleanup(VkDevice device)
 {
 	for (size_t i = 0; i < swapchainFramebuffers.size(); i++) {
 		vkDestroyFramebuffer(device, swapchainFramebuffers[i], nullptr);

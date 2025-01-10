@@ -1,12 +1,12 @@
 #include "Model.hpp"
 
-Model::Model(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
-	const VkCommandPool& commandPool, const VkQueue& queue,
+Model::Model(DeviceManager& deviceManager,
+	VkCommandPool commandPool,
 	std::vector<Vertex> vertices, std::vector<uint32_t> indices,
 	std::vector<Texture> textures, std::string name)
 	:
-	vertexBuffer(device,physicalDevice,commandPool,queue,vertices),
-	indexBuffer(device, physicalDevice, commandPool, queue,indices),
+	vertexBuffer(deviceManager,commandPool,vertices),
+	indexBuffer(deviceManager, commandPool,indices),
 	textures(textures),
 	position(glm::vec3(0.0f)),
 	rotation(glm::vec3(0.0f)),
@@ -17,14 +17,14 @@ Model::Model(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
 }
 
 
-void Model::cleanup()
+void Model::cleanup(VkDevice device)
 {
 	for (auto& texture : textures)
 	{
-		texture.cleanup();
+		texture.cleanup(device);
 	}
-	vertexBuffer.cleanup();
-	indexBuffer.cleanup();
+	vertexBuffer.cleanup(device);
+	indexBuffer.cleanup(device);
 }
 
 VertexBuffer& Model::getVertexBuffer()

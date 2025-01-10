@@ -37,11 +37,7 @@ App::App()
 	glfwHandler(),
 	camera(glfwHandler.window.get(), { 0.0,0.0,-3.0 },5.0f),
 	renderer(glfwHandler.window.get(), glfwHandler.WIDTH, glfwHandler.HEIGHT, camera),
-	modelLoader(renderer.getDeviceManager().getDevice(),
-		renderer.getDeviceManager().getPhysicalDevice(),
-		renderer.getCommandBuffer().getCommandPool(),
-		renderer.getDeviceManager().getGraphicsQueue(),
-		renderer.getDeviceManager().getPhysicalDeviceProperties())
+	modelLoader(renderer.getDeviceManager(),renderer.getCommandBuffer().getCommandPool())
 {
 
 	glfwSetWindowUserPointer(glfwHandler.window.get(), this);

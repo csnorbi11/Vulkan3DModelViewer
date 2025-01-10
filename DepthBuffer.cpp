@@ -1,36 +1,33 @@
 #include "DepthBuffer.hpp"
 
-DepthBuffer::DepthBuffer(const VkPhysicalDevice& physicalDevice, const VkDevice& device,
-	const VkExtent2D& swapchainExtent, VkSampleCountFlagBits sampleCount)
+DepthBuffer::DepthBuffer(DeviceManager& deviceManager,
+	VkExtent2D swapchainExtent)
 	:
 	image(VK_NULL_HANDLE),
 	imageMemory(VK_NULL_HANDLE),
 	imageView(VK_NULL_HANDLE),
-	physicalDevice(physicalDevice),
-	device(device),
-	swapchainExtent(swapchainExtent),
-	sampleCount(sampleCount)
+	swapchainExtent(swapchainExtent)
 {
-	create();
+	create(deviceManager);
 }
 
 
-void DepthBuffer::create(uint32_t width, uint32_t height)
+void DepthBuffer::create(DeviceManager& deviceManager, uint32_t width, uint32_t height)
 {
 	if (width != 0 && height != 0) {
 		swapchainExtent.width = width;
 		swapchainExtent.height = height;
 	}
 
-	format = findDepthFormat();
+	format = findDepthFormat(deviceManager);
 
-	createImage(swapchainExtent.width, swapchainExtent.height, 1, format, sampleCount,
+	createImage(swapchainExtent.width, swapchainExtent.height, 1, format, deviceManager.getSampleCount(),
 		VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
-		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image, imageMemory, device, physicalDevice);
-	imageView = createImageView(image, format, VK_IMAGE_ASPECT_DEPTH_BIT, 1, device);
+		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image, imageMemory, deviceManager.getDevice(), deviceManager.getPhysicalDevice());
+	imageView = createImageView(image, format, VK_IMAGE_ASPECT_DEPTH_BIT, 1, deviceManager.getDevice());
 }
 
-void DepthBuffer::cleanup()
+void DepthBuffer::cleanup(VkDevice device)
 {
 	vkDestroyImageView(device, imageView, nullptr);
 	vkDestroyImage(device, image, nullptr);
@@ -47,9 +44,9 @@ const VkFormat& DepthBuffer::getDepthFormat()
 	return format;
 }
 
-VkFormat DepthBuffer::findDepthFormat()
+VkFormat DepthBuffer::findDepthFormat(DeviceManager& deviceManager)
 {
-	return findSupportedFormat(
+	return findSupportedFormat(deviceManager,
 		{ VK_FORMAT_D32_SFLOAT,VK_FORMAT_D32_SFLOAT_S8_UINT,VK_FORMAT_D16_UNORM_S8_UINT },
 		VK_IMAGE_TILING_OPTIMAL,
 		VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
@@ -59,11 +56,11 @@ bool DepthBuffer::hasScencilComponent(VkFormat format)
 {
 	return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
 }
-VkFormat DepthBuffer::findSupportedFormat(const std::vector<VkFormat> candidates, VkImageTiling tiling, VkFormatFeatureFlags features)
+VkFormat DepthBuffer::findSupportedFormat(DeviceManager& deviceManager, const std::vector<VkFormat> candidates, VkImageTiling tiling, VkFormatFeatureFlags features)
 {
 	for (VkFormat format : candidates) {
 		VkFormatProperties props;
-		vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &props);
+		vkGetPhysicalDeviceFormatProperties(deviceManager.getPhysicalDevice(), format, &props);
 
 		if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features) {
 			return format;

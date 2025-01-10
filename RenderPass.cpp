@@ -1,15 +1,14 @@
 #include "RenderPass.hpp"
 
 
-RenderPass::RenderPass(const VkDevice& device, const VkFormat& swapchainImageFormat,
-	const VkSampleCountFlagBits& sampleCount, const VkFormat& depthBufferFormat)
-	:
-	device(device)
+RenderPass::RenderPass(VkDevice device, VkFormat swapchainImageFormat,
+	VkSampleCountFlagBits sampleCount, VkFormat depthBufferFormat)
 {
-	create(swapchainImageFormat, sampleCount, depthBufferFormat, device);
+	create(device, sampleCount, depthBufferFormat, swapchainImageFormat);
 }
 
-void RenderPass::create(const VkFormat& swapchainImageFormat, const VkSampleCountFlagBits& sampleCount, const VkFormat& depthBufferFormat, const VkDevice& device)
+void RenderPass::create(VkDevice device, VkSampleCountFlagBits sampleCount,
+	VkFormat depthBufferFormat, VkFormat swapchainImageFormat)
 {
 	VkAttachmentDescription colorAttachment{};
 	colorAttachment.format = swapchainImageFormat;
@@ -86,7 +85,7 @@ void RenderPass::create(const VkFormat& swapchainImageFormat, const VkSampleCoun
 }
 
 
-void RenderPass::cleanup()
+void RenderPass::cleanup(VkDevice device)
 {
 	vkDestroyRenderPass(device, renderpass, nullptr);
 }

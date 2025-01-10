@@ -2,23 +2,12 @@
 
 
 
-Texture::~Texture()
-{
 
-}
-
-Texture::Texture(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
-	const VkCommandPool& commandPool, const VkQueue& graphicsQueue,
-	const std::string& path, const VkPhysicalDeviceProperties& properties)
-	:
-	device(device),
-	PATH(path),
-	queue(graphicsQueue),
-	commandPool(commandPool),
-	properties(properties)
+Texture::Texture(DeviceManager& deviceManager, const VkCommandPool& commandPool,
+	const std::string& path)
 {
 	int texWidth, texHeight, texChannels;
-	stbi_uc* pixels = stbi_load(PATH.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+	stbi_uc* pixels = stbi_load(path.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
 	VkDeviceSize imageSize = texWidth * texHeight * 4;
 	mipLevels = static_cast<uint32_t>(std::floor(log2(std::max(texWidth, texHeight)))) + 1;
 
@@ -30,32 +19,32 @@ Texture::Texture(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
 	VkDeviceMemory stagingBufferMemory;
 
 	createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-		VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory, device,physicalDevice);
+		VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory, deviceManager.getDevice(), deviceManager.getPhysicalDevice());
 
 	void* data;
-	vkMapMemory(device, stagingBufferMemory, 0, imageSize, 0, &data);
+	vkMapMemory(deviceManager.getDevice(), stagingBufferMemory, 0, imageSize, 0, &data);
 	memcpy(data, pixels, imageSize);
-	vkUnmapMemory(device, stagingBufferMemory);
+	vkUnmapMemory(deviceManager.getDevice(), stagingBufferMemory);
 
 	stbi_image_free(pixels);
 
 
 	createImage(texWidth, texHeight, mipLevels, VK_FORMAT_R8G8B8A8_SRGB, VK_SAMPLE_COUNT_1_BIT, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
 		VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-		textureImage, textureImaageMemory,device,physicalDevice);
+		textureImage, textureImaageMemory, deviceManager.getDevice(), deviceManager.getPhysicalDevice());
 
-	transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED,
+	transitionImageLayout(deviceManager.getDevice(), commandPool, deviceManager.getGraphicsQueue(), textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED,
 		VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, mipLevels);
-	copyBufferToImage(stagingBuffer, textureImage, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
+	copyBufferToImage(deviceManager.getDevice(),commandPool,deviceManager.getGraphicsQueue(),stagingBuffer, textureImage, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
 
 
 
-	vkDestroyBuffer(device, stagingBuffer, nullptr);
-	vkFreeMemory(device, stagingBufferMemory, nullptr);
+	vkDestroyBuffer(deviceManager.getDevice(), stagingBuffer, nullptr);
+	vkFreeMemory(deviceManager.getDevice(), stagingBufferMemory, nullptr);
 
-	generateMipmaps(textureImage, VK_FORMAT_R8G8B8A8_SRGB, texWidth, texHeight, mipLevels,physicalDevice);
+	generateMipmaps(deviceManager, commandPool,textureImage, VK_FORMAT_R8G8B8A8_SRGB, texWidth, texHeight, mipLevels);
 
-	textureImageView = createImageView(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT, mipLevels,device);
+	textureImageView = createImageView(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT, mipLevels, deviceManager.getDevice());
 
 	VkSamplerCreateInfo samplerInfo{};
 	samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -68,7 +57,7 @@ Texture::Texture(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
 
 
 	samplerInfo.anisotropyEnable = VK_TRUE;
-	samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
+	samplerInfo.maxAnisotropy = deviceManager.getPhysicalDeviceProperties().limits.maxSamplerAnisotropy;
 	samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
 	samplerInfo.unnormalizedCoordinates = VK_FALSE;
 
@@ -80,12 +69,12 @@ Texture::Texture(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
 	samplerInfo.minLod = 0.0f;
 	samplerInfo.maxLod = mipLevels;
 
-	if (vkCreateSampler(device, &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS) {
+	if (vkCreateSampler(deviceManager.getDevice(), &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create texture sampler");
 	}
 }
 
-void Texture::cleanup()
+void Texture::cleanup(VkDevice device)
 {
 	vkDestroySampler(device, textureSampler, nullptr);
 	vkDestroyImageView(device, textureImageView, nullptr);
@@ -103,7 +92,7 @@ const VkSampler& Texture::getSampler()
 	return textureSampler;
 }
 
-void Texture::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height)
+void Texture::copyBufferToImage(VkDevice device, VkCommandPool commandPool, VkQueue queue, VkBuffer buffer, VkImage image, uint32_t width, uint32_t height)
 {
 	VkCommandBuffer commandBuffer = beginSingleTimeCommands(commandPool, device);
 
@@ -133,10 +122,11 @@ void Texture::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, 
 		&region
 	);
 
-	endSingleTimeCommands(commandBuffer,queue,commandPool,device);
+	endSingleTimeCommands(commandBuffer,queue,commandPool, device);
 }
 
-void Texture::transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, uint32_t mipLevels)
+void Texture::transitionImageLayout(VkDevice device, VkCommandPool commandPool, VkQueue queue, VkImage image, VkFormat format, VkImageLayout oldLayout,
+	VkImageLayout newLayout, uint32_t mipLevels)
 {
 	VkCommandBuffer commandBuffer = beginSingleTimeCommands(commandPool, device);
 
@@ -190,17 +180,17 @@ void Texture::transitionImageLayout(VkImage image, VkFormat format, VkImageLayou
 	endSingleTimeCommands(commandBuffer, queue, commandPool, device);
 }
 
-void Texture::generateMipmaps(VkImage image, VkFormat imageFormat, int32_t texWidth, int32_t texHeight, uint32_t mipLevels,
-	const VkPhysicalDevice& physicalDevice)
+void Texture::generateMipmaps(DeviceManager& deviceManager, VkCommandPool commandPool, VkImage image, VkFormat imageFormat,
+	int32_t texWidth, int32_t texHeight, uint32_t mipLevels)
 {
 	VkFormatProperties formatProperties;
-	vkGetPhysicalDeviceFormatProperties(physicalDevice, imageFormat, &formatProperties);
+	vkGetPhysicalDeviceFormatProperties(deviceManager.getPhysicalDevice(), imageFormat, &formatProperties);
 	if (!(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT)) {
 		throw std::runtime_error("texture image format does not support linear blitting!");
 	}
 
 
-	VkCommandBuffer commandBuffer = beginSingleTimeCommands(commandPool, device);
+	VkCommandBuffer commandBuffer = beginSingleTimeCommands(commandPool, deviceManager.getDevice());
 
 	VkImageMemoryBarrier barrier{};
 	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -275,10 +265,10 @@ void Texture::generateMipmaps(VkImage image, VkFormat imageFormat, int32_t texWi
 		0, nullptr,
 		1, &barrier);
 
-	endSingleTimeCommands(commandBuffer, queue, commandPool, device);
+	endSingleTimeCommands(commandBuffer, deviceManager.getGraphicsQueue(), commandPool, deviceManager.getDevice());
 }
 
-void Texture::createTextureSampler()
+void Texture::createTextureSampler(DeviceManager& deviceManager)
 {
 	VkSamplerCreateInfo samplerInfo{};
 	samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -291,7 +281,7 @@ void Texture::createTextureSampler()
 
 
 	samplerInfo.anisotropyEnable = VK_TRUE;
-	samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
+	samplerInfo.maxAnisotropy = deviceManager.getPhysicalDeviceProperties().limits.maxSamplerAnisotropy;
 	samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
 	samplerInfo.unnormalizedCoordinates = VK_FALSE;
 
@@ -303,7 +293,7 @@ void Texture::createTextureSampler()
 	samplerInfo.minLod = 0.0f;
 	samplerInfo.maxLod = mipLevels;
 
-	if (vkCreateSampler(device, &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS) {
+	if (vkCreateSampler(deviceManager.getDevice(), &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create texture sampler");
 	}
 }

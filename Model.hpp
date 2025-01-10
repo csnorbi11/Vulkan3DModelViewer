@@ -9,13 +9,13 @@ public:
 	Model() = default;
 	~Model() = default;
 
-	Model(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
-		const VkCommandPool& commandPool, const VkQueue& queue,
+	Model(DeviceManager& deviceManager,
+		VkCommandPool commandPool,
 		std::vector<Vertex> vertices, std::vector<uint32_t> indices,
 		std::vector<Texture> textures, std::string name);
 
 
-	void cleanup();
+	void cleanup(VkDevice device);
 
 	VertexBuffer& getVertexBuffer();
 	IndexBuffer& getIndexBuffer();

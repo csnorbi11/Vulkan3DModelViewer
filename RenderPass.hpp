@@ -7,16 +7,15 @@ public:
 	RenderPass() = default;
 	~RenderPass() = default;
 
-	RenderPass(const VkDevice& device,const VkFormat& swapchainImageFormat,
-	const VkSampleCountFlagBits& sampleCount, const VkFormat& depthBufferFormat);
+	RenderPass(VkDevice device,VkFormat swapchainImageFormat,
+	VkSampleCountFlagBits sampleCount, VkFormat depthBufferFormat);
 
-	void create(const VkFormat& swapchainImageFormat, const VkSampleCountFlagBits& sampleCount, const VkFormat& depthBufferFormat, const VkDevice& device);
-	void cleanup();
+	void create(VkDevice device, VkSampleCountFlagBits sampleCount,
+		VkFormat depthBufferFormat, VkFormat swapchainImageFormat);
+	void cleanup(VkDevice device);
 
 	const VkRenderPass& getRenderPass();
 
 private:
 	VkRenderPass renderpass;
-
-	VkDevice device;
 };

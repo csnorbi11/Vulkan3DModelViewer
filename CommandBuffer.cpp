@@ -3,13 +3,12 @@
 #include <backends/imgui_impl_vulkan.h>
 
 
-CommandBuffer::CommandBuffer(const VkDevice& device, const QueueFamilyIndices& indices,
-	const VkRenderPass& renderpass, const std::vector<VkFramebuffer>& swapchainFramebuffers,
-	const VkExtent2D& swapchainExtent, const VkPipeline& graphicsPipeline,
-	const VkPipelineLayout& pipelineLayout,
+CommandBuffer::CommandBuffer(VkDevice device, QueueFamilyIndices indices,
+	VkRenderPass renderpass, const std::vector<VkFramebuffer>& swapchainFramebuffers,
+	VkExtent2D swapchainExtent, VkPipeline graphicsPipeline,
+	VkPipelineLayout pipelineLayout,
 	const int MAX_FRAMES_IN_FLIGHT, uint32_t dynamicAlignment)
 	:
-	device(device),
 	renderpass(renderpass),
 	swapchainFramebuffers(swapchainFramebuffers),
 	swapchainExtent(swapchainExtent),
@@ -40,11 +39,11 @@ CommandBuffer::CommandBuffer(const VkDevice& device, const QueueFamilyIndices& i
 
 
 	clearValues.resize(MAX_FRAMES_IN_FLIGHT);
-	clearValues[0].color = { 0.1f,0.1f,0.1f };
+	clearValues[0].color = { 0.0f,0.0f,0.0f };
 	clearValues[1].depthStencil = { 1.0f,0 };
 }
 
-void CommandBuffer::cleanup()
+void CommandBuffer::cleanup(VkDevice device)
 {
 	vkDestroyCommandPool(device, commandPool, nullptr);
 
@@ -65,7 +64,7 @@ void CommandBuffer::recordCommandBuffer(uint32_t currentFrame, uint32_t imageInd
 
 	VkRenderPassBeginInfo renderPassInfo{};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-	renderPassInfo.renderPass = renderpass;	
+	renderPassInfo.renderPass = renderpass;
 	renderPassInfo.framebuffer = swapchainFramebuffers[imageIndex];
 	renderPassInfo.renderArea.offset = { 0, 0 };
 	renderPassInfo.renderArea.extent = swapchainExtent;

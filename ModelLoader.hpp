@@ -10,9 +10,8 @@ public:
 	ModelLoader() = default;
 	~ModelLoader() = default;
 
-	ModelLoader(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
-		const VkCommandPool& commandPool, const VkQueue& queue,
-		const VkPhysicalDeviceProperties& properties);
+	ModelLoader(DeviceManager& deviceManager,
+		VkCommandPool commandPool);
 
 	Model loadModel(const std::string PATH, bool verticalFlipTexture = false);
 
@@ -20,10 +19,6 @@ public:
 private:
 
 
-	VkDevice device;
-	VkPhysicalDeviceProperties properties;
-	VkPhysicalDevice physicalDevice;
+	DeviceManager& deviceManager;
 	VkCommandPool commandPool;
-	VkQueue queue;
-
 };

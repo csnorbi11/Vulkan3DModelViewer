@@ -1,8 +1,6 @@
 #include "SyncObjects.hpp"
 
-SyncObjects::SyncObjects(const VkDevice& device, const int MAX_FRAMES_IN_FLIGHT)
-    :
-    device(device)
+SyncObjects::SyncObjects(VkDevice device, const int MAX_FRAMES_IN_FLIGHT)
 {
     imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
     renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
@@ -25,7 +23,7 @@ SyncObjects::SyncObjects(const VkDevice& device, const int MAX_FRAMES_IN_FLIGHT)
     }
 }
 
-void SyncObjects::cleanup()
+void SyncObjects::cleanup(VkDevice device)
 {
     for (size_t i = 0; i < imageAvailableSemaphores.size(); i++) {
         vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);

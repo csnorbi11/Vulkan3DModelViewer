@@ -18,9 +18,7 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window, int& windowWidth, int& window
 
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
-	swapchainManager = std::make_unique<SwapchainManager>(deviceManager->getPhysicalDevice(), deviceManager->getDevice(),
-		deviceManager->getDeviceExtensions(), deviceManager->getIndices(), surface, width, height,
-		deviceManager->getSampleCount());
+	swapchainManager = std::make_unique<SwapchainManager>(*deviceManager, surface, width, height);
 
 	uniformBuffer = std::make_unique<UniformBuffer>(deviceManager->getDevice(),
 		deviceManager->getPhysicalDevice(), MAX_FRAMES_IN_FLIGHT, swapchainManager->getImageExtent(), deviceManager->getPhysicalDeviceProperties(),
@@ -46,9 +44,9 @@ VulkanRenderer::~VulkanRenderer()
 
 	swapchainManager->cleanup();
 
-	syncObjects->cleanup();
-	commandbuffer->cleanup();
-	graphicsPipeline->cleanup();
+	syncObjects->cleanup(deviceManager->getDevice());
+	commandbuffer->cleanup(deviceManager->getDevice());
+	graphicsPipeline->cleanup(deviceManager->getDevice());
 	uniformBuffer->cleanup();
 
 	deviceManager->cleanup();
@@ -209,7 +207,7 @@ void VulkanRenderer::recieveModel(const Model& model)
 
 void VulkanRenderer::deleteModel(Model& model)
 {
-	model.cleanup();
+	model.cleanup(deviceManager->getDevice());
 	for (auto it = models.begin(); it != models.end(); it++)
 	{
 		if (&(*it) == &model)
@@ -224,7 +222,7 @@ void VulkanRenderer::deleteAllModels()
 {
 	for (auto& model : models)
 	{
-		model.cleanup();
+		model.cleanup(deviceManager->getDevice());
 	}
 	models.clear();
 }

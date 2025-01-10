@@ -1,15 +1,11 @@
 #include "ModelLoader.hpp"
 
 
-ModelLoader::ModelLoader(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
-	const VkCommandPool& commandPool, const VkQueue& queue,
-	const VkPhysicalDeviceProperties& properties)
+ModelLoader::ModelLoader(DeviceManager& deviceManager,
+	VkCommandPool commandPool)
 	:
-	device(device),
-	physicalDevice(physicalDevice),
-	commandPool(commandPool),
-	queue(queue),
-	properties(properties)
+	deviceManager(deviceManager),
+	commandPool(commandPool)
 {
 }
 
@@ -72,12 +68,12 @@ Model ModelLoader::loadModel(const std::string PATH, bool verticalFlipTexture)
 	for (size_t i = 0; i < materials.size(); i++) {
 		if (materials[i].diffuse_texname != "") {
 
-			textures.emplace_back(device, physicalDevice, commandPool, queue, path + materials[i].diffuse_texname, properties);
+			textures.emplace_back(deviceManager, commandPool, path + materials[i].diffuse_texname);
 
 		}
 
 	}
 
-	return Model(device, physicalDevice, commandPool, queue, vertices, indices, textures, fileName);
+	return Model(deviceManager, commandPool, vertices, indices, textures, fileName);
 }
 

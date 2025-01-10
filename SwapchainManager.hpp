@@ -3,16 +3,15 @@
 #include "DepthBuffer.hpp"
 #include "Msaa.hpp"
 #include "Framebuffer.hpp"
+#include "DeviceManager.hpp"
 
 class SwapchainManager {
 public:
 	SwapchainManager() = default;
 	~SwapchainManager() = default;
 
-	SwapchainManager(const VkPhysicalDevice& phyDevice, const VkDevice& device,
-		const std::vector<const char*>& deviceExtensions, const QueueFamilyIndices& indices,
-		VkSurfaceKHR& surface, uint32_t frameBufferWidth, uint32_t frameBufferHeight,
-		VkSampleCountFlagBits sampleCount);
+	SwapchainManager(DeviceManager& deviceManager,
+		VkSurfaceKHR surface, uint32_t frameBufferWidth, uint32_t frameBufferHeight);
 	void create();
 	void cleanup();
 	void recreate(uint32_t frameBufferWidth, uint32_t frameBufferHeight);
@@ -51,10 +50,6 @@ private:
 
 
 	VkSurfaceKHR surface;
-	VkPhysicalDevice physicalDevice;
-	VkDevice device;
-	VkSampleCountFlagBits sampleCount;
-	std::vector<const char*> extensions;
-	QueueFamilyIndices indices;
+	DeviceManager& deviceManager;
 	uint32_t framebufferWidth, framebufferHeight;
 };
