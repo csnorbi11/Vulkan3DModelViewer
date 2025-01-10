@@ -17,6 +17,7 @@ public:
 	void processMouseInput(float xOffset, float yOffset);
 
 	double mouseSensitivity;
+	float moveSpeed;
 
 private:
 	void calculateViewMatrix();

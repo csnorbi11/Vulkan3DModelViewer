@@ -14,6 +14,8 @@ Camera* globalCamera;
 
 void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 {
+
+
 	if (globalCamera == nullptr)
 		return;
 
@@ -27,6 +29,7 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 	lastY = yposCurrent;
 
 	globalCamera->processMouseInput(xOffset, yOffset);
+
 }
 
 App::App()
@@ -49,9 +52,6 @@ App::App()
 	initImGui();
 
 }
-
-
-
 App::~App()
 {
 	ImGui_ImplVulkan_Shutdown();
@@ -71,6 +71,10 @@ void App::loop()
 	double endTime = 0;
 	double deltaTime = 0;
 	bool flipY = false;
+
+	
+	renderer.recieveModel(modelLoader.loadModel("backpack.obj"));
+
 	while (!glfwWindowShouldClose(glfwHandler.window.get())) {
 		startTime = glfwGetTime();
 		glfwPollEvents();
@@ -81,9 +85,7 @@ void App::loop()
 		ImGui::NewFrame();
 		ModelHandlerWIndow(flipY);
 
-		ImGui::Begin("Menu");
-		
-		ImGui::End();
+		MenuWindow();
 
 		ImGui::EndFrame();
 
@@ -100,21 +102,30 @@ void App::loop()
 
 }
 
+void App::MenuWindow()
+{
+	ImGui::Begin("Menu");
+	ImVec2 menuWindowSize(glfwHandler.WIDTH / 6, glfwHandler.HEIGHT / 2);
+	ImGui::SetWindowSize(menuWindowSize);
+	ImGui::SetWindowPos(ImVec2(0, 0));
+
+	ImGui::InputFloat("Camera speed: ", &camera.moveSpeed);
+	ImGui::End();
+}
 void App::ModelHandlerWIndow(bool& flipY)
 {
 
 	ImGui::Begin("Model Loader/Transformer");
-	modelWindowSize = ImWindowSize(glfwHandler.WIDTH / 4, glfwHandler.HEIGHT);
-	std::cout << "window: " << glfwHandler.WIDTH << ":" << glfwHandler.HEIGHT << "\t" <<
-		modelWindowSize.x << ":" << modelWindowSize.y << std::endl;
+	modelWindowSize = ImVec2(glfwHandler.WIDTH / 4, glfwHandler.HEIGHT);
 	ImGui::SetWindowSize(modelWindowSize);
-	ImGui::SetWindowPos(ImVec2(0, 0));
+	int posOffsetX = glfwHandler.WIDTH - modelWindowSize.x;
+	ImGui::SetWindowPos(ImVec2(posOffsetX, 0));
+	ImGui::Text("Number of models: %d", renderer.models.size());
 	ModelLoaderDialog(flipY);
 	ModelPropertiesGUI();
 	ImGui::End();
 
 }
-
 void App::initImGui()
 {
 	IMGUI_CHECKVERSION();
@@ -157,6 +168,9 @@ void App::ModelPropertiesGUI()
 		if (ImGui::Button("Reset Rotation")) {
 			model.rotation = glm::vec3(0.0f);
 		}
+		if (ImGui::Button("Reset Scale")) {
+			model.scale = glm::vec3(1.0f);
+		}
 		ImGui::DragFloat("x", &model.position.x, 0.1f);
 		ImGui::DragFloat("y", &model.position.y, 0.1f);
 		ImGui::DragFloat("z", &model.position.z, 0.1f);
@@ -189,7 +203,6 @@ void App::ModelLoaderDialog(bool& flipY)
 		ImGuiFileDialog::Instance()->Close();
 	}
 }
-
 void App::framebufferResizeCallback(GLFWwindow* window, int width, int height)
 {
 	auto app = reinterpret_cast<App*>(glfwGetWindowUserPointer(window));

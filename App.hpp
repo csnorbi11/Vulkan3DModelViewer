@@ -8,8 +8,6 @@
 
 static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 
-typedef ImVec2 ImWindowSize;
-
 class App {
 public:
 
@@ -20,6 +18,8 @@ public:
 
 private:
 	void loop();
+
+	void MenuWindow();
 
 	void ModelHandlerWIndow(bool& flipY);
 
@@ -34,6 +34,5 @@ private:
 	ModelLoader modelLoader;
 	Camera camera;
 
-	ImWindowSize modelWindowSize;
-
+	ImVec2 modelWindowSize;
 };

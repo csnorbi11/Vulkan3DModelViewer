@@ -41,6 +41,7 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window, int& windowWidth, int& window
 }
 VulkanRenderer::~VulkanRenderer()
 {
+
 	deleteAllModels();
 
 	swapchainManager->cleanup();

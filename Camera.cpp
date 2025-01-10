@@ -9,7 +9,8 @@ Camera::Camera(GLFWwindow* window, glm::vec3 position)
 	moveInput(glm::vec3(0.0f)),
 	up(glm::vec3(0.0f)),
 	right(glm::vec3(0.0f)),
-	front(glm::vec3(0.0f))
+	front(glm::vec3(0.0f)),
+	moveSpeed(1.0f)
 {
 	//to make camera look to positive Z
 	rotation.y = 90.f;
@@ -27,7 +28,7 @@ void Camera::update(float deltaTime)
 	movementInput();
 	AscendDescent(deltaTime);
 
-	position += (front * moveInput.z + right * moveInput.x) * deltaTime;
+	position += (front * moveInput.z + right * moveInput.x) * moveSpeed * deltaTime;
 
 	calculateViewMatrix();
 }
