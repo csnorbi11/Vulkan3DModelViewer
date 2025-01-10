@@ -208,6 +208,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
+    <None Include="lightblub.frag" />
+    <None Include="lightblub.vert" />
     <None Include="shader.frag" />
     <None Include="shader.vert" />
     <None Include="shaderCompile.bat" />

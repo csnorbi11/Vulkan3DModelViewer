@@ -200,5 +200,11 @@
       <Filter>Shader Files</Filter>
     </None>
     <None Include="ClassDiagram.cd" />
+    <None Include="lightblub.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="lightblub.frag">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
