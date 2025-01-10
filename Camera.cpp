@@ -1,7 +1,7 @@
 #include "Camera.hpp"
 
 
-Camera::Camera(GLFWwindow* window, glm::vec3 position)
+Camera::Camera(GLFWwindow* window, glm::vec3 position, float moveSpeed)
 	:
 	window(window),
 	mouseSensitivity(1.0),
@@ -10,7 +10,7 @@ Camera::Camera(GLFWwindow* window, glm::vec3 position)
 	up(glm::vec3(0.0f)),
 	right(glm::vec3(0.0f)),
 	front(glm::vec3(0.0f)),
-	moveSpeed(1.0f)
+	moveSpeed(moveSpeed)
 {
 	//to make camera look to positive Z
 	rotation.y = 90.f;
@@ -22,6 +22,10 @@ glm::mat4 Camera::getViewMatrix() const
 	glm::vec3 fr(front.x, front.y, front.z);
 	glm::vec3 u(up.x, up.y, up.z);
 	return glm::lookAt(pos, pos + fr, u);
+}
+glm::vec3 Camera::getPosition() const
+{
+	return position;
 }
 void Camera::update(float deltaTime)
 {
@@ -53,9 +57,9 @@ void Camera::processMouseInput(float xOffset, float yOffset)
 void Camera::AscendDescent(float deltaTime)
 {
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-		position.y += deltaTime;
+		position.y += moveSpeed * deltaTime;
 	else if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-		position.y -= deltaTime;
+		position.y -= moveSpeed * deltaTime;
 }
 void Camera::movementInput()
 {

@@ -35,7 +35,7 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 App::App()
 	:
 	glfwHandler(),
-	camera(glfwHandler.window.get(), { 0.0,0.0,-3.0 }),
+	camera(glfwHandler.window.get(), { 0.0,0.0,-3.0 },5.0f),
 	renderer(glfwHandler.window.get(), glfwHandler.WIDTH, glfwHandler.HEIGHT, camera),
 	modelLoader(renderer.getDeviceManager().getDevice(),
 		renderer.getDeviceManager().getPhysicalDevice(),
@@ -109,7 +109,7 @@ void App::MenuWindow()
 	ImGui::SetWindowSize(menuWindowSize);
 	ImGui::SetWindowPos(ImVec2(0, 0));
 
-	ImGui::InputFloat("Camera speed: ", &camera.moveSpeed);
+	ImGui::DragFloat("Camera speed: ", &camera.moveSpeed);
 	ImGui::End();
 }
 void App::ModelHandlerWIndow(bool& flipY)

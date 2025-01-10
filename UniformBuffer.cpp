@@ -85,7 +85,7 @@ void UniformBuffer::calculateDynamicBuffer()
 
 void UniformBuffer::updateStatic(uint32_t currentFrame)
 {
-
+	staticUbo.camPos = camera.getPosition();
 	staticUbo.view = camera.getViewMatrix();
 	staticUbo.proj = glm::perspective(glm::radians(80.0f), swapchainExtent.width / (float)swapchainExtent.height, 0.1f, 100.0f);
 	staticUbo.proj[1][1] *= -1;

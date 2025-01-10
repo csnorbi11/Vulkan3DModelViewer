@@ -9,9 +9,11 @@ public:
 	Camera() = default;
 	~Camera() = default;
 
-	Camera(GLFWwindow* window, glm::vec3 position = glm::vec3(0));
+	Camera(GLFWwindow* window, glm::vec3 position = glm::vec3(0), float moveSpeed=1.0f);
 
 	glm::mat4 getViewMatrix() const;
+	glm::vec3 getPosition() const;
+
 	void update(float deltaTime);
 
 	void processMouseInput(float xOffset, float yOffset);
