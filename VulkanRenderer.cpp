@@ -134,7 +134,6 @@ void VulkanRenderer::readConfig(const std::string configPath)
 	}
 
 	inputFile.close();
-	exit(1);
 }
 
 void VulkanRenderer::drawFrame()

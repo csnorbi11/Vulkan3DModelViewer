@@ -3,11 +3,14 @@
 
 GraphicsPipeline::GraphicsPipeline(DeviceManager& deviceManager, VkExtent2D swapchainExtent,
 	VkFormat swapchainImageFormat, VkRenderPass renderpass,
-	const int MAX_FRAMES_IN_FLIGHT, UniformBuffer uniformBuffer)
+	const int MAX_FRAMES_IN_FLIGHT, UniformBuffer uniformBuffer,
+	const std::string name, const std::string& vertShader, const std::string& fragShader)
+	:
+	name(name)
 {
 
-	auto vertShaderCode = readFile("vert.spv");
-	auto fragShaderCode = readFile("frag.spv");
+	auto vertShaderCode = readFile(vertShader);
+	auto fragShaderCode = readFile(fragShader);
 
 	VkShaderModule vertShaderModule = createShaderModule(deviceManager.getDevice(), vertShaderCode);
 	VkShaderModule fragShaderModule = createShaderModule(deviceManager.getDevice(), fragShaderCode);
@@ -185,6 +188,11 @@ const VkPipeline& GraphicsPipeline::getPipeline()
 const VkPipelineLayout& GraphicsPipeline::getLayout()
 {
 	return pipelineLayout;
+}
+
+const std::string& GraphicsPipeline::getName()
+{
+	return name;
 }
 
 
