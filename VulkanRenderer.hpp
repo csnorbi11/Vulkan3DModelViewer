@@ -36,7 +36,7 @@ public:
 	UniformBuffer& getUniformBuffer();
 	SwapchainManager& getSwapchainManager();
 
-	std::vector<Model> models;
+	std::vector<std::unique_ptr<Object>> objects;
 
 private:
 	void createInstance();

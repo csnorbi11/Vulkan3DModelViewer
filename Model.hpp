@@ -14,7 +14,7 @@ public:
 		std::vector<Texture> textures, std::string name);
 
 
-	void cleanup(VkDevice device);
+	void cleanup(VkDevice device) override;
 
 
 	std::vector<Texture>& getTextures();

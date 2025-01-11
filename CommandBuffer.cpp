@@ -51,7 +51,7 @@ void CommandBuffer::cleanup(VkDevice device)
 }
 
 void CommandBuffer::recordCommandBuffer(uint32_t currentFrame, uint32_t imageIndex,
-	std::vector<Model>& models)
+	std::vector<std::unique_ptr<Object>>& objects)
 {
 	VkCommandBufferBeginInfo beginInfo{};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -91,13 +91,13 @@ void CommandBuffer::recordCommandBuffer(uint32_t currentFrame, uint32_t imageInd
 	//VkBuffer vertexBuffers[] = { vertexBuffer };
 	VkDeviceSize offsets[] = { 0 };
 	int i = 0;
-	for (auto& model : models) {
+	for (auto& object : objects) {
 		uint32_t dynamicOffset = dynamicAlignment * i++;
-		vkCmdBindVertexBuffers(commandBuffers[currentFrame], 0, 1, &model.getVertexBuffer().getBuffer(), offsets);
-		vkCmdBindIndexBuffer(commandBuffers[currentFrame], model.getIndexBuffer().getBuffer(), 0, VK_INDEX_TYPE_UINT32);
+		vkCmdBindVertexBuffers(commandBuffers[currentFrame], 0, 1, &object->getVertexBuffer().getBuffer(), offsets);
+		vkCmdBindIndexBuffer(commandBuffers[currentFrame], object->getIndexBuffer().getBuffer(), 0, VK_INDEX_TYPE_UINT32);
 
-		vkCmdBindDescriptorSets(commandBuffers[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &model.descriptorSets[currentFrame], 1, &dynamicOffset);
-		vkCmdDrawIndexed(commandBuffers[currentFrame], model.getIndexBuffer().getCount(), 1, 0, 0, 0);
+		vkCmdBindDescriptorSets(commandBuffers[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &object->descriptorSets[currentFrame], 1, &dynamicOffset);
+		vkCmdDrawIndexed(commandBuffers[currentFrame], object->getIndexBuffer().getCount(), 1, 0, 0, 0);
 
 	}
 

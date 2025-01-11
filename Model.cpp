@@ -7,9 +7,7 @@ Model::Model(DeviceManager& deviceManager,
 	:
 	Object(deviceManager,commandPool,vertices,indices,name),
 	textures(textures)
-{
-
-}
+{}
 
 
 void Model::cleanup(VkDevice device)

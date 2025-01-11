@@ -31,9 +31,9 @@ public:
 
 	UniformBuffer(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
 		const int MAX_FRAMES_IN_FLIGHT, const VkExtent2D& swapchainExtent, VkPhysicalDeviceProperties properties,
-		const std::vector<Model>& models, const Camera& camera);
+		const std::vector<std::unique_ptr<Object>>& objects, const Camera& camera);
 
-	void createDescriptorSets(Model& model, const int MAX_FRAMES_IN_FLIGHT);
+	void createDescriptorSets(Object& object, const int MAX_FRAMES_IN_FLIGHT);
 
 	void recreateDynamicBuffer();
 	void calculateDynamicBuffer();
@@ -52,7 +52,7 @@ private:
 	void createDescriptorSetLayout();
 	void createDescriptorPool(const int MAX_FRAMES_IN_FLIGHT);
 
-	const std::vector<Model>& models;
+	const std::vector<std::unique_ptr<Object>>& objects;
 
 	const Camera& camera;
 

@@ -117,7 +117,7 @@ void App::ModelHandlerWIndow(bool& flipY)
 	ImGui::SetWindowSize(modelWindowSize);
 	int posOffsetX = glfwHandler.WIDTH - modelWindowSize.x;
 	ImGui::SetWindowPos(ImVec2(posOffsetX, 0));
-	ImGui::Text("Number of models: %d", renderer.models.size());
+	ImGui::Text("Number of models: %d", renderer.objects.size());
 	ModelLoaderDialog(flipY);
 	ModelPropertiesGUI();
 	ImGui::End();
@@ -151,32 +151,32 @@ void App::initImGui()
 void App::ModelPropertiesGUI()
 {
 	int i = 1;
-	for (auto& model : renderer.models) {
+	for (auto& object : renderer.objects) {
 		ImGui::BeginChild(i, modelWindowSize, true);
-		ImGui::LabelText("Name", model.name.c_str());
+		ImGui::LabelText("Name", object->name.c_str());
 		if (ImGui::Button("Delete")) {
-			renderer.models.erase(renderer.models.begin() + i - 1);
+			renderer.objects.erase(renderer.objects.begin() + i - 1);
 			ImGui::EndChild();
 			break;
 		}
 		if (ImGui::Button("Reset Position")) {
-			model.position = glm::vec3(0.0f);
+			object->position = glm::vec3(0.0f);
 		}
 		if (ImGui::Button("Reset Rotation")) {
-			model.rotation = glm::vec3(0.0f);
+			object->rotation = glm::vec3(0.0f);
 		}
 		if (ImGui::Button("Reset Scale")) {
-			model.scale = glm::vec3(1.0f);
+			object->scale = glm::vec3(1.0f);
 		}
-		ImGui::DragFloat("x", &model.position.x, 0.1f);
-		ImGui::DragFloat("y", &model.position.y, 0.1f);
-		ImGui::DragFloat("z", &model.position.z, 0.1f);
-		ImGui::DragFloat("pitch", &model.rotation.x, 0.1f);
-		ImGui::DragFloat("yaw", &model.rotation.y, 0.1f);
-		ImGui::DragFloat("roll", &model.rotation.z, 0.1f);
-		ImGui::DragFloat("ScaleX: ", &model.scale.x, 0.1f, 0.0f);
-		ImGui::DragFloat("ScaleY", &model.scale.y, 0.1f, 0.0f);
-		ImGui::DragFloat("ScaleZ", &model.scale.z, 0.1f, 0.0f);
+		ImGui::DragFloat("x", &object->position.x, 0.1f);
+		ImGui::DragFloat("y", &object->position.y, 0.1f);
+		ImGui::DragFloat("z", &object->position.z, 0.1f);
+		ImGui::DragFloat("pitch", &object->rotation.x, 0.1f);
+		ImGui::DragFloat("yaw", &object->rotation.y, 0.1f);
+		ImGui::DragFloat("roll", &object->rotation.z, 0.1f);
+		ImGui::DragFloat("ScaleX: ", &object->scale.x, 0.1f, 0.0f);
+		ImGui::DragFloat("ScaleY", &object->scale.y, 0.1f, 0.0f);
+		ImGui::DragFloat("ScaleZ", &object->scale.z, 0.1f, 0.0f);
 		ImGui::EndChild();
 		i++;
 	}

@@ -24,7 +24,7 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window, int& windowWidth, int& window
 
 	uniformBuffer = std::make_unique<UniformBuffer>(deviceManager->getDevice(),
 		deviceManager->getPhysicalDevice(), MAX_FRAMES_IN_FLIGHT, swapchainManager->getImageExtent(), deviceManager->getPhysicalDeviceProperties(),
-		models, camera);
+		objects, camera);
 
 	graphicsPipeline = std::make_unique<GraphicsPipeline>(*deviceManager, swapchainManager->getImageExtent(),
 		swapchainManager->getImageFormat(), swapchainManager->getRenderPass().getRenderPass(),
@@ -156,7 +156,7 @@ void VulkanRenderer::drawFrame()
 	vkResetFences(deviceManager->getDevice(), 1, &syncObjects->inFlightFences[currentFrame]);
 
 	vkResetCommandBuffer(commandbuffer->getCommandbuffers()[currentFrame], 0);
-	commandbuffer->recordCommandBuffer(currentFrame, imageIndex, models);
+	commandbuffer->recordCommandBuffer(currentFrame, imageIndex, objects);
 
 
 	uniformBuffer->updateDynamic(currentFrame);
@@ -212,21 +212,21 @@ void VulkanRenderer::wait()
 
 void VulkanRenderer::recieveModel(const Model& model)
 {
-	models.push_back(model);
+	objects.push_back(std::make_unique<Model>(model));
 	uniformBuffer->calculateDynamicBuffer();
 	uniformBuffer->recreateDynamicBuffer();
-	for (auto& model : models)
-		uniformBuffer->createDescriptorSets(model, MAX_FRAMES_IN_FLIGHT);
+	for (auto& object : objects)
+		uniformBuffer->createDescriptorSets(*object, MAX_FRAMES_IN_FLIGHT);
 }
 
 void VulkanRenderer::deleteModel(Model& model)
 {
 	model.cleanup(deviceManager->getDevice());
-	for (auto it = models.begin(); it != models.end(); it++)
+	for (auto it = objects.begin(); it != objects.end(); it++)
 	{
-		if (&(*it) == &model)
+		if ((*it).get() == &model)
 		{
-			models.erase(it);
+			objects.erase(it);
 			return;
 		}
 	}
@@ -234,11 +234,11 @@ void VulkanRenderer::deleteModel(Model& model)
 
 void VulkanRenderer::deleteAllModels()
 {
-	for (auto& model : models)
+	for (auto& object : objects)
 	{
-		model.cleanup(deviceManager->getDevice());
+		object->cleanup(deviceManager->getDevice());
 	}
-	models.clear();
+	objects.clear();
 }
 
 DeviceManager& VulkanRenderer::getDeviceManager()

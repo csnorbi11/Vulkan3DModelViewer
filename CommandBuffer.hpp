@@ -2,6 +2,7 @@
 #include "RendererCommon.h"
 #include "SwapchainManager.hpp"
 #include "Model.hpp"
+#include "LightSource.hpp"
 
 class CommandBuffer {
 public:
@@ -17,7 +18,7 @@ public:
 	void cleanup(VkDevice device);
 
 	void recordCommandBuffer(uint32_t currentFrame, uint32_t imageIndex,
-		std::vector<Model>& models);
+		std::vector<std::unique_ptr<Object>>& objects);
 	void setClearColor(VkClearValue newClearValue);
 	void update(SwapchainManager& swapchainManager);
 
