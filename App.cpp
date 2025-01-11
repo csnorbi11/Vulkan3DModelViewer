@@ -36,7 +36,8 @@ App::App()
 	:
 	glfwHandler(),
 	camera(glfwHandler.window.get(), { 0.0,0.0,-3.0 },5.0f),
-	renderer(glfwHandler.window.get(), glfwHandler.WIDTH, glfwHandler.HEIGHT, camera),
+	renderer(glfwHandler.window.get(), glfwHandler.WIDTH, glfwHandler.HEIGHT, camera,
+		"config.txt"),
 	modelLoader(renderer.getDeviceManager(),renderer.getCommandBuffer().getCommandPool())
 {
 
@@ -105,7 +106,7 @@ void App::MenuWindow()
 	ImGui::SetWindowSize(menuWindowSize);
 	ImGui::SetWindowPos(ImVec2(0, 0));
 
-	ImGui::DragFloat("Camera speed: ", &camera.moveSpeed);
+	ImGui::DragFloat("Camera speed: ", &camera.moveSpeed,0.1f);
 	ImGui::End();
 }
 void App::ModelHandlerWIndow(bool& flipY)

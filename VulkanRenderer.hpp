@@ -19,7 +19,7 @@ public:
 	~VulkanRenderer();
 
 	VulkanRenderer(GLFWwindow* window, int& windowWidth, int& windowHeight,
-		const Camera& camera);
+		const Camera& camera, const std::string configPath);
 
 	void drawFrame();
 
@@ -44,6 +44,7 @@ private:
 
 	void recreateSwapchain();
 
+	void readConfig(const std::string configPath);
 
 	GLFWwindow* window;
 	int& windowWidth;

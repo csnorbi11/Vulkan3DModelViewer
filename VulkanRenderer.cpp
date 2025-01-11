@@ -1,7 +1,7 @@
 #include "VulkanRenderer.hpp"
 
 VulkanRenderer::VulkanRenderer(GLFWwindow* window, int& windowWidth, int& windowHeight,
-	const Camera& camera)
+	const Camera& camera, const std::string configPath)
 	:
 	window(window),
 	MAX_FRAMES_IN_FLIGHT(2),
@@ -10,6 +10,8 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window, int& windowWidth, int& window
 	windowWidth(windowWidth),
 	windowHeight(windowHeight)
 {
+	readConfig(configPath);
+
 	validationLayers = std::make_unique<ValidationLayers>();
 	createInstance();
 	createSurface(window);
@@ -24,10 +26,9 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window, int& windowWidth, int& window
 		deviceManager->getPhysicalDevice(), MAX_FRAMES_IN_FLIGHT, swapchainManager->getImageExtent(), deviceManager->getPhysicalDeviceProperties(),
 		models, camera);
 
-	graphicsPipeline = std::make_unique<GraphicsPipeline>(deviceManager->getDevice(), swapchainManager->getImageExtent(),
-		swapchainManager->getMsaa().getSampleCount(), swapchainManager->getImageFormat(),
-		deviceManager->getPhysicalDevice(), swapchainManager->getRenderPass().getRenderPass(),
-		MAX_FRAMES_IN_FLIGHT, deviceManager->getPhysicalDeviceProperties(), *uniformBuffer);
+	graphicsPipeline = std::make_unique<GraphicsPipeline>(*deviceManager, swapchainManager->getImageExtent(),
+		swapchainManager->getImageFormat(), swapchainManager->getRenderPass().getRenderPass(),
+		MAX_FRAMES_IN_FLIGHT, *uniformBuffer);
 
 	commandbuffer = std::make_unique<CommandBuffer>(deviceManager->getDevice(), deviceManager->getIndices(),
 		swapchainManager->getRenderPass().getRenderPass(), swapchainManager->getFramebuffer().getSwapchainFramebuffers(),
@@ -120,6 +121,20 @@ void VulkanRenderer::recreateSwapchain()
 
 	swapchainManager->recreate(static_cast<uint32_t>(windowWidth), static_cast<uint32_t>(windowHeight));
 	commandbuffer->update(*swapchainManager);
+}
+
+void VulkanRenderer::readConfig(const std::string configPath)
+{
+	std::ifstream inputFile(configPath);
+	
+	std::string line;
+
+	while (std::getline(inputFile, line)) {
+		std::cout << line << std::endl;
+	}
+
+	inputFile.close();
+	exit(1);
 }
 
 void VulkanRenderer::drawFrame()

@@ -1,18 +1,16 @@
 #include "GraphicsPipeline.hpp"
 
 
-GraphicsPipeline::GraphicsPipeline(VkDevice device, VkExtent2D swapchainExtent,
-	VkSampleCountFlagBits sampleCount, VkFormat swapchainImageFormat,
-	VkPhysicalDevice physicalDevice, VkRenderPass renderpass,
-	const int MAX_FRAMES_IN_FLIGHT, VkPhysicalDeviceProperties properties,
-	UniformBuffer uniformBuffer)
+GraphicsPipeline::GraphicsPipeline(DeviceManager& deviceManager, VkExtent2D swapchainExtent,
+	VkFormat swapchainImageFormat, VkRenderPass renderpass,
+	const int MAX_FRAMES_IN_FLIGHT, UniformBuffer uniformBuffer)
 {
 
 	auto vertShaderCode = readFile("vert.spv");
 	auto fragShaderCode = readFile("frag.spv");
 
-	VkShaderModule vertShaderModule = createShaderModule(device, vertShaderCode);
-	VkShaderModule fragShaderModule = createShaderModule(device, fragShaderCode);
+	VkShaderModule vertShaderModule = createShaderModule(deviceManager.getDevice(), vertShaderCode);
+	VkShaderModule fragShaderModule = createShaderModule(deviceManager.getDevice(), fragShaderCode);
 
 
 	VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
@@ -93,7 +91,7 @@ GraphicsPipeline::GraphicsPipeline(VkDevice device, VkExtent2D swapchainExtent,
 	VkPipelineMultisampleStateCreateInfo multisampling{};
 	multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
 	multisampling.sampleShadingEnable = VK_TRUE;
-	multisampling.rasterizationSamples = sampleCount;
+	multisampling.rasterizationSamples = deviceManager.getSampleCount();
 	multisampling.minSampleShading = 0.2f;
 	multisampling.pSampleMask = nullptr; // Optional
 	multisampling.alphaToCoverageEnable = VK_FALSE; // Optional
@@ -140,7 +138,7 @@ GraphicsPipeline::GraphicsPipeline(VkDevice device, VkExtent2D swapchainExtent,
 	pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
 
 
-	if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
+	if (vkCreatePipelineLayout(deviceManager.getDevice(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create pipeline layout!");
 	}
 
@@ -164,12 +162,12 @@ GraphicsPipeline::GraphicsPipeline(VkDevice device, VkExtent2D swapchainExtent,
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
 	pipelineInfo.basePipelineIndex = -1; // Optional
 
-	if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS) {
+	if (vkCreateGraphicsPipelines(deviceManager.getDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create graphics pipeline!");
 	}
 
-	vkDestroyShaderModule(device, vertShaderModule, nullptr);
-	vkDestroyShaderModule(device, fragShaderModule, nullptr);
+	vkDestroyShaderModule(deviceManager.getDevice(), vertShaderModule, nullptr);
+	vkDestroyShaderModule(deviceManager.getDevice(), fragShaderModule, nullptr);
 }
 
 void GraphicsPipeline::cleanup(VkDevice device)

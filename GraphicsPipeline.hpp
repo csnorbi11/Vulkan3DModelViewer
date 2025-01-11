@@ -2,17 +2,16 @@
 #include "RendererCommon.h"
 #include "RenderPass.hpp"
 #include "UniformBuffer.hpp"
+#include "DeviceManager.hpp"
 
 class GraphicsPipeline {
 public:
 	GraphicsPipeline() = default;
 	~GraphicsPipeline() = default;
 
-	GraphicsPipeline(VkDevice device, VkExtent2D swapchainExtent,
-		VkSampleCountFlagBits sampleCount, VkFormat swapchainImageFormat,
-		VkPhysicalDevice physicalDevice, VkRenderPass renderpass,
-		const int MAX_FRAMES_IN_FLIGHT, VkPhysicalDeviceProperties properties,
-		UniformBuffer uniformBuffer);
+	GraphicsPipeline(DeviceManager& deviceManager, VkExtent2D swapchainExtent,
+		 VkFormat swapchainImageFormat, VkRenderPass renderpass,
+		const int MAX_FRAMES_IN_FLIGHT, UniformBuffer uniformBuffer);
 
 	void cleanup(VkDevice device);
 
