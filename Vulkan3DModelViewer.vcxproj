@@ -166,10 +166,12 @@
     <ClCompile Include="imgui_tables.cpp" />
     <ClCompile Include="imgui_widgets.cpp" />
     <ClCompile Include="IndexBuffer.cpp" />
+    <ClCompile Include="LightSource.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="Msaa.cpp" />
+    <ClCompile Include="Object.cpp" />
     <ClCompile Include="RendererCommon.cpp" />
     <ClCompile Include="RendererCommon.h" />
     <ClCompile Include="RenderPass.cpp" />
@@ -194,9 +196,11 @@
     <ClInclude Include="imgui_impl_glfw.h" />
     <ClInclude Include="imgui_impl_vulkan.h" />
     <ClInclude Include="IndexBuffer.hpp" />
+    <ClInclude Include="LightSource.hpp" />
     <ClInclude Include="Model.hpp" />
     <ClInclude Include="ModelLoader.hpp" />
     <ClInclude Include="Msaa.hpp" />
+    <ClInclude Include="Object.hpp" />
     <ClInclude Include="RenderPass.hpp" />
     <ClInclude Include="SwapchainManager.hpp" />
     <ClInclude Include="SyncObjects.hpp" />

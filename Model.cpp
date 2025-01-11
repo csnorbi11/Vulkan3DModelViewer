@@ -5,13 +5,8 @@ Model::Model(DeviceManager& deviceManager,
 	std::vector<Vertex> vertices, std::vector<uint32_t> indices,
 	std::vector<Texture> textures, std::string name)
 	:
-	vertexBuffer(deviceManager,commandPool,vertices),
-	indexBuffer(deviceManager, commandPool,indices),
-	textures(textures),
-	position(glm::vec3(0.0f)),
-	rotation(glm::vec3(0.0f)),
-	scale(glm::vec3(1.0f)),
-	name(name)
+	Object(deviceManager,commandPool,vertices,indices,name),
+	textures(textures)
 {
 
 }
@@ -23,18 +18,7 @@ void Model::cleanup(VkDevice device)
 	{
 		texture.cleanup(device);
 	}
-	vertexBuffer.cleanup(device);
-	indexBuffer.cleanup(device);
-}
-
-VertexBuffer& Model::getVertexBuffer()
-{
-	return vertexBuffer;
-}
-
-IndexBuffer& Model::getIndexBuffer()
-{
-	return indexBuffer;
+	Object::cleanup(device);
 }
 
 std::vector<Texture>& Model::getTextures()

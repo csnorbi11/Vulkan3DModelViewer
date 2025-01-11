@@ -1,10 +1,9 @@
 #pragma once
 #include "RendererCommon.h"
-#include "VertexBuffer.hpp"
-#include "IndexBuffer.hpp"
+#include "Object.hpp"
 #include "Texture.hpp"
 
-class Model {
+class Model : public Object {
 public:
 	Model() = default;
 	~Model() = default;
@@ -17,19 +16,11 @@ public:
 
 	void cleanup(VkDevice device);
 
-	VertexBuffer& getVertexBuffer();
-	IndexBuffer& getIndexBuffer();
+
 	std::vector<Texture>& getTextures();
 
-	std::vector<VkDescriptorSet> descriptorSets;
 
-	glm::vec3 position;
-	glm::vec3 rotation;
-	glm::vec3 scale;
-	std::string name;
 
 private:
-	VertexBuffer vertexBuffer;
-	IndexBuffer indexBuffer;
 	std::vector<Texture> textures;
 };

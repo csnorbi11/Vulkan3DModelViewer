@@ -28,7 +28,7 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window, int& windowWidth, int& window
 
 	graphicsPipeline = std::make_unique<GraphicsPipeline>(*deviceManager, swapchainManager->getImageExtent(),
 		swapchainManager->getImageFormat(), swapchainManager->getRenderPass().getRenderPass(),
-		MAX_FRAMES_IN_FLIGHT, *uniformBuffer);
+		MAX_FRAMES_IN_FLIGHT, *uniformBuffer,"modelShader", "vert.spv", "frag.spv");
 
 	commandbuffer = std::make_unique<CommandBuffer>(deviceManager->getDevice(), deviceManager->getIndices(),
 		swapchainManager->getRenderPass().getRenderPass(), swapchainManager->getFramebuffer().getSwapchainFramebuffers(),
