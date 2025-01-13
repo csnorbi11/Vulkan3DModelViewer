@@ -52,7 +52,7 @@ void CommandBuffer::cleanup(VkDevice device)
 }
 
 void CommandBuffer::recordCommandBuffer(uint32_t currentFrame, uint32_t imageIndex,
-	std::vector<std::unique_ptr<Object>>& objects)
+	ObjectContainer& objectContainer)
 {
 	VkCommandBufferBeginInfo beginInfo{};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -93,7 +93,7 @@ void CommandBuffer::recordCommandBuffer(uint32_t currentFrame, uint32_t imageInd
 	//VkBuffer vertexBuffers[] = { vertexBuffer };
 	VkDeviceSize offsets[] = { 0 };
 	int i = 0;
-	for (auto& object : objects) {
+	for (auto& object : objectContainer.get()) {
 		int j = 0;
 		if (typeid(*object).name() != typeid(Model).name()) {
 			j = 1;

@@ -7,7 +7,7 @@
 class Object {
 public:
 	Object() = default;
-	~Object() = default;
+	virtual ~Object() = default;
 
 	Object(DeviceManager& deviceManager,
 		VkCommandPool commandPool,

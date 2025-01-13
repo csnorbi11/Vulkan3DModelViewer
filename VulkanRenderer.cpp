@@ -24,7 +24,7 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window, int& windowWidth, int& window
 
 	uniformBuffer = std::make_unique<UniformBuffer>(deviceManager->getDevice(),
 		deviceManager->getPhysicalDevice(), MAX_FRAMES_IN_FLIGHT, swapchainManager->getImageExtent(), deviceManager->getPhysicalDeviceProperties(),
-		objects, camera);
+		objectContainer, camera);
 
 	graphicsPipelines.push_back(GraphicsPipeline(*deviceManager, swapchainManager->getImageExtent(),
 		swapchainManager->getImageFormat(), swapchainManager->getRenderPass().getRenderPass(),
@@ -41,10 +41,7 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window, int& windowWidth, int& window
 
 	syncObjects = std::make_unique<SyncObjects>(deviceManager->getDevice(), MAX_FRAMES_IN_FLIGHT);
 
-	objects.push_back(std::make_unique<LightSource>(*deviceManager, commandbuffer->getCommandPool(), "light",glm::vec3(0.0,0.0,1.0)));
-	objects.push_back(std::make_unique<LightSource>(*deviceManager, commandbuffer->getCommandPool(), "light",glm::vec3(0.0,1.0,0.0)));
-	objects.push_back(std::make_unique<LightSource>(*deviceManager, commandbuffer->getCommandPool(), "light",glm::vec3(1.0,0.0,0.0)));
-
+	objectContainer.addLightSource({ *deviceManager,commandbuffer->getCommandPool(),"light" });
 }
 VulkanRenderer::~VulkanRenderer()
 {
@@ -165,7 +162,7 @@ void VulkanRenderer::drawFrame()
 	vkResetFences(deviceManager->getDevice(), 1, &syncObjects->inFlightFences[currentFrame]);
 
 	vkResetCommandBuffer(commandbuffer->getCommandbuffers()[currentFrame], 0);
-	commandbuffer->recordCommandBuffer(currentFrame, imageIndex, objects);
+	commandbuffer->recordCommandBuffer(currentFrame, imageIndex, objectContainer);
 
 
 	uniformBuffer->updateDynamic(currentFrame);
@@ -221,33 +218,26 @@ void VulkanRenderer::wait()
 
 void VulkanRenderer::recieveModel(const Model& model)
 {
-	objects.push_back(std::make_unique<Model>(model));
+	objectContainer.addModel(model);
 	uniformBuffer->calculateDynamicBuffer();
 	uniformBuffer->recreateDynamicBuffer();
-	for (auto& object : objects)
+	for (auto& object : objectContainer.get())
 		uniformBuffer->createDescriptorSets(*object, MAX_FRAMES_IN_FLIGHT);
 }
 
 void VulkanRenderer::deleteModel(Model& model)
 {
 	model.cleanup(deviceManager->getDevice());
-	for (auto it = objects.begin(); it != objects.end(); it++)
-	{
-		if ((*it).get() == &model)
-		{
-			objects.erase(it);
-			return;
-		}
-	}
+	objectContainer.removeObject(model);
 }
 
 void VulkanRenderer::deleteAllModels()
 {
-	for (auto& object : objects)
+	for (auto& object : objectContainer.get())
 	{
 		object->cleanup(deviceManager->getDevice());
 	}
-	objects.clear();
+	objectContainer.clear();
 }
 
 DeviceManager& VulkanRenderer::getDeviceManager()

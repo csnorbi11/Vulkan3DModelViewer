@@ -2,6 +2,7 @@
 #include "RendererCommon.h"
 #include "Model.hpp"
 #include "Camera.hpp"
+#include "ObjectContainer.hpp"
 
 #include <chrono>
 
@@ -11,8 +12,12 @@ struct StaticUbo {
 	glm::vec3 camPos;
 };
 
-struct DynamicUbo {
+struct ModelDynamicUbo {
 	glm::mat4* model{nullptr};
+};
+
+struct LightSourceDynamicUbo {
+	std::vector<glm::vec3>* lightSourcePositions;
 };
 
 struct UniformBuffers {
@@ -31,7 +36,7 @@ public:
 
 	UniformBuffer(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
 		const int MAX_FRAMES_IN_FLIGHT, const VkExtent2D& swapchainExtent, VkPhysicalDeviceProperties properties,
-		const std::vector<std::unique_ptr<Object>>& objects, const Camera& camera);
+		const ObjectContainer& objectContainer, const Camera& camera);
 
 	void createDescriptorSets(Object& object, const int MAX_FRAMES_IN_FLIGHT);
 
@@ -52,7 +57,7 @@ private:
 	void createDescriptorSetLayout();
 	void createDescriptorPool(const int MAX_FRAMES_IN_FLIGHT);
 
-	const std::vector<std::unique_ptr<Object>>& objects;
+	const ObjectContainer& objectContainer;
 
 	const Camera& camera;
 
@@ -62,7 +67,7 @@ private:
 	const uint32_t MAX_MODEL_COUNT;
 
 	StaticUbo staticUbo;
-	DynamicUbo dynamicUbo;
+	ModelDynamicUbo dynamicUbo;
 
 	
 	VkDescriptorSetLayout descriptorSetLayout;

@@ -4,6 +4,7 @@
 #include "Model.hpp"
 #include "LightSource.hpp"
 #include "GraphicsPipeline.hpp"
+#include "ObjectContainer.hpp"
 
 class CommandBuffer {
 public:
@@ -19,7 +20,7 @@ public:
 	void cleanup(VkDevice device);
 
 	void recordCommandBuffer(uint32_t currentFrame, uint32_t imageIndex,
-		std::vector<std::unique_ptr<Object>>& objects);
+		ObjectContainer& objectContainer);
 	void setClearColor(VkClearValue newClearValue);
 	void update(SwapchainManager& swapchainManager);
 

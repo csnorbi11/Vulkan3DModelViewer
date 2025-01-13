@@ -12,6 +12,7 @@
 #include "UniformBuffer.hpp"
 #include "Model.hpp"
 #include "Camera.hpp"
+#include "ObjectContainer.hpp"
 
 class VulkanRenderer {
 public:
@@ -36,7 +37,7 @@ public:
 	UniformBuffer& getUniformBuffer();
 	SwapchainManager& getSwapchainManager();
 
-	std::vector<std::unique_ptr<Object>> objects;
+	ObjectContainer objectContainer;
 
 private:
 	void createInstance();

@@ -172,6 +172,7 @@
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="Msaa.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="ObjectContainer.cpp" />
     <ClCompile Include="RendererCommon.cpp" />
     <ClCompile Include="RendererCommon.h" />
     <ClCompile Include="RenderPass.cpp" />
@@ -201,6 +202,7 @@
     <ClInclude Include="ModelLoader.hpp" />
     <ClInclude Include="Msaa.hpp" />
     <ClInclude Include="Object.hpp" />
+    <ClInclude Include="ObjectContainer.hpp" />
     <ClInclude Include="RenderPass.hpp" />
     <ClInclude Include="SwapchainManager.hpp" />
     <ClInclude Include="SyncObjects.hpp" />

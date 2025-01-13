@@ -19,14 +19,14 @@ UniformBuffer::~UniformBuffer()
 
 UniformBuffer::UniformBuffer(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
 	const int MAX_FRAMES_IN_FLIGHT, const VkExtent2D& swapchainExtent, VkPhysicalDeviceProperties properties,
-	const std::vector<std::unique_ptr<Object>>& objects, const Camera& camera)
+	const ObjectContainer& objectContainer, const Camera& camera)
 	:
 	device(device),
 	swapchainExtent(swapchainExtent),
 	staticUbo{},
 	MAX_FRAMES_IN_FLIGHT(MAX_FRAMES_IN_FLIGHT),
 	physicalDevice(physicalDevice),
-	objects(objects),
+	objectContainer(objectContainer),
 	camera(camera),
 	MAX_MODEL_COUNT(1000)
 {
@@ -77,7 +77,7 @@ void UniformBuffer::recreateDynamicBuffer()
 
 void UniformBuffer::calculateDynamicBuffer()
 {
-	bufferSize = dynamicAlignment * MAX_FRAMES_IN_FLIGHT * objects.size();
+	bufferSize = dynamicAlignment * MAX_FRAMES_IN_FLIGHT * objectContainer.getModelCount();
 
 	dynamicUbo.model = (glm::mat4*)_aligned_realloc(dynamicUbo.model, bufferSize, dynamicAlignment);
 	assert(dynamicUbo.model);
@@ -94,17 +94,16 @@ void UniformBuffer::updateStatic(uint32_t currentFrame)
 }
 void UniformBuffer::updateDynamic(uint32_t currentFrame)
 {
-	if (objects.size() == 0)
+	if (objectContainer.getModelCount() == 0)
 		return;
 	uint32_t dim = static_cast<uint32_t>(pow(2, (1.0f / 3.0f)));
-	for (size_t i = 0; i < objects.size(); i++) {
-
+	for (size_t i = 0; i < objectContainer.get().size(); i++) {
 		glm::mat4* modelMat = (glm::mat4*)(((uint64_t)dynamicUbo.model + (i * dynamicAlignment)));
-		*modelMat = glm::translate(glm::mat4(1.0), objects[i]->position);
-		*modelMat = glm::rotate(*modelMat, glm::radians(objects[i]->rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-		*modelMat = glm::rotate(*modelMat, glm::radians(objects[i]->rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		*modelMat = glm::rotate(*modelMat, glm::radians(objects[i]->rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-		*modelMat = glm::scale(*modelMat, objects[i]->scale);
+		*modelMat = glm::translate(glm::mat4(1.0), objectContainer.get()[i]->position);
+		*modelMat = glm::rotate(*modelMat, glm::radians(objectContainer.get()[i]->rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		*modelMat = glm::rotate(*modelMat, glm::radians(objectContainer.get()[i]->rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		*modelMat = glm::rotate(*modelMat, glm::radians(objectContainer.get()[i]->rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+		*modelMat = glm::scale(*modelMat, objectContainer.get()[i]->scale);
 	}
 
 
@@ -221,13 +220,16 @@ void UniformBuffer::createDescriptorSets(Object& object, const int MAX_FRAMES_IN
 		staticBufferInfo.offset = 0;
 		staticBufferInfo.range = sizeof(staticUbo);
 
-		VkDescriptorBufferInfo dynamicBufferInfo{};
-		dynamicBufferInfo.buffer = uniformBuffers.dynamicBuffers[i];
-		dynamicBufferInfo.offset = 0;
-		dynamicBufferInfo.range = dynamicAlignment;
+		VkDescriptorBufferInfo modelDynamicBufferInfo{};
+		modelDynamicBufferInfo.buffer = uniformBuffers.dynamicBuffers[i];
+		modelDynamicBufferInfo.offset = 0;
+		modelDynamicBufferInfo.range = dynamicAlignment;
+
+		VkDescriptorBufferInfo lightSourcesDynamicBufferInfo{};
 
 		VkWriteDescriptorSet staticDescriptorWrite{};
-		VkWriteDescriptorSet dynamicDescriptorWrite{};
+		VkWriteDescriptorSet modelDynamicDescriptorWrite{};
+		VkWriteDescriptorSet lightSourcesDynamicDescriptorWrite{};
 
 		staticDescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		staticDescriptorWrite.dstSet = object.descriptorSets[i];
@@ -239,18 +241,18 @@ void UniformBuffer::createDescriptorSets(Object& object, const int MAX_FRAMES_IN
 		staticDescriptorWrite.pImageInfo = nullptr;
 		staticDescriptorWrite.pTexelBufferView = nullptr;
 
-		dynamicDescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		dynamicDescriptorWrite.dstSet = object.descriptorSets[i];
-		dynamicDescriptorWrite.dstBinding = 1;
-		dynamicDescriptorWrite.dstArrayElement = 0;
-		dynamicDescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
-		dynamicDescriptorWrite.descriptorCount = 1;
-		dynamicDescriptorWrite.pBufferInfo = &dynamicBufferInfo;
-		dynamicDescriptorWrite.pImageInfo = nullptr;
-		dynamicDescriptorWrite.pTexelBufferView = nullptr;
+		modelDynamicDescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		modelDynamicDescriptorWrite.dstSet = object.descriptorSets[i];
+		modelDynamicDescriptorWrite.dstBinding = 1;
+		modelDynamicDescriptorWrite.dstArrayElement = 0;
+		modelDynamicDescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+		modelDynamicDescriptorWrite.descriptorCount = 1;
+		modelDynamicDescriptorWrite.pBufferInfo = &modelDynamicBufferInfo;
+		modelDynamicDescriptorWrite.pImageInfo = nullptr;
+		modelDynamicDescriptorWrite.pTexelBufferView = nullptr;
 
 		vkUpdateDescriptorSets(device, 1, &staticDescriptorWrite, 0, nullptr);
-		vkUpdateDescriptorSets(device, 1, &dynamicDescriptorWrite, 0, nullptr);
+		vkUpdateDescriptorSets(device, 1, &modelDynamicDescriptorWrite, 0, nullptr);
 
 		std::cout << typeid(object).name() << std::endl;
 		if (typeid(object).name() != typeid(Model).name()) {

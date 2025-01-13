@@ -117,7 +117,7 @@ void App::ModelHandlerWIndow(bool& flipY)
 	ImGui::SetWindowSize(modelWindowSize);
 	int posOffsetX = glfwHandler.WIDTH - modelWindowSize.x;
 	ImGui::SetWindowPos(ImVec2(posOffsetX, 0));
-	ImGui::Text("Number of models: %d", renderer.objects.size());
+	ImGui::Text("Number of models: %d", renderer.objectContainer.getModelCount());
 	ModelLoaderDialog(flipY);
 	ModelPropertiesGUI();
 	ImGui::End();
@@ -151,11 +151,11 @@ void App::initImGui()
 void App::ModelPropertiesGUI()
 {
 	int i = 1;
-	for (auto& object : renderer.objects) {
+	for (auto& object : renderer.objectContainer.get()) {
 		ImGui::BeginChild(i, modelWindowSize, true);
 		ImGui::LabelText("Name", object->name.c_str());
 		if (ImGui::Button("Delete")) {
-			renderer.objects.erase(renderer.objects.begin() + i - 1);
+			renderer.deleteModel(dynamic_cast<Model&>(*object));
 			ImGui::EndChild();
 			break;
 		}
