@@ -252,9 +252,11 @@ void UniformBuffer::createDescriptorSets(Object& object, const int MAX_FRAMES_IN
 		vkUpdateDescriptorSets(device, 1, &staticDescriptorWrite, 0, nullptr);
 		vkUpdateDescriptorSets(device, 1, &dynamicDescriptorWrite, 0, nullptr);
 
-		Model* model = dynamic_cast<Model*>(&object);
-		if (model->getTextures().size() == 0)
+		std::cout << typeid(object).name() << std::endl;
+		if (typeid(object).name() != typeid(Model).name()) {
 			continue;
+		}
+		Model* model = dynamic_cast<Model*>(&object);
 
 		VkDescriptorImageInfo imageInfo{};
 		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;

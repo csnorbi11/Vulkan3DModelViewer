@@ -3,6 +3,7 @@
 #include "SwapchainManager.hpp"
 #include "Model.hpp"
 #include "LightSource.hpp"
+#include "GraphicsPipeline.hpp"
 
 class CommandBuffer {
 public:
@@ -11,7 +12,7 @@ public:
 
 	CommandBuffer(VkDevice device, QueueFamilyIndices indices,
 		VkRenderPass renderpass, const std::vector<VkFramebuffer>& swapchainFramebuffers,
-		VkExtent2D swapchainExtent, VkPipeline graphicsPipeline,
+		VkExtent2D swapchainExtent, const std::vector<GraphicsPipeline>& graphicsPipelines,
 		VkPipelineLayout pipelineLayout,
 		const int MAX_FRAMES_IN_FLIGHT, uint32_t dynamicAlignment);
 
@@ -36,7 +37,7 @@ private:
 	VkRenderPass renderpass;
 	std::vector<VkFramebuffer> swapchainFramebuffers;
 	VkExtent2D swapchainExtent;
-	VkPipeline graphicsPipeline;
+	std::vector<GraphicsPipeline> graphicsPipelines;
 	VkPipelineLayout pipelineLayout;
 	uint32_t dynamicAlignment;
 

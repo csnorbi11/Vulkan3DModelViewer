@@ -57,7 +57,7 @@ private:
 	std::unique_ptr<DeviceManager> deviceManager;
 	std::unique_ptr<SwapchainManager> swapchainManager;
 	std::unique_ptr<UniformBuffer> uniformBuffer;
-	std::unique_ptr<GraphicsPipeline> graphicsPipeline;
+	std::vector<GraphicsPipeline> graphicsPipelines;
 	std::unique_ptr<CommandBuffer> commandbuffer;
 
 	std::unique_ptr<SyncObjects> syncObjects;

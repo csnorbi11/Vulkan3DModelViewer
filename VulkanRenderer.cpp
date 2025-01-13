@@ -26,16 +26,24 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window, int& windowWidth, int& window
 		deviceManager->getPhysicalDevice(), MAX_FRAMES_IN_FLIGHT, swapchainManager->getImageExtent(), deviceManager->getPhysicalDeviceProperties(),
 		objects, camera);
 
-	graphicsPipeline = std::make_unique<GraphicsPipeline>(*deviceManager, swapchainManager->getImageExtent(),
+	graphicsPipelines.push_back(GraphicsPipeline(*deviceManager, swapchainManager->getImageExtent(),
 		swapchainManager->getImageFormat(), swapchainManager->getRenderPass().getRenderPass(),
-		MAX_FRAMES_IN_FLIGHT, *uniformBuffer,"modelShader", "vert.spv", "frag.spv");
+		MAX_FRAMES_IN_FLIGHT, *uniformBuffer, "modelShader", "shadervert.spv", "shader.fragrag.spv"));
+
+	graphicsPipelines.push_back(GraphicsPipeline(*deviceManager, swapchainManager->getImageExtent(),
+		swapchainManager->getImageFormat(), swapchainManager->getRenderPass().getRenderPass(),
+		MAX_FRAMES_IN_FLIGHT, *uniformBuffer, "lightShader", "lightblubvert.spv", "lightblub.fragrag.spv"));
 
 	commandbuffer = std::make_unique<CommandBuffer>(deviceManager->getDevice(), deviceManager->getIndices(),
 		swapchainManager->getRenderPass().getRenderPass(), swapchainManager->getFramebuffer().getSwapchainFramebuffers(),
-		swapchainManager->getImageExtent(), graphicsPipeline->getPipeline(), graphicsPipeline->getLayout(),
+		swapchainManager->getImageExtent(), graphicsPipelines, graphicsPipelines[0].getLayout(),
 		MAX_FRAMES_IN_FLIGHT, uniformBuffer->getDynamicAlignment());
 
 	syncObjects = std::make_unique<SyncObjects>(deviceManager->getDevice(), MAX_FRAMES_IN_FLIGHT);
+
+	objects.push_back(std::make_unique<LightSource>(*deviceManager, commandbuffer->getCommandPool(), "light",glm::vec3(0.0,0.0,1.0)));
+	objects.push_back(std::make_unique<LightSource>(*deviceManager, commandbuffer->getCommandPool(), "light",glm::vec3(0.0,1.0,0.0)));
+	objects.push_back(std::make_unique<LightSource>(*deviceManager, commandbuffer->getCommandPool(), "light",glm::vec3(1.0,0.0,0.0)));
 
 }
 VulkanRenderer::~VulkanRenderer()
@@ -47,7 +55,8 @@ VulkanRenderer::~VulkanRenderer()
 
 	syncObjects->cleanup(deviceManager->getDevice());
 	commandbuffer->cleanup(deviceManager->getDevice());
-	graphicsPipeline->cleanup(deviceManager->getDevice());
+	for (auto& graphicsPipeline : graphicsPipelines)
+		graphicsPipeline.cleanup(deviceManager->getDevice());
 	uniformBuffer->cleanup();
 
 	deviceManager->cleanup();
@@ -126,11 +135,11 @@ void VulkanRenderer::recreateSwapchain()
 void VulkanRenderer::readConfig(const std::string configPath)
 {
 	std::ifstream inputFile(configPath);
-	
+
 	std::string line;
 
 	while (std::getline(inputFile, line)) {
-		std::cout << line << std::endl;
+		//std::cout << line << std::endl;
 	}
 
 	inputFile.close();

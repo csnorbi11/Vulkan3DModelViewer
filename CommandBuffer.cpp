@@ -5,17 +5,18 @@
 
 CommandBuffer::CommandBuffer(VkDevice device, QueueFamilyIndices indices,
 	VkRenderPass renderpass, const std::vector<VkFramebuffer>& swapchainFramebuffers,
-	VkExtent2D swapchainExtent, VkPipeline graphicsPipeline,
+	VkExtent2D swapchainExtent, const std::vector<GraphicsPipeline>& graphicsPipelines,
 	VkPipelineLayout pipelineLayout,
 	const int MAX_FRAMES_IN_FLIGHT, uint32_t dynamicAlignment)
 	:
 	renderpass(renderpass),
 	swapchainFramebuffers(swapchainFramebuffers),
 	swapchainExtent(swapchainExtent),
-	graphicsPipeline(graphicsPipeline),
+	graphicsPipelines(graphicsPipelines),
 	pipelineLayout(pipelineLayout),
 	dynamicAlignment(dynamicAlignment)
 {
+
 	VkCommandPoolCreateInfo poolInfo{};
 	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 	poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
@@ -71,8 +72,9 @@ void CommandBuffer::recordCommandBuffer(uint32_t currentFrame, uint32_t imageInd
 	renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
 	renderPassInfo.pClearValues = clearValues.data();
 
+
+
 	vkCmdBeginRenderPass(commandBuffers[currentFrame], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-	vkCmdBindPipeline(commandBuffers[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
 	VkViewport viewport{};
 	viewport.x = 0.0f;
@@ -92,6 +94,14 @@ void CommandBuffer::recordCommandBuffer(uint32_t currentFrame, uint32_t imageInd
 	VkDeviceSize offsets[] = { 0 };
 	int i = 0;
 	for (auto& object : objects) {
+		int j = 0;
+		if (typeid(*object).name() != typeid(Model).name()) {
+			j = 1;
+		}
+
+		vkCmdBindPipeline(commandBuffers[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipelines[j].getPipeline());
+
+
 		uint32_t dynamicOffset = dynamicAlignment * i++;
 		vkCmdBindVertexBuffers(commandBuffers[currentFrame], 0, 1, &object->getVertexBuffer().getBuffer(), offsets);
 		vkCmdBindIndexBuffer(commandBuffers[currentFrame], object->getIndexBuffer().getBuffer(), 0, VK_INDEX_TYPE_UINT32);
