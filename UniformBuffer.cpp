@@ -18,10 +18,10 @@ UniformBuffer::~UniformBuffer()
 }
 
 UniformBuffer::UniformBuffer(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
-                             const int MAX_FRAMES_IN_FLIGHT, const VkExtent2D& swapchainExtent,
-                             VkPhysicalDeviceProperties properties,
-                             const std::vector<Model>& models, const std::vector<LightSource>& lightSources,
-                             const Camera& camera)
+	const int MAX_FRAMES_IN_FLIGHT, const VkExtent2D& swapchainExtent,
+	VkPhysicalDeviceProperties properties,
+	const std::vector<Model>& models, const std::vector<LightSource>& lightSources,
+	const Camera& camera)
 	:
 	models(models),
 	lightSources(lightSources),
@@ -59,10 +59,10 @@ void UniformBuffer::create(const int MAX_FRAMES_IN_FLIGHT, const VkPhysicalDevic
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
 		createBuffer(sizeof(StaticUbo), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-		             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-		             uniformBuffers.staticBuffers[i], uniformBuffers.staticBuffersMemory[i], device, physicalDevice);
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+			uniformBuffers.staticBuffers[i], uniformBuffers.staticBuffersMemory[i], device, physicalDevice);
 		vkMapMemory(device, uniformBuffers.staticBuffersMemory[i], 0, sizeof(StaticUbo), 0,
-		            &uniformBuffers.staticBuffersMapped[i]);
+			&uniformBuffers.staticBuffersMapped[i]);
 	}
 }
 
@@ -77,9 +77,9 @@ void UniformBuffer::recreateDynamicBuffer()
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
 		createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-		             uniformBuffers.dynamicBuffers[i], uniformBuffers.dynamicBuffersMemory[i], device, physicalDevice);
+			uniformBuffers.dynamicBuffers[i], uniformBuffers.dynamicBuffersMemory[i], device, physicalDevice);
 		vkMapMemory(device, uniformBuffers.dynamicBuffersMemory[i], 0, bufferSize, 0,
-		            &uniformBuffers.dynamicBuffersMapped[i]);
+			&uniformBuffers.dynamicBuffersMapped[i]);
 	}
 }
 
@@ -96,7 +96,7 @@ void UniformBuffer::updateStatic(uint32_t currentFrame)
 	staticUbo.camPos = camera.getPosition();
 	staticUbo.view = camera.getViewMatrix();
 	staticUbo.proj = glm::perspective(glm::radians(80.0f),
-	                                  swapchainExtent.width / static_cast<float>(swapchainExtent.height), 0.1f, 100.0f);
+		swapchainExtent.width / static_cast<float>(swapchainExtent.height), 0.1f, 100.0f);
 	staticUbo.proj[1][1] *= -1;
 
 	memcpy(uniformBuffers.staticBuffersMapped[currentFrame], &staticUbo, sizeof(staticUbo));
@@ -104,19 +104,30 @@ void UniformBuffer::updateStatic(uint32_t currentFrame)
 
 void UniformBuffer::updateDynamic(uint32_t currentFrame)
 {
-	if (models.size() == 0)
+	if (models.empty() && lightSources.empty())
 		return;
 	uint32_t dim = static_cast<uint32_t>(pow(2, (1.0f / 3.0f)));
+	size_t offset = 0;
 	for (size_t i = 0; i < models.size(); i++)
 	{
-		auto modelMat = (glm::mat4*)(((uint64_t)dynamicUbo.model + (i * dynamicAlignment)));
+		auto modelMat = (glm::mat4*)(((uint64_t)dynamicUbo.model + (offset * dynamicAlignment)));
+		offset++;
 		*modelMat = translate(glm::mat4(1.0), models[i].position);
 		*modelMat = rotate(*modelMat, glm::radians(models[i].rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
 		*modelMat = rotate(*modelMat, glm::radians(models[i].rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 		*modelMat = rotate(*modelMat, glm::radians(models[i].rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 		*modelMat = scale(*modelMat, models[i].scale);
 	}
-
+	for (size_t i=0;i<lightSources.size();i++)
+	{
+		auto modelMat = (glm::mat4*)(((uint64_t)dynamicUbo.model + (offset * dynamicAlignment)));
+		offset++;
+		*modelMat = translate(glm::mat4(1.0), lightSources[i].position);
+		*modelMat = rotate(*modelMat, glm::radians(lightSources[i].rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		*modelMat = rotate(*modelMat, glm::radians(lightSources[i].rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		*modelMat = rotate(*modelMat, glm::radians(lightSources[i].rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+		*modelMat = scale(*modelMat, lightSources[i].scale);
+	}
 
 	memcpy(uniformBuffers.dynamicBuffersMapped[currentFrame], dynamicUbo.model, bufferSize);
 	VkMappedMemoryRange memoryRange{};

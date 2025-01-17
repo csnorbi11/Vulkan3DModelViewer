@@ -191,10 +191,10 @@
     <ClInclude Include="dirent.h" />
     <ClInclude Include="Framebuffer.hpp" />
     <ClInclude Include="GraphicsPipeline.hpp" />
-    <ClInclude Include="ImGuiFileDialog.h" />
-    <ClInclude Include="ImGuiFileDialogConfig.h" />
-    <ClInclude Include="imgui_impl_glfw.h" />
-    <ClInclude Include="imgui_impl_vulkan.h" />
+    <ClInclude Include="imguiheaders\ImGuiFileDialog.h" />
+    <ClInclude Include="imguiheaders\ImGuiFileDialogConfig.h" />
+    <ClInclude Include="imguiheaders\imgui_impl_glfw.h" />
+    <ClInclude Include="imguiheaders\imgui_impl_vulkan.h" />
     <ClInclude Include="IndexBuffer.hpp" />
     <ClInclude Include="LightSource.hpp" />
     <ClInclude Include="Model.hpp" />

@@ -36,7 +36,7 @@ struct UniformBuffers
 class UniformBuffer
 {
 public:
-	UniformBuffer() = default;
+	UniformBuffer() = delete;
 	~UniformBuffer();
 
 	UniformBuffer(const VkDevice& device, const VkPhysicalDevice& physicalDevice,

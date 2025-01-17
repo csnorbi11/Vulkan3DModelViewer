@@ -3,8 +3,8 @@
 #include "VulkanRenderer.hpp"
 #include "ModelLoader.hpp"
 
-#include "ImGuiFileDialogConfig.h"
-#include "ImGuiFileDialog.h"
+#include "imguiheaders/ImGuiFileDialogConfig.h"
+#include "imguiheaders/ImGuiFileDialog.h"
 
 static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 
