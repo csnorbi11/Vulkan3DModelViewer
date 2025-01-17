@@ -98,6 +98,11 @@ void UniformBuffer::updateStatic(uint32_t currentFrame)
 	staticUbo.proj = glm::perspective(glm::radians(80.0f),
 		swapchainExtent.width / static_cast<float>(swapchainExtent.height), 0.1f, 100.0f);
 	staticUbo.proj[1][1] *= -1;
+	for (size_t i=0;i<std::min(MAX_LIGHTS,lightSources.size());i++)
+	{
+		staticUbo.lightSources[i].position = lightSources[i].position;
+		staticUbo.lightSources[i].position = lightSources[i].color;
+	}
 
 	for (size_t i=0;i<MAX_LIGHT_SOURCE;i++)
 	{
