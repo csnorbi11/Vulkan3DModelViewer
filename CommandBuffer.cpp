@@ -4,10 +4,10 @@
 
 
 CommandBuffer::CommandBuffer(VkDevice device, QueueFamilyIndices indices,
-	VkRenderPass renderpass, const std::vector<VkFramebuffer>& swapchainFramebuffers,
-	VkExtent2D swapchainExtent, const std::vector<GraphicsPipeline>& graphicsPipelines,
-	VkPipelineLayout pipelineLayout,
-	const int MAX_FRAMES_IN_FLIGHT, uint32_t dynamicAlignment)
+                             VkRenderPass renderpass, const std::vector<VkFramebuffer>& swapchainFramebuffers,
+                             VkExtent2D swapchainExtent, const std::vector<GraphicsPipeline>& graphicsPipelines,
+                             VkPipelineLayout pipelineLayout,
+                             const int MAX_FRAMES_IN_FLIGHT, uint32_t dynamicAlignment)
 	:
 	renderpass(renderpass),
 	swapchainFramebuffers(swapchainFramebuffers),
@@ -16,13 +16,13 @@ CommandBuffer::CommandBuffer(VkDevice device, QueueFamilyIndices indices,
 	pipelineLayout(pipelineLayout),
 	dynamicAlignment(dynamicAlignment)
 {
-
 	VkCommandPoolCreateInfo poolInfo{};
 	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 	poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 	poolInfo.queueFamilyIndex = indices.graphicsFamily.value();
 
-	if (vkCreateCommandPool(device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
+	if (vkCreateCommandPool(device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS)
+	{
 		throw std::runtime_error("failed to create command pool");
 	}
 
@@ -34,32 +34,32 @@ CommandBuffer::CommandBuffer(VkDevice device, QueueFamilyIndices indices,
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 	allocInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
 
-	if (vkAllocateCommandBuffers(device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
+	if (vkAllocateCommandBuffers(device, &allocInfo, commandBuffers.data()) != VK_SUCCESS)
+	{
 		throw std::runtime_error("failed to allocate command buffers!");
 	}
 
 
 	clearValues.resize(MAX_FRAMES_IN_FLIGHT);
-	clearValues[0].color = { 0.0f,0.0f,0.0f };
-	clearValues[1].depthStencil = { 1.0f,0 };
+	clearValues[0].color = {0.0f, 0.0f, 0.0f};
+	clearValues[1].depthStencil = {1.0f, 0};
 }
 
 void CommandBuffer::cleanup(VkDevice device)
 {
 	vkDestroyCommandPool(device, commandPool, nullptr);
-
-
 }
 
 void CommandBuffer::recordCommandBuffer(uint32_t currentFrame, uint32_t imageIndex,
-	ObjectContainer& objectContainer)
+                                        std::vector<Model>& models, std::vector<LightSource>& lightSources)
 {
 	VkCommandBufferBeginInfo beginInfo{};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 	beginInfo.flags = 0; // Optional
 	beginInfo.pInheritanceInfo = nullptr; // Optional
 
-	if (vkBeginCommandBuffer(commandBuffers[currentFrame], &beginInfo) != VK_SUCCESS) {
+	if (vkBeginCommandBuffer(commandBuffers[currentFrame], &beginInfo) != VK_SUCCESS)
+	{
 		throw std::runtime_error("failed to begin recording command buffer!");
 	}
 
@@ -67,11 +67,10 @@ void CommandBuffer::recordCommandBuffer(uint32_t currentFrame, uint32_t imageInd
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 	renderPassInfo.renderPass = renderpass;
 	renderPassInfo.framebuffer = swapchainFramebuffers[imageIndex];
-	renderPassInfo.renderArea.offset = { 0, 0 };
+	renderPassInfo.renderArea.offset = {0, 0};
 	renderPassInfo.renderArea.extent = swapchainExtent;
 	renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
 	renderPassInfo.pClearValues = clearValues.data();
-
 
 
 	vkCmdBeginRenderPass(commandBuffers[currentFrame], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
@@ -86,39 +85,48 @@ void CommandBuffer::recordCommandBuffer(uint32_t currentFrame, uint32_t imageInd
 	vkCmdSetViewport(commandBuffers[currentFrame], 0, 1, &viewport);
 
 	VkRect2D scissor{};
-	scissor.offset = { 0, 0 };
+	scissor.offset = {0, 0};
 	scissor.extent = swapchainExtent;
 	vkCmdSetScissor(commandBuffers[currentFrame], 0, 1, &scissor);
 
 	//VkBuffer vertexBuffers[] = { vertexBuffer };
-	VkDeviceSize offsets[] = { 0 };
+	VkDeviceSize offsets[] = {0};
 	int i = 0;
-	for (auto& object : objectContainer.get()) {
-		int j = 0;
-		if (typeid(*object).name() != typeid(Model).name()) {
-			j = 1;
-		}
-
-		vkCmdBindPipeline(commandBuffers[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipelines[j].getPipeline());
-
+	for (auto& model : models)
+	{
+		vkCmdBindPipeline(commandBuffers[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS,
+		                  graphicsPipelines[0].getPipeline());
 
 		uint32_t dynamicOffset = dynamicAlignment * i++;
-		vkCmdBindVertexBuffers(commandBuffers[currentFrame], 0, 1, &object->getVertexBuffer().getBuffer(), offsets);
-		vkCmdBindIndexBuffer(commandBuffers[currentFrame], object->getIndexBuffer().getBuffer(), 0, VK_INDEX_TYPE_UINT32);
+		vkCmdBindVertexBuffers(commandBuffers[currentFrame], 0, 1, &model.getVertexBuffer().getBuffer(), offsets);
+		vkCmdBindIndexBuffer(commandBuffers[currentFrame], model.getIndexBuffer().getBuffer(), 0, VK_INDEX_TYPE_UINT32);
 
-		vkCmdBindDescriptorSets(commandBuffers[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &object->descriptorSets[currentFrame], 1, &dynamicOffset);
-		vkCmdDrawIndexed(commandBuffers[currentFrame], object->getIndexBuffer().getCount(), 1, 0, 0, 0);
-
+		vkCmdBindDescriptorSets(commandBuffers[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1,
+		                        &model.descriptorSets[currentFrame], 1, &dynamicOffset);
+		vkCmdDrawIndexed(commandBuffers[currentFrame], model.getIndexBuffer().getCount(), 1, 0, 0, 0);
 	}
 
+	for (auto& lightSource : lightSources)
+	{
+		vkCmdBindPipeline(commandBuffers[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS,
+		                  graphicsPipelines[1].getPipeline());
 
+		uint32_t dynamicOffset = dynamicAlignment * i++;
+		vkCmdBindVertexBuffers(commandBuffers[currentFrame], 0, 1, &lightSource.getVertexBuffer().getBuffer(), offsets);
+		vkCmdBindIndexBuffer(commandBuffers[currentFrame], lightSource.getIndexBuffer().getBuffer(), 0,
+		                     VK_INDEX_TYPE_UINT32);
 
+		vkCmdBindDescriptorSets(commandBuffers[currentFrame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1,
+		                        &lightSource.descriptorSets[currentFrame], 1, &dynamicOffset);
+		vkCmdDrawIndexed(commandBuffers[currentFrame], lightSource.getIndexBuffer().getCount(), 1, 0, 0, 0);
+	}
 
 
 	ImGui::Render();
 	ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffers[currentFrame]);
 	vkCmdEndRenderPass(commandBuffers[currentFrame]);
-	if (vkEndCommandBuffer(commandBuffers[currentFrame]) != VK_SUCCESS) {
+	if (vkEndCommandBuffer(commandBuffers[currentFrame]) != VK_SUCCESS)
+	{
 		throw std::runtime_error("failed to record command buffer!");
 	}
 }
@@ -137,13 +145,12 @@ void CommandBuffer::update(SwapchainManager& swapchainManager)
 }
 
 
-
 std::vector<VkCommandBuffer>& CommandBuffer::getCommandbuffers()
 {
 	return commandBuffers;
 }
 
-const VkCommandPool& CommandBuffer::getCommandPool()
+VkCommandPool CommandBuffer::getCommandPool()
 {
 	return commandPool;
 }

@@ -14,8 +14,6 @@ Camera* globalCamera;
 
 void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 {
-
-
 	if (globalCamera == nullptr)
 		return;
 
@@ -29,26 +27,24 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 	lastY = yposCurrent;
 
 	globalCamera->processMouseInput(xOffset, yOffset);
-
 }
 
 App::App()
 	:
 	glfwHandler(),
-	camera(glfwHandler.window.get(), { 0.0,0.0,-3.0 },5.0f),
 	renderer(glfwHandler.window.get(), glfwHandler.WIDTH, glfwHandler.HEIGHT, camera,
-		"config.txt"),
-	modelLoader(renderer.getDeviceManager(),renderer.getCommandBuffer().getCommandPool())
+	         "config.txt"),
+	modelLoader(renderer.getDeviceManager(), renderer.getCommandBuffer().getCommandPool()),
+	camera(glfwHandler.window.get(), {0.0, 0.0, -3.0}, 5.0f)
 {
-
 	glfwSetWindowUserPointer(glfwHandler.window.get(), this);
 	glfwSetWindowSizeCallback(glfwHandler.window.get(), framebufferResizeCallback);
 	glfwSetCursorPosCallback(glfwHandler.window.get(), mouseCallback);
 	globalCamera = &camera;
 
 	initImGui();
-
 }
+
 App::~App()
 {
 	ImGui_ImplVulkan_Shutdown();
@@ -63,16 +59,16 @@ void App::run()
 
 void App::loop()
 {
-
 	double startTime = 0;
 	double endTime = 0;
 	double deltaTime = 0;
 	bool flipY = false;
 
-	
+
 	renderer.recieveModel(modelLoader.loadModel("backpack.obj"));
 
-	while (!glfwWindowShouldClose(glfwHandler.window.get())) {
+	while (!glfwWindowShouldClose(glfwHandler.window.get()))
+	{
 		startTime = glfwGetTime();
 		glfwPollEvents();
 
@@ -96,7 +92,6 @@ void App::loop()
 		deltaTime = endTime - startTime;
 	}
 	renderer.wait();
-
 }
 
 void App::MenuWindow()
@@ -106,23 +101,33 @@ void App::MenuWindow()
 	ImGui::SetWindowSize(menuWindowSize);
 	ImGui::SetWindowPos(ImVec2(0, 0));
 
-	ImGui::DragFloat("Camera speed: ", &camera.moveSpeed,0.1f);
+	ImGui::DragFloat("Camera speed: ", &camera.moveSpeed, 0.1f);
 	ImGui::End();
 }
+
 void App::ModelHandlerWIndow(bool& flipY)
 {
-
 	ImGui::Begin("Model Loader/Transformer");
-	modelWindowSize = ImVec2(glfwHandler.WIDTH / 4, glfwHandler.HEIGHT);
+	modelWindowSize = ImVec2(glfwHandler.WIDTH / 4, glfwHandler.HEIGHT / 2);
 	ImGui::SetWindowSize(modelWindowSize);
 	int posOffsetX = glfwHandler.WIDTH - modelWindowSize.x;
 	ImGui::SetWindowPos(ImVec2(posOffsetX, 0));
-	ImGui::Text("Number of models: %d", renderer.objectContainer.getModelCount());
 	ModelLoaderDialog(flipY);
-	ModelPropertiesGUI();
+	ImGui::Text("Number of models: %d", renderer.models.size());
+	ObjectPropertiesGUI(renderer.models);
+	ImGui::Text("Number of light sources: %d", renderer.lightSources.size());
+	ObjectPropertiesGUI(renderer.lightSources);
 	ImGui::End();
-
+	ImGui::Begin("Light Transformer");
+	modelWindowSize = ImVec2(glfwHandler.WIDTH / 4, glfwHandler.HEIGHT / 2);
+	ImGui::SetWindowSize(modelWindowSize);
+	posOffsetX = glfwHandler.WIDTH - modelWindowSize.x;
+	ImGui::SetWindowPos(ImVec2(posOffsetX, glfwHandler.HEIGHT / 2));
+	ImGui::Text("Number of light sources: %d", renderer.lightSources.size());
+	ObjectPropertiesGUI(renderer.lightSources);
+	ImGui::End();
 }
+
 void App::initImGui()
 {
 	IMGUI_CHECKVERSION();
@@ -148,51 +153,63 @@ void App::initImGui()
 	ImGui_ImplVulkan_Init(&initInfo);
 	ImGui_ImplVulkan_CreateFontsTexture();
 }
-void App::ModelPropertiesGUI()
+
+template <class T>
+void App::ObjectPropertiesGUI(std::vector<T>& vector)
 {
 	int i = 1;
-	for (auto& object : renderer.objectContainer.get()) {
+	for (auto& object : vector)
+	{
 		ImGui::BeginChild(i, modelWindowSize, true);
-		ImGui::LabelText("Name", object->name.c_str());
-		if (ImGui::Button("Delete")) {
-			renderer.deleteModel(dynamic_cast<Model&>(*object));
+		ImGui::LabelText("Name", object.name.c_str());
+		if (ImGui::Button("Delete"))
+		{
+			if (typeid(T) == typeid(Model))
+			{
+				//renderer.deleteObject(object);
+			}
 			ImGui::EndChild();
 			break;
 		}
-		if (ImGui::Button("Reset Position")) {
-			object->position = glm::vec3(0.0f);
+		if (ImGui::Button("Reset Position"))
+		{
+			object.position = glm::vec3(0.0f);
 		}
-		if (ImGui::Button("Reset Rotation")) {
-			object->rotation = glm::vec3(0.0f);
+		if (ImGui::Button("Reset Rotation"))
+		{
+			object.rotation = glm::vec3(0.0f);
 		}
-		if (ImGui::Button("Reset Scale")) {
-			object->scale = glm::vec3(1.0f);
+		if (ImGui::Button("Reset Scale"))
+		{
+			object.scale = glm::vec3(1.0f);
 		}
-		ImGui::DragFloat("x", &object->position.x, 0.1f);
-		ImGui::DragFloat("y", &object->position.y, 0.1f);
-		ImGui::DragFloat("z", &object->position.z, 0.1f);
-		ImGui::DragFloat("pitch", &object->rotation.x, 0.1f);
-		ImGui::DragFloat("yaw", &object->rotation.y, 0.1f);
-		ImGui::DragFloat("roll", &object->rotation.z, 0.1f);
-		ImGui::DragFloat("ScaleX: ", &object->scale.x, 0.1f, 0.0f);
-		ImGui::DragFloat("ScaleY", &object->scale.y, 0.1f, 0.0f);
-		ImGui::DragFloat("ScaleZ", &object->scale.z, 0.1f, 0.0f);
+		ImGui::DragFloat("x", &object.position.x, 0.1f);
+		ImGui::DragFloat("y", &object.position.y, 0.1f);
+		ImGui::DragFloat("z", &object.position.z, 0.1f);
+		ImGui::DragFloat("pitch", &object.rotation.x, 0.1f);
+		ImGui::DragFloat("yaw", &object.rotation.y, 0.1f);
+		ImGui::DragFloat("roll", &object.rotation.z, 0.1f);
+		ImGui::DragFloat("ScaleX: ", &object.scale.x, 0.1f, 0.0f);
+		ImGui::DragFloat("ScaleY", &object.scale.y, 0.1f, 0.0f);
+		ImGui::DragFloat("ScaleZ", &object.scale.z, 0.1f, 0.0f);
 		ImGui::EndChild();
 		i++;
 	}
 }
+
 void App::ModelLoaderDialog(bool& flipY)
 {
-	if (ImGui::Button("Load Model")) {
+	if (ImGui::Button("Load Model"))
+	{
 		IGFD::FileDialogConfig config;
 		config.path = ".";
 		ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".obj", config);
 	}
 	ImGui::Checkbox("Flip Y", &flipY);
-	if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
-
-
-		if (ImGuiFileDialog::Instance()->IsOk()) {
+	if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey"))
+	{
+		if (ImGuiFileDialog::Instance()->IsOk())
+		{
 			std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
 			std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
 			renderer.recieveModel(modelLoader.loadModel(filePathName, flipY));
@@ -200,10 +217,9 @@ void App::ModelLoaderDialog(bool& flipY)
 		ImGuiFileDialog::Instance()->Close();
 	}
 }
+
 void App::framebufferResizeCallback(GLFWwindow* window, int width, int height)
 {
 	auto app = reinterpret_cast<App*>(glfwGetWindowUserPointer(window));
 	app->renderer.framebufferResized = true;
 }
-
-

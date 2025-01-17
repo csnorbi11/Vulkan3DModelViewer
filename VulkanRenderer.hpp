@@ -12,21 +12,23 @@
 #include "UniformBuffer.hpp"
 #include "Model.hpp"
 #include "Camera.hpp"
-#include "ObjectContainer.hpp"
+#include "LightSource.hpp"
 
-class VulkanRenderer {
+class VulkanRenderer
+{
 public:
 	VulkanRenderer() = default;
 	~VulkanRenderer();
 
 	VulkanRenderer(GLFWwindow* window, int& windowWidth, int& windowHeight,
-		const Camera& camera, const std::string configPath);
+	               const Camera& camera, std::string configPath);
 
 	void drawFrame();
 
 	void wait();
 	void recieveModel(const Model& model);
-	void deleteModel(Model& model);
+	template <typename T>
+	void deleteObject(T& object);
 	void deleteAllModels();
 
 	bool framebufferResized;
@@ -37,7 +39,8 @@ public:
 	UniformBuffer& getUniformBuffer();
 	SwapchainManager& getSwapchainManager();
 
-	ObjectContainer objectContainer;
+	std::vector<Model> models;
+	std::vector<LightSource> lightSources;
 
 private:
 	void createInstance();
@@ -45,7 +48,7 @@ private:
 
 	void recreateSwapchain();
 
-	void readConfig(const std::string configPath);
+	void readConfig(std::string configPath);
 
 	GLFWwindow* window;
 	int& windowWidth;

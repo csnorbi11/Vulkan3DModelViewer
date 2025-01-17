@@ -2,13 +2,13 @@
 #include "RendererCommon.h"
 
 
-
-class SyncObjects {
+class SyncObjects
+{
 public:
 	SyncObjects() = default;
 	~SyncObjects() = default;
 
-	SyncObjects(VkDevice device, const int MAX_FRAMES_IN_FLIGHT);
+	SyncObjects(VkDevice device, int MAX_FRAMES_IN_FLIGHT);
 
 	void cleanup(VkDevice device);
 

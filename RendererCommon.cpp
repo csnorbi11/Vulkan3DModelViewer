@@ -12,14 +12,17 @@ QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surfa
 		vkGetPhysicalDeviceQueueFamilyProperties(device, &familyCount, queueFamilies.data());
 
 		int i = 0;
-		for (const auto& family : queueFamilies) {
-			if (family.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+		for (const auto& family : queueFamilies)
+		{
+			if (family.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+			{
 				indices.graphicsFamily = i;
 			}
 
 			VkBool32 presentSupported = false;
 			vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupported);
-			if (presentSupported) {
+			if (presentSupported)
+			{
 				indices.presentFamily = i;
 			}
 
@@ -31,6 +34,7 @@ QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surfa
 		return indices;
 	}
 }
+
 SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface)
 {
 	SwapChainSupportDetails details;
@@ -38,14 +42,16 @@ SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurface
 
 	uint32_t formatCount = 0;
 	vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
-	if (formatCount != 0) {
+	if (formatCount != 0)
+	{
 		details.formats.resize(formatCount);
 		vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, details.formats.data());
 	}
 
 	uint32_t presentModeCount = 0;
 	vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, nullptr);
-	if (presentModeCount != 0) {
+	if (presentModeCount != 0)
+	{
 		details.presents.resize(presentModeCount);
 		vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, details.presents.data());
 	}
@@ -58,8 +64,10 @@ uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties, V
 	VkPhysicalDeviceMemoryProperties memProperties;
 	vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
 
-	for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
-		if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+	for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++)
+	{
+		if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
+		{
 			return i;
 		}
 	}
@@ -68,15 +76,15 @@ uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties, V
 }
 
 void createImage(uint32_t width, uint32_t height, uint32_t mipLevels, VkFormat format,
-	VkSampleCountFlagBits numberOfSamples, VkImageTiling tiling, VkImageUsageFlags usage,
-	VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory,
-	const VkDevice& device, const VkPhysicalDevice& physicalDevice)
+                 VkSampleCountFlagBits numberOfSamples, VkImageTiling tiling, VkImageUsageFlags usage,
+                 VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory,
+                 const VkDevice& device, const VkPhysicalDevice& physicalDevice)
 {
 	VkImageCreateInfo imageInfo{};
 	imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 	imageInfo.imageType = VK_IMAGE_TYPE_2D;
-	imageInfo.extent.width = static_cast<uint32_t>(width);
-	imageInfo.extent.height = static_cast<uint32_t>(height);
+	imageInfo.extent.width = width;
+	imageInfo.extent.height = height;
 	imageInfo.extent.depth = 1;
 	imageInfo.mipLevels = mipLevels;
 	imageInfo.arrayLayers = 1;
@@ -88,7 +96,8 @@ void createImage(uint32_t width, uint32_t height, uint32_t mipLevels, VkFormat f
 	imageInfo.samples = numberOfSamples;
 	imageInfo.flags = 0;
 
-	if (vkCreateImage(device, &imageInfo, nullptr, &image) != VK_SUCCESS) {
+	if (vkCreateImage(device, &imageInfo, nullptr, &image) != VK_SUCCESS)
+	{
 		throw std::runtime_error("cannot create texture image");
 	}
 
@@ -101,7 +110,8 @@ void createImage(uint32_t width, uint32_t height, uint32_t mipLevels, VkFormat f
 	allocInfo.allocationSize = memRequirments.size;
 	allocInfo.memoryTypeIndex = findMemoryType(memRequirments.memoryTypeBits, properties, physicalDevice);
 
-	if (vkAllocateMemory(device, &allocInfo, nullptr, &imageMemory) != VK_SUCCESS) {
+	if (vkAllocateMemory(device, &allocInfo, nullptr, &imageMemory) != VK_SUCCESS)
+	{
 		throw std::runtime_error("failed to alloc image memory");
 	}
 
@@ -109,7 +119,7 @@ void createImage(uint32_t width, uint32_t height, uint32_t mipLevels, VkFormat f
 }
 
 VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags,
-	uint32_t mipLevels, VkDevice device)
+                            uint32_t mipLevels, VkDevice device)
 {
 	VkImageViewCreateInfo viewInfo{};
 	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -123,7 +133,8 @@ VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags a
 	viewInfo.subresourceRange.layerCount = 1;
 
 	VkImageView imageView;
-	if (vkCreateImageView(device, &viewInfo, nullptr, &imageView) != VK_SUCCESS) {
+	if (vkCreateImageView(device, &viewInfo, nullptr, &imageView) != VK_SUCCESS)
+	{
 		throw std::runtime_error("failed to create texture image view!");
 	}
 
@@ -134,11 +145,12 @@ std::vector<char> readFile(const std::string& filename)
 {
 	std::ifstream file(filename, std::ios::ate | std::ios::binary);
 
-	if (!file.is_open()) {
+	if (!file.is_open())
+	{
 		throw std::runtime_error("failed to open file: " + filename);
 	}
 
-	size_t fileSize = (size_t)file.tellg();
+	size_t fileSize = file.tellg();
 	std::vector<char> buffer(fileSize);
 
 	file.seekg(0);
@@ -150,8 +162,8 @@ std::vector<char> readFile(const std::string& filename)
 }
 
 void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
-	VkBuffer& buffer, VkDeviceMemory& bufferMemory, const VkDevice& device,
-	const VkPhysicalDevice& physicalDevice)
+                  VkBuffer& buffer, VkDeviceMemory& bufferMemory, const VkDevice& device,
+                  const VkPhysicalDevice& physicalDevice)
 {
 	VkBufferCreateInfo bufferInfo{};
 	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -159,7 +171,8 @@ void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyF
 	bufferInfo.usage = usage;
 	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-	if (vkCreateBuffer(device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS) {
+	if (vkCreateBuffer(device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS)
+	{
 		throw std::runtime_error("failed to create buffer");
 	}
 
@@ -171,14 +184,16 @@ void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyF
 	allocInfo.allocationSize = memRequirments.size;
 	allocInfo.memoryTypeIndex = findMemoryType(memRequirments.memoryTypeBits, properties, physicalDevice);
 
-	if (vkAllocateMemory(device, &allocInfo, nullptr, &bufferMemory) != EXIT_SUCCESS) {
+	if (vkAllocateMemory(device, &allocInfo, nullptr, &bufferMemory) != EXIT_SUCCESS)
+	{
 		throw std::runtime_error("failed to allocate buffer memory");
 	}
 
 	vkBindBufferMemory(device, buffer, bufferMemory, 0);
 }
+
 void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size,
-	const VkCommandPool& commandPool, const VkDevice& device, const VkQueue& queue)
+                const VkCommandPool& commandPool, const VkDevice& device, const VkQueue& queue)
 {
 	VkCommandBuffer commandBuffer = beginSingleTimeCommands(commandPool, device);
 
@@ -210,8 +225,9 @@ VkCommandBuffer beginSingleTimeCommands(const VkCommandPool& commandPool, const 
 
 	return commandBuffer;
 }
+
 void endSingleTimeCommands(VkCommandBuffer commandBuffer, const VkQueue& queue,
-	const VkCommandPool& commandPool, const VkDevice& device)
+                           const VkCommandPool& commandPool, const VkDevice& device)
 {
 	vkEndCommandBuffer(commandBuffer);
 

@@ -24,10 +24,11 @@
 #if NDEBUG
 const bool enableValidationLayers = false;
 #else
-const bool enableValidationLayers = true;
+constexpr bool enableValidationLayers = true;
 #endif
 
-struct Vertex {
+struct Vertex
+{
 	glm::vec3 position;
 	glm::vec3 normal;
 	glm::vec2 texCoord;
@@ -38,42 +39,46 @@ struct Vertex {
 	bool operator==(const Vertex& other) const;
 };
 
-struct QueueFamilyIndices {
+struct QueueFamilyIndices
+{
 	std::optional<uint32_t> graphicsFamily;
 	std::optional<uint32_t> presentFamily;
 
-	bool isComplete() {
+	bool isComplete()
+	{
 		return graphicsFamily.has_value() && presentFamily.has_value();
 	}
 };
+
 QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surface);
 
-struct SwapChainSupportDetails {
+struct SwapChainSupportDetails
+{
 	VkSurfaceCapabilitiesKHR capabilities;
 	std::vector<VkSurfaceFormatKHR> formats;
 	std::vector<VkPresentModeKHR> presents;
 };
+
 SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface);
 
 uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties, VkPhysicalDevice physicalDevice);
 
 void createImage(uint32_t width, uint32_t height, uint32_t mipLevels, VkFormat format,
-	VkSampleCountFlagBits numberOfSamples, VkImageTiling tiling, VkImageUsageFlags usage,
-	VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory,
-	const VkDevice& device, const VkPhysicalDevice& physicalDevice);
+                 VkSampleCountFlagBits numberOfSamples, VkImageTiling tiling, VkImageUsageFlags usage,
+                 VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory,
+                 const VkDevice& device, const VkPhysicalDevice& physicalDevice);
 
 VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags,
-	uint32_t mipLevels, VkDevice device);
+                            uint32_t mipLevels, VkDevice device);
 
 std::vector<char> readFile(const std::string& filename);
 
 void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
-	VkBuffer& buffer, VkDeviceMemory& bufferMemory, const VkDevice& device,
-	const VkPhysicalDevice& physicalDevice);
+                  VkBuffer& buffer, VkDeviceMemory& bufferMemory, const VkDevice& device,
+                  const VkPhysicalDevice& physicalDevice);
 void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size,
-	const VkCommandPool& commandPool, const VkDevice& device, const VkQueue& queue);
+                const VkCommandPool& commandPool, const VkDevice& device, const VkQueue& queue);
 
 VkCommandBuffer beginSingleTimeCommands(const VkCommandPool& commandPool, const VkDevice& device);
-void endSingleTimeCommands(VkCommandBuffer commandBuffer, const VkQueue& queue, 
-	const VkCommandPool& commandPool, const VkDevice& device);
-
+void endSingleTimeCommands(VkCommandBuffer commandBuffer, const VkQueue& queue,
+                           const VkCommandPool& commandPool, const VkDevice& device);

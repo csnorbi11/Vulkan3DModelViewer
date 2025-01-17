@@ -2,14 +2,15 @@
 #include "RendererCommon.h"
 #include "DeviceManager.hpp"
 
-class IndexBuffer {
+class IndexBuffer
+{
 public:
 	IndexBuffer() = default;
 	~IndexBuffer() = default;
 
 	IndexBuffer(DeviceManager& deviceManager,
-		VkCommandPool commandPool,
-		std::vector<uint32_t> indices);
+	            VkCommandPool commandPool,
+	            std::vector<uint32_t> indices);
 
 	void cleanup(VkDevice device);
 

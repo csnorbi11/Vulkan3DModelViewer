@@ -2,12 +2,13 @@
 #include "RendererCommon.h"
 #include "Object.hpp"
 
-class LightSource : public Object {
+class LightSource : public Object
+{
 public:
 	LightSource() = default;
-	~LightSource() = default;
+	~LightSource() override = default;
 
 	LightSource(DeviceManager& deviceManager,
-		VkCommandPool commandPool, std::string name,
-		glm::vec3 color=glm::vec3(1.0f,1.0f,1.0f));
+	            VkCommandPool commandPool, std::string name,
+	            glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f));
 };

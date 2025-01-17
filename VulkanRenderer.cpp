@@ -1,14 +1,14 @@
 #include "VulkanRenderer.hpp"
 
 VulkanRenderer::VulkanRenderer(GLFWwindow* window, int& windowWidth, int& windowHeight,
-	const Camera& camera, const std::string configPath)
+                               const Camera& camera, const std::string configPath)
 	:
-	window(window),
-	MAX_FRAMES_IN_FLIGHT(2),
-	currentFrame(0),
 	framebufferResized(false),
+	window(window),
 	windowWidth(windowWidth),
-	windowHeight(windowHeight)
+	windowHeight(windowHeight),
+	currentFrame(0),
+	MAX_FRAMES_IN_FLIGHT(2)
 {
 	readConfig(configPath);
 
@@ -23,29 +23,43 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window, int& windowWidth, int& window
 	swapchainManager = std::make_unique<SwapchainManager>(*deviceManager, surface, width, height);
 
 	uniformBuffer = std::make_unique<UniformBuffer>(deviceManager->getDevice(),
-		deviceManager->getPhysicalDevice(), MAX_FRAMES_IN_FLIGHT, swapchainManager->getImageExtent(), deviceManager->getPhysicalDeviceProperties(),
-		objectContainer, camera);
+	                                                deviceManager->getPhysicalDevice(), MAX_FRAMES_IN_FLIGHT,
+	                                                swapchainManager->getImageExtent(),
+	                                                deviceManager->getPhysicalDeviceProperties(),
+	                                                models, lightSources, camera);
 
 	graphicsPipelines.push_back(GraphicsPipeline(*deviceManager, swapchainManager->getImageExtent(),
-		swapchainManager->getImageFormat(), swapchainManager->getRenderPass().getRenderPass(),
-		MAX_FRAMES_IN_FLIGHT, *uniformBuffer, "modelShader", "shadervert.spv", "shader.fragrag.spv"));
+	                                             swapchainManager->getImageFormat(),
+	                                             swapchainManager->getRenderPass().getRenderPass(),
+	                                             MAX_FRAMES_IN_FLIGHT, *uniformBuffer, "modelShader", "shadervert.spv",
+	                                             "shader.fragrag.spv"));
 
 	graphicsPipelines.push_back(GraphicsPipeline(*deviceManager, swapchainManager->getImageExtent(),
-		swapchainManager->getImageFormat(), swapchainManager->getRenderPass().getRenderPass(),
-		MAX_FRAMES_IN_FLIGHT, *uniformBuffer, "lightShader", "lightblubvert.spv", "lightblub.fragrag.spv"));
+	                                             swapchainManager->getImageFormat(),
+	                                             swapchainManager->getRenderPass().getRenderPass(),
+	                                             MAX_FRAMES_IN_FLIGHT, *uniformBuffer, "lightShader",
+	                                             "lightblubvert.spv", "lightblub.fragrag.spv"));
 
 	commandbuffer = std::make_unique<CommandBuffer>(deviceManager->getDevice(), deviceManager->getIndices(),
-		swapchainManager->getRenderPass().getRenderPass(), swapchainManager->getFramebuffer().getSwapchainFramebuffers(),
-		swapchainManager->getImageExtent(), graphicsPipelines, graphicsPipelines[0].getLayout(),
-		MAX_FRAMES_IN_FLIGHT, uniformBuffer->getDynamicAlignment());
+	                                                swapchainManager->getRenderPass().getRenderPass(),
+	                                                swapchainManager->getFramebuffer().getSwapchainFramebuffers(),
+	                                                swapchainManager->getImageExtent(), graphicsPipelines,
+	                                                graphicsPipelines[0].getLayout(),
+	                                                MAX_FRAMES_IN_FLIGHT, uniformBuffer->getDynamicAlignment());
 
 	syncObjects = std::make_unique<SyncObjects>(deviceManager->getDevice(), MAX_FRAMES_IN_FLIGHT);
 
-	objectContainer.addLightSource({ *deviceManager,commandbuffer->getCommandPool(),"light" });
+	lightSources.push_back(LightSource(*deviceManager, commandbuffer->getCommandPool(), "light"));
+	uniformBuffer->calculateDynamicBuffer();
+	uniformBuffer->recreateDynamicBuffer();
+	for (auto& lightSource : lightSources)
+	{
+		uniformBuffer->createDescriptorSets(lightSource, MAX_FRAMES_IN_FLIGHT);
+	}
 }
+
 VulkanRenderer::~VulkanRenderer()
 {
-
 	deleteAllModels();
 
 	swapchainManager->cleanup();
@@ -57,7 +71,8 @@ VulkanRenderer::~VulkanRenderer()
 	uniformBuffer->cleanup();
 
 	deviceManager->cleanup();
-	if (enableValidationLayers) {
+	if (enableValidationLayers)
+	{
 		DestroyDebugUtilsMessengerEXT(instance, validationLayers->getDebugMessenger(), nullptr);
 	}
 	vkDestroySurfaceKHR(instance, surface, nullptr);
@@ -66,7 +81,8 @@ VulkanRenderer::~VulkanRenderer()
 
 void VulkanRenderer::createInstance()
 {
-	if (enableValidationLayers && !validationLayers->checkValidationLayerSupport()) {
+	if (enableValidationLayers && !validationLayers->checkValidationLayerSupport())
+	{
 		throw std::runtime_error("validation layers requested, but not available");
 	}
 
@@ -88,27 +104,31 @@ void VulkanRenderer::createInstance()
 	createInfo.ppEnabledExtensionNames = extensions.data();
 
 	VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
-	if (enableValidationLayers) {
+	if (enableValidationLayers)
+	{
 		createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers->getValidationLayers().size());
 		createInfo.ppEnabledLayerNames = validationLayers->getValidationLayers().data();
 
 		validationLayers->populateDebugMessengerCreateInfo(debugCreateInfo);
-		createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
+		createInfo.pNext = &debugCreateInfo;
 	}
-	else {
+	else
+	{
 		createInfo.enabledLayerCount = 0;
 		createInfo.pNext = nullptr;
 	}
 
 
-	if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
+	if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS)
+	{
 		throw std::runtime_error("failed to create instance");
 	}
-
 }
+
 void VulkanRenderer::createSurface(GLFWwindow* window)
 {
-	if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS) {
+	if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS)
+	{
 		throw std::runtime_error("filed to create surface");
 	}
 }
@@ -116,7 +136,8 @@ void VulkanRenderer::createSurface(GLFWwindow* window)
 void VulkanRenderer::recreateSwapchain()
 {
 	glfwGetFramebufferSize(window, &windowWidth, &windowHeight);
-	while (windowWidth == 0 || windowHeight == 0) {
+	while (windowWidth == 0 || windowHeight == 0)
+	{
 		glfwGetFramebufferSize(window, &windowWidth, &windowHeight);
 		glfwWaitEvents();
 	}
@@ -135,7 +156,8 @@ void VulkanRenderer::readConfig(const std::string configPath)
 
 	std::string line;
 
-	while (std::getline(inputFile, line)) {
+	while (std::getline(inputFile, line))
+	{
 		//std::cout << line << std::endl;
 	}
 
@@ -145,24 +167,27 @@ void VulkanRenderer::readConfig(const std::string configPath)
 void VulkanRenderer::drawFrame()
 {
 	vkWaitForFences(deviceManager->getDevice(), 1, &(syncObjects->inFlightFences[currentFrame]),
-		VK_TRUE, UINT64_MAX);
+	                VK_TRUE, UINT64_MAX);
 
 	uint32_t imageIndex;
 	VkResult result = vkAcquireNextImageKHR(deviceManager->getDevice(), swapchainManager->getSwapchain(), UINT64_MAX,
-		syncObjects->imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
+	                                        syncObjects->imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE,
+	                                        &imageIndex);
 
-	if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+	if (result == VK_ERROR_OUT_OF_DATE_KHR)
+	{
 		recreateSwapchain();
 		return;
 	}
-	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+	if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+	{
 		throw std::runtime_error("faileed to acquire image from swapchain");
 	}
 
 	vkResetFences(deviceManager->getDevice(), 1, &syncObjects->inFlightFences[currentFrame]);
 
 	vkResetCommandBuffer(commandbuffer->getCommandbuffers()[currentFrame], 0);
-	commandbuffer->recordCommandBuffer(currentFrame, imageIndex, objectContainer);
+	commandbuffer->recordCommandBuffer(currentFrame, imageIndex, models, lightSources);
 
 
 	uniformBuffer->updateDynamic(currentFrame);
@@ -172,19 +197,21 @@ void VulkanRenderer::drawFrame()
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-	VkSemaphore waitSemaphores[] = { syncObjects->imageAvailableSemaphores[currentFrame] };
-	VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+	VkSemaphore waitSemaphores[] = {syncObjects->imageAvailableSemaphores[currentFrame]};
+	VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
 	submitInfo.waitSemaphoreCount = 1;
 	submitInfo.pWaitSemaphores = waitSemaphores;
 	submitInfo.pWaitDstStageMask = waitStages;
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &commandbuffer->getCommandbuffers()[currentFrame];
 
-	VkSemaphore signalSemaphores[] = { syncObjects->renderFinishedSemaphores[currentFrame] };
+	VkSemaphore signalSemaphores[] = {syncObjects->renderFinishedSemaphores[currentFrame]};
 	submitInfo.signalSemaphoreCount = 1;
 	submitInfo.pSignalSemaphores = signalSemaphores;
 
-	if (vkQueueSubmit(deviceManager->getGraphicsQueue(), 1, &submitInfo, syncObjects->inFlightFences[currentFrame]) != VK_SUCCESS) {
+	if (vkQueueSubmit(deviceManager->getGraphicsQueue(), 1, &submitInfo, syncObjects->inFlightFences[currentFrame]) !=
+		VK_SUCCESS)
+	{
 		throw std::runtime_error("failed to submit draw command buffer!");
 	}
 
@@ -193,18 +220,20 @@ void VulkanRenderer::drawFrame()
 	presentInfo.waitSemaphoreCount = 1;
 	presentInfo.pWaitSemaphores = signalSemaphores;
 
-	VkSwapchainKHR swapChains[] = { swapchainManager->getSwapchain() };
+	VkSwapchainKHR swapChains[] = {swapchainManager->getSwapchain()};
 	presentInfo.swapchainCount = 1;
 	presentInfo.pSwapchains = swapChains;
 	presentInfo.pImageIndices = &imageIndex;
 	presentInfo.pResults = nullptr;
 
 	result = vkQueuePresentKHR(deviceManager->getPresentQueue(), &presentInfo);
-	if (result == VK_SUBOPTIMAL_KHR || result == VK_ERROR_OUT_OF_DATE_KHR || framebufferResized) {
+	if (result == VK_SUBOPTIMAL_KHR || result == VK_ERROR_OUT_OF_DATE_KHR || framebufferResized)
+	{
 		framebufferResized = false;
 		recreateSwapchain();
 	}
-	else if (result != VK_SUCCESS) {
+	else if (result != VK_SUCCESS)
+	{
 		throw std::runtime_error("failed to present swap chain image");
 	}
 
@@ -218,32 +247,58 @@ void VulkanRenderer::wait()
 
 void VulkanRenderer::recieveModel(const Model& model)
 {
-	objectContainer.addModel(model);
+	models.push_back(model);
 	uniformBuffer->calculateDynamicBuffer();
 	uniformBuffer->recreateDynamicBuffer();
-	for (auto& object : objectContainer.get())
-		uniformBuffer->createDescriptorSets(*object, MAX_FRAMES_IN_FLIGHT);
+	for (auto& model : models)
+		uniformBuffer->createDescriptorSets(model, MAX_FRAMES_IN_FLIGHT);
+	for (auto& lightSource : lightSources)
+		uniformBuffer->createDescriptorSets(lightSource, MAX_FRAMES_IN_FLIGHT);
 }
 
-void VulkanRenderer::deleteModel(Model& model)
+template <typename T>
+void VulkanRenderer::deleteObject(T& object)
 {
-	model.cleanup(deviceManager->getDevice());
-	objectContainer.removeObject(model);
+	if (typeid(object) == typeid(Model))
+	{
+		object->cleanup(deviceManager->getDevice());
+		for (auto it = models.begin(); it != models.end(); ++it)
+		{
+			if (&(*it) == object)
+			{
+				models.erase(it);
+				return;
+			}
+		}
+	}
+	else if (typeid(object) == typeid(LightSource))
+	{
+		object->cleanup(deviceManager->getDevice());
+		for (auto it = lightSources.begin(); it != lightSources.end(); ++it)
+		{
+			if (&(*it) == object)
+			{
+				lightSources.erase(it);
+				return;
+			}
+		}
+	}
 }
 
 void VulkanRenderer::deleteAllModels()
 {
-	for (auto& object : objectContainer.get())
+	for (auto& model : models)
 	{
-		object->cleanup(deviceManager->getDevice());
+		model.cleanup(deviceManager->getDevice());
 	}
-	objectContainer.clear();
+	models.clear();
 }
 
 DeviceManager& VulkanRenderer::getDeviceManager()
 {
 	return *deviceManager;
 }
+
 CommandBuffer& VulkanRenderer::getCommandBuffer()
 {
 	return *commandbuffer;

@@ -5,13 +5,14 @@
 #include "Framebuffer.hpp"
 #include "DeviceManager.hpp"
 
-class SwapchainManager {
+class SwapchainManager
+{
 public:
 	SwapchainManager() = default;
 	~SwapchainManager() = default;
 
 	SwapchainManager(DeviceManager& deviceManager,
-		VkSurfaceKHR surface, uint32_t frameBufferWidth, uint32_t frameBufferHeight);
+	                 VkSurfaceKHR surface, uint32_t frameBufferWidth, uint32_t frameBufferHeight);
 	void create();
 	void cleanup();
 	void recreate(uint32_t frameBufferWidth, uint32_t frameBufferHeight);
@@ -25,9 +26,7 @@ public:
 	RenderPass& getRenderPass();
 	Framebuffer& getFramebuffer();
 
-
 private:
-	
 	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& avaiableFormats);
 	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& avaiablePresentModes);
 	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);

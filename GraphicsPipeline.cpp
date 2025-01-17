@@ -2,13 +2,12 @@
 
 
 GraphicsPipeline::GraphicsPipeline(DeviceManager& deviceManager, VkExtent2D swapchainExtent,
-	VkFormat swapchainImageFormat, VkRenderPass renderpass,
-	const int MAX_FRAMES_IN_FLIGHT, UniformBuffer uniformBuffer,
-	const std::string name, const std::string& vertShader, const std::string& fragShader)
+                                   VkFormat swapchainImageFormat, VkRenderPass renderpass,
+                                   const int MAX_FRAMES_IN_FLIGHT, UniformBuffer uniformBuffer,
+                                   const std::string name, const std::string& vertShader, const std::string& fragShader)
 	:
 	name(name)
 {
-
 	auto vertShaderCode = readFile(vertShader);
 	auto fragShaderCode = readFile(fragShader);
 
@@ -29,7 +28,7 @@ GraphicsPipeline::GraphicsPipeline(DeviceManager& deviceManager, VkExtent2D swap
 	fragShaderStageInfo.pName = "main";
 
 
-	VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
+	VkPipelineShaderStageCreateInfo shaderStages[] = {vertShaderStageInfo, fragShaderStageInfo};
 
 	auto bindingDescription = Vertex::getBindingDescription();
 	auto attributeDescriptions = Vertex::getAttributeDescriptions();
@@ -37,9 +36,9 @@ GraphicsPipeline::GraphicsPipeline(DeviceManager& deviceManager, VkExtent2D swap
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 	vertexInputInfo.vertexBindingDescriptionCount = 1;
-	vertexInputInfo.pVertexBindingDescriptions = &bindingDescription; 
+	vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
 	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
-	vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data(); 
+	vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
 	VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
 	inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -49,13 +48,13 @@ GraphicsPipeline::GraphicsPipeline(DeviceManager& deviceManager, VkExtent2D swap
 	VkViewport viewport{};
 	viewport.x = 0.0f;
 	viewport.y = 0.0f;
-	viewport.width = (float)swapchainExtent.width;
-	viewport.height = (float)swapchainExtent.height;
+	viewport.width = static_cast<float>(swapchainExtent.width);
+	viewport.height = static_cast<float>(swapchainExtent.height);
 	viewport.minDepth = 0.0f;
 	viewport.maxDepth = 1.0f;
 
 	VkRect2D scissor{};
-	scissor.offset = { 0, 0 };
+	scissor.offset = {0, 0};
 	scissor.extent = swapchainExtent;
 
 	VkPipelineViewportStateCreateInfo viewportState{};
@@ -101,7 +100,8 @@ GraphicsPipeline::GraphicsPipeline(DeviceManager& deviceManager, VkExtent2D swap
 	multisampling.alphaToOneEnable = VK_FALSE; // Optional
 
 	VkPipelineColorBlendAttachmentState colorBlendAttachment{};
-	colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+	colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT
+		| VK_COLOR_COMPONENT_A_BIT;
 	colorBlendAttachment.blendEnable = VK_FALSE;
 	colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE; // Optional
 	colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
@@ -111,8 +111,8 @@ GraphicsPipeline::GraphicsPipeline(DeviceManager& deviceManager, VkExtent2D swap
 	colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD; // Optional
 
 	std::vector<VkDynamicState> dynamicStates = {
-	VK_DYNAMIC_STATE_VIEWPORT,
-	VK_DYNAMIC_STATE_SCISSOR
+		VK_DYNAMIC_STATE_VIEWPORT,
+		VK_DYNAMIC_STATE_SCISSOR
 	};
 
 	VkPipelineDynamicStateCreateInfo dynamicState{};
@@ -131,7 +131,6 @@ GraphicsPipeline::GraphicsPipeline(DeviceManager& deviceManager, VkExtent2D swap
 	colorBlending.blendConstants[2] = 0.0f; // Optional
 	colorBlending.blendConstants[3] = 0.0f; // Optional
 
-	
 
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -141,7 +140,8 @@ GraphicsPipeline::GraphicsPipeline(DeviceManager& deviceManager, VkExtent2D swap
 	pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
 
 
-	if (vkCreatePipelineLayout(deviceManager.getDevice(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
+	if (vkCreatePipelineLayout(deviceManager.getDevice(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS)
+	{
 		throw std::runtime_error("failed to create pipeline layout!");
 	}
 
@@ -165,7 +165,9 @@ GraphicsPipeline::GraphicsPipeline(DeviceManager& deviceManager, VkExtent2D swap
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
 	pipelineInfo.basePipelineIndex = -1; // Optional
 
-	if (vkCreateGraphicsPipelines(deviceManager.getDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS) {
+	if (vkCreateGraphicsPipelines(deviceManager.getDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) !=
+		VK_SUCCESS)
+	{
 		throw std::runtime_error("failed to create graphics pipeline!");
 	}
 
@@ -177,7 +179,6 @@ void GraphicsPipeline::cleanup(VkDevice device)
 {
 	vkDestroyPipeline(device, pipeline, nullptr);
 	vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
-	
 }
 
 const VkPipeline& GraphicsPipeline::getPipeline()
@@ -204,7 +205,8 @@ VkShaderModule GraphicsPipeline::createShaderModule(VkDevice device, const std::
 	createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
 
 	VkShaderModule shaderModule;
-	if (vkCreateShaderModule(device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
+	if (vkCreateShaderModule(device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS)
+	{
 		throw std::runtime_error("failed to create shader module!");
 	}
 

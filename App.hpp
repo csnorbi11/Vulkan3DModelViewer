@@ -8,9 +8,9 @@
 
 static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 
-class App {
+class App
+{
 public:
-
 	App();
 	~App();
 
@@ -24,7 +24,8 @@ private:
 
 	void initImGui();
 	void ModelLoaderDialog(bool& flipY);
-	void ModelPropertiesGUI();
+	template <class T>
+	void ObjectPropertiesGUI(std::vector<T>& vector);
 
 	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 

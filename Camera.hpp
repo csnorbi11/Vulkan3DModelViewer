@@ -4,12 +4,13 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
-class Camera {
+class Camera
+{
 public:
 	Camera() = default;
 	~Camera() = default;
 
-	Camera(GLFWwindow* window, glm::vec3 position = glm::vec3(0), float moveSpeed=1.0f);
+	Camera(GLFWwindow* window, glm::vec3 position = glm::vec3(0), float moveSpeed = 1.0f);
 
 	glm::mat4 getViewMatrix() const;
 	glm::vec3 getPosition() const;

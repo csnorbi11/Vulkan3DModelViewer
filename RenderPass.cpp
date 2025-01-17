@@ -2,13 +2,13 @@
 
 
 RenderPass::RenderPass(VkDevice device, VkFormat swapchainImageFormat,
-	VkSampleCountFlagBits sampleCount, VkFormat depthBufferFormat)
+                       VkSampleCountFlagBits sampleCount, VkFormat depthBufferFormat)
 {
 	create(device, sampleCount, depthBufferFormat, swapchainImageFormat);
 }
 
 void RenderPass::create(VkDevice device, VkSampleCountFlagBits sampleCount,
-	VkFormat depthBufferFormat, VkFormat swapchainImageFormat)
+                        VkFormat depthBufferFormat, VkFormat swapchainImageFormat)
 {
 	VkAttachmentDescription colorAttachment{};
 	colorAttachment.format = swapchainImageFormat;
@@ -59,8 +59,10 @@ void RenderPass::create(VkDevice device, VkSampleCountFlagBits sampleCount,
 	subpass.pDepthStencilAttachment = &depthAttachmentRef;
 	subpass.pResolveAttachments = &colorAttachmentResolveRef;
 
-	std::array<VkAttachmentDescription, 3> attachments = { colorAttachment, depthAttachment,
-		colorAttachmentResolve };
+	std::array<VkAttachmentDescription, 3> attachments = {
+		colorAttachment, depthAttachment,
+		colorAttachmentResolve
+	};
 	VkRenderPassCreateInfo renderPassInfo{};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
 	renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
@@ -71,15 +73,18 @@ void RenderPass::create(VkDevice device, VkSampleCountFlagBits sampleCount,
 	VkSubpassDependency dependency{};
 	dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
 	dependency.dstSubpass = 0;
-	dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+	dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT |
+		VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
 	dependency.srcAccessMask = 0;
-	dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+	dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT |
+		VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
 	dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 
 	renderPassInfo.dependencyCount = 1;
 	renderPassInfo.pDependencies = &dependency;
 
-	if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderpass) != VK_SUCCESS) {
+	if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderpass) != VK_SUCCESS)
+	{
 		throw std::runtime_error("failed to create render pass!");
 	}
 }
@@ -94,4 +99,3 @@ const VkRenderPass& RenderPass::getRenderPass()
 {
 	return renderpass;
 }
-

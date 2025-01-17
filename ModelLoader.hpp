@@ -5,20 +5,18 @@
 
 #include <tiny_obj_loader.h>
 
-class ModelLoader {
+class ModelLoader
+{
 public:
 	ModelLoader() = default;
 	~ModelLoader() = default;
 
 	ModelLoader(DeviceManager& deviceManager,
-		VkCommandPool commandPool);
+	            VkCommandPool commandPool);
 
-	Model loadModel(const std::string PATH, bool verticalFlipTexture = false);
-
+	Model loadModel(std::string PATH, bool verticalFlipTexture = false);
 
 private:
-
-
 	DeviceManager& deviceManager;
 	VkCommandPool commandPool;
 };

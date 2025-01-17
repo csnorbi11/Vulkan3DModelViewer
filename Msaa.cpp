@@ -2,11 +2,11 @@
 
 
 Msaa::Msaa(DeviceManager& deviceManager, VkExtent2D swapchainExtent,
-	VkFormat swapchainImageFormat)
+           VkFormat swapchainImageFormat)
 	:
+	sampleCount(deviceManager.getSampleCount()),
 	swapchainExtent(swapchainExtent),
-	swapchainImageFormat(swapchainImageFormat),
-	sampleCount(deviceManager.getSampleCount())
+	swapchainImageFormat(swapchainImageFormat)
 {
 	create(deviceManager);
 }
@@ -34,15 +34,16 @@ void Msaa::updateExtent(const VkExtent2D toUpdate)
 }
 
 void Msaa::create(DeviceManager& deviceManager,
-	uint32_t width, uint32_t height)
+                  uint32_t width, uint32_t height)
 {
-	if (width != 0 && height != 0) {
+	if (width != 0 && height != 0)
+	{
 		swapchainExtent.width = width;
 		swapchainExtent.height = height;
 	}
 	createImage(swapchainExtent.width, swapchainExtent.height, 1, swapchainImageFormat,
-		deviceManager.getSampleCount(), VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT |
-		VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image, imageMemory,
-		deviceManager.getDevice(), deviceManager.getPhysicalDevice());
+	            deviceManager.getSampleCount(), VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT |
+	            VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image, imageMemory,
+	            deviceManager.getDevice(), deviceManager.getPhysicalDevice());
 	imageView = createImageView(image, swapchainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT, 1, deviceManager.getDevice());
 }

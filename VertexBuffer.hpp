@@ -3,13 +3,14 @@
 #include "DeviceManager.hpp"
 
 
-class VertexBuffer {
+class VertexBuffer
+{
 public:
 	VertexBuffer() = default;
 	~VertexBuffer() = default;
 
 	VertexBuffer(DeviceManager& deviceManager, VkCommandPool& commandPool,
-		const std::vector<Vertex>& vertices);
+	             const std::vector<Vertex>& vertices);
 
 	void cleanup(VkDevice device);
 

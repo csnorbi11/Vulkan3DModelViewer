@@ -2,25 +2,29 @@
 #include "RendererCommon.h"
 #include "Model.hpp"
 #include "Camera.hpp"
-#include "ObjectContainer.hpp"
+#include "LightSource.hpp"
 
 #include <chrono>
 
-struct StaticUbo {
+struct StaticUbo
+{
 	glm::mat4 view;
 	glm::mat4 proj;
 	glm::vec3 camPos;
 };
 
-struct ModelDynamicUbo {
+struct ModelDynamicUbo
+{
 	glm::mat4* model{nullptr};
 };
 
-struct LightSourceDynamicUbo {
+struct LightSourceDynamicUbo
+{
 	std::vector<glm::vec3>* lightSourcePositions;
 };
 
-struct UniformBuffers {
+struct UniformBuffers
+{
 	std::vector<VkBuffer> staticBuffers;
 	std::vector<VkBuffer> dynamicBuffers;
 	std::vector<VkDeviceMemory> staticBuffersMemory;
@@ -29,16 +33,18 @@ struct UniformBuffers {
 	std::vector<void*> dynamicBuffersMapped;
 };
 
-class UniformBuffer {
+class UniformBuffer
+{
 public:
 	UniformBuffer() = default;
 	~UniformBuffer();
 
 	UniformBuffer(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
-		const int MAX_FRAMES_IN_FLIGHT, const VkExtent2D& swapchainExtent, VkPhysicalDeviceProperties properties,
-		const ObjectContainer& objectContainer, const Camera& camera);
+	              int MAX_FRAMES_IN_FLIGHT, const VkExtent2D& swapchainExtent, VkPhysicalDeviceProperties properties,
+	              const std::vector<Model>& models, const std::vector<LightSource>& lightSources,
+	              const Camera& camera);
 
-	void createDescriptorSets(Object& object, const int MAX_FRAMES_IN_FLIGHT);
+	void createDescriptorSets(Object& object, int MAX_FRAMES_IN_FLIGHT);
 
 	void recreateDynamicBuffer();
 	void calculateDynamicBuffer();
@@ -49,15 +55,14 @@ public:
 	VkDescriptorSetLayout& getLayout();
 	uint32_t getDynamicAlignment();
 	VkDescriptorPool& getDescriptorPool();
-	
 
-	
 private:
-	void create(const int MAX_FRAMES_IN_FLIGHT, const VkPhysicalDevice& physicalDevice);
+	void create(int MAX_FRAMES_IN_FLIGHT, const VkPhysicalDevice& physicalDevice);
 	void createDescriptorSetLayout();
-	void createDescriptorPool(const int MAX_FRAMES_IN_FLIGHT);
+	void createDescriptorPool(int MAX_FRAMES_IN_FLIGHT);
 
-	const ObjectContainer& objectContainer;
+	const std::vector<Model>& models;
+	const std::vector<LightSource>& lightSources;
 
 	const Camera& camera;
 
@@ -69,7 +74,7 @@ private:
 	StaticUbo staticUbo;
 	ModelDynamicUbo dynamicUbo;
 
-	
+
 	VkDescriptorSetLayout descriptorSetLayout;
 	VkDescriptorSetLayout dynamicDescriptorSetLayout;
 	VkDescriptorPool descriptorPool;

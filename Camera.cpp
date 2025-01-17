@@ -3,14 +3,14 @@
 
 Camera::Camera(GLFWwindow* window, glm::vec3 position, float moveSpeed)
 	:
-	window(window),
 	mouseSensitivity(1.0),
+	moveSpeed(moveSpeed),
+	window(window),
 	position(position),
 	moveInput(glm::vec3(0.0f)),
-	up(glm::vec3(0.0f)),
-	right(glm::vec3(0.0f)),
 	front(glm::vec3(0.0f)),
-	moveSpeed(moveSpeed)
+	right(glm::vec3(0.0f)),
+	up(glm::vec3(0.0f))
 {
 	//to make camera look to positive Z
 	rotation.y = 90.f;
@@ -21,12 +21,14 @@ glm::mat4 Camera::getViewMatrix() const
 	glm::vec3 pos(position.x, position.y, position.z);
 	glm::vec3 fr(front.x, front.y, front.z);
 	glm::vec3 u(up.x, up.y, up.z);
-	return glm::lookAt(pos, pos + fr, u);
+	return lookAt(pos, pos + fr, u);
 }
+
 glm::vec3 Camera::getPosition() const
 {
 	return position;
 }
+
 void Camera::update(float deltaTime)
 {
 	movementInput();
@@ -36,6 +38,7 @@ void Camera::update(float deltaTime)
 
 	calculateViewMatrix();
 }
+
 void Camera::processMouseInput(float xOffset, float yOffset)
 {
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) != GLFW_PRESS)
@@ -51,7 +54,6 @@ void Camera::processMouseInput(float xOffset, float yOffset)
 		rotation.x = 89.0f;
 	if (rotation.x < -89.0f)
 		rotation.x = -89.0f;
-
 }
 
 void Camera::AscendDescent(float deltaTime)
@@ -61,6 +63,7 @@ void Camera::AscendDescent(float deltaTime)
 	else if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
 		position.y -= moveSpeed * deltaTime;
 }
+
 void Camera::movementInput()
 {
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -74,16 +77,16 @@ void Camera::movementInput()
 		moveInput.x = -1;
 	else moveInput.x = 0;
 }
+
 void Camera::calculateViewMatrix()
 {
 	glm::vec3 dir;
 	dir.x = cos(glm::radians(rotation.y)) * cos(glm::radians(rotation.x));
 	dir.y = sin(glm::radians(rotation.x));
 	dir.z = sin(glm::radians(rotation.y)) * cos(glm::radians(rotation.x));
-	
 
 
-	front = glm::normalize(dir);
-	right = glm::normalize(glm::cross(front, glm::vec3(0.0, 1.0, 0.0)));
-	up = glm::normalize(glm::cross(right, front));
+	front = normalize(dir);
+	right = normalize(cross(front, glm::vec3(0.0, 1.0, 0.0)));
+	up = normalize(cross(right, front));
 }

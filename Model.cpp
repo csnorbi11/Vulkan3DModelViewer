@@ -1,13 +1,14 @@
 #include "Model.hpp"
 
 Model::Model(DeviceManager& deviceManager,
-	VkCommandPool commandPool,
-	std::vector<Vertex> vertices, std::vector<uint32_t> indices,
-	std::vector<Texture> textures, std::string name)
+             VkCommandPool commandPool,
+             std::vector<Vertex> vertices, std::vector<uint32_t> indices,
+             std::vector<Texture> textures, std::string name)
 	:
-	Object(deviceManager,commandPool,vertices,indices,name),
+	Object(deviceManager, commandPool, vertices, indices, name),
 	textures(textures)
-{}
+{
+}
 
 
 void Model::cleanup(VkDevice device)

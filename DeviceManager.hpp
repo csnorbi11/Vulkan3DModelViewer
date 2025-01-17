@@ -2,13 +2,14 @@
 #include "RendererCommon.h"
 #include "ValidationLayers.hpp"
 
-class DeviceManager {
+class DeviceManager
+{
 public:
 	DeviceManager() = default;
 	~DeviceManager() = default;
 
 	DeviceManager(VkInstance instance, VkSurfaceKHR surface, const std::vector<const char*>& extensions);
-	
+
 	void cleanup();
 
 	const VkPhysicalDevice& getPhysicalDevice();
@@ -35,7 +36,7 @@ private:
 	QueueFamilyIndices indices;
 
 	const std::vector<const char*> deviceExtensions = {
-	VK_KHR_SWAPCHAIN_EXTENSION_NAME
+		VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
 
 	VkDevice device;

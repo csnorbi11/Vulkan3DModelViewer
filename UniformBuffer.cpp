@@ -18,29 +18,31 @@ UniformBuffer::~UniformBuffer()
 }
 
 UniformBuffer::UniformBuffer(const VkDevice& device, const VkPhysicalDevice& physicalDevice,
-	const int MAX_FRAMES_IN_FLIGHT, const VkExtent2D& swapchainExtent, VkPhysicalDeviceProperties properties,
-	const ObjectContainer& objectContainer, const Camera& camera)
+                             const int MAX_FRAMES_IN_FLIGHT, const VkExtent2D& swapchainExtent,
+                             VkPhysicalDeviceProperties properties,
+                             const std::vector<Model>& models, const std::vector<LightSource>& lightSources,
+                             const Camera& camera)
 	:
-	device(device),
-	swapchainExtent(swapchainExtent),
-	staticUbo{},
-	MAX_FRAMES_IN_FLIGHT(MAX_FRAMES_IN_FLIGHT),
-	physicalDevice(physicalDevice),
-	objectContainer(objectContainer),
+	models(models),
+	lightSources(lightSources),
 	camera(camera),
-	MAX_MODEL_COUNT(1000)
+	MAX_MODEL_COUNT(1000),
+	staticUbo{},
+	device(device),
+	physicalDevice(physicalDevice),
+	swapchainExtent(swapchainExtent),
+	MAX_FRAMES_IN_FLIGHT(MAX_FRAMES_IN_FLIGHT)
 {
 	size_t minUboAlignment = properties.limits.minUniformBufferOffsetAlignment;
 	dynamicAlignment = sizeof(glm::mat4);
 	if (minUboAlignment > 0)
 		dynamicAlignment = (sizeof(glm::mat4) + minUboAlignment - 1) & ~(minUboAlignment - 1);
 	bufferSize = 0;
-	dynamicUbo.model = (glm::mat4*)alignedAlloc(bufferSize, dynamicAlignment);
+	dynamicUbo.model = static_cast<glm::mat4*>(alignedAlloc(bufferSize, dynamicAlignment));
 
 	create(MAX_FRAMES_IN_FLIGHT, physicalDevice);
 	createDescriptorSetLayout();
 	createDescriptorPool(MAX_FRAMES_IN_FLIGHT);
-
 }
 
 void UniformBuffer::create(const int MAX_FRAMES_IN_FLIGHT, const VkPhysicalDevice& physicalDevice)
@@ -54,32 +56,38 @@ void UniformBuffer::create(const int MAX_FRAMES_IN_FLIGHT, const VkPhysicalDevic
 	uniformBuffers.staticBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
 	uniformBuffers.staticBuffersMapped.resize(MAX_FRAMES_IN_FLIGHT);
 
-	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-		createBuffer(sizeof(StaticUbo), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers.staticBuffers[i], uniformBuffers.staticBuffersMemory[i], device, physicalDevice);
-		vkMapMemory(device, uniformBuffers.staticBuffersMemory[i], 0, sizeof(StaticUbo), 0, &uniformBuffers.staticBuffersMapped[i]);
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	{
+		createBuffer(sizeof(StaticUbo), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+		             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+		             uniformBuffers.staticBuffers[i], uniformBuffers.staticBuffersMemory[i], device, physicalDevice);
+		vkMapMemory(device, uniformBuffers.staticBuffersMemory[i], 0, sizeof(StaticUbo), 0,
+		            &uniformBuffers.staticBuffersMapped[i]);
 	}
 }
 
 void UniformBuffer::recreateDynamicBuffer()
 {
-	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	{
 		vkDestroyBuffer(device, uniformBuffers.dynamicBuffers[i], nullptr);
 		vkFreeMemory(device, uniformBuffers.dynamicBuffersMemory[i], nullptr);
 	}
 
-	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-		createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers.dynamicBuffers[i], uniformBuffers.dynamicBuffersMemory[i], device, physicalDevice);
-		vkMapMemory(device, uniformBuffers.dynamicBuffersMemory[i], 0, bufferSize, 0, &uniformBuffers.dynamicBuffersMapped[i]);
-
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	{
+		createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+		             uniformBuffers.dynamicBuffers[i], uniformBuffers.dynamicBuffersMemory[i], device, physicalDevice);
+		vkMapMemory(device, uniformBuffers.dynamicBuffersMemory[i], 0, bufferSize, 0,
+		            &uniformBuffers.dynamicBuffersMapped[i]);
 	}
-
 }
 
 void UniformBuffer::calculateDynamicBuffer()
 {
-	bufferSize = dynamicAlignment * MAX_FRAMES_IN_FLIGHT * objectContainer.getModelCount();
+	bufferSize = dynamicAlignment * MAX_FRAMES_IN_FLIGHT * (models.size() + lightSources.size());
 
-	dynamicUbo.model = (glm::mat4*)_aligned_realloc(dynamicUbo.model, bufferSize, dynamicAlignment);
+	dynamicUbo.model = static_cast<glm::mat4*>(_aligned_realloc(dynamicUbo.model, bufferSize, dynamicAlignment));
 	assert(dynamicUbo.model);
 }
 
@@ -87,23 +95,26 @@ void UniformBuffer::updateStatic(uint32_t currentFrame)
 {
 	staticUbo.camPos = camera.getPosition();
 	staticUbo.view = camera.getViewMatrix();
-	staticUbo.proj = glm::perspective(glm::radians(80.0f), swapchainExtent.width / (float)swapchainExtent.height, 0.1f, 100.0f);
+	staticUbo.proj = glm::perspective(glm::radians(80.0f),
+	                                  swapchainExtent.width / static_cast<float>(swapchainExtent.height), 0.1f, 100.0f);
 	staticUbo.proj[1][1] *= -1;
 
 	memcpy(uniformBuffers.staticBuffersMapped[currentFrame], &staticUbo, sizeof(staticUbo));
 }
+
 void UniformBuffer::updateDynamic(uint32_t currentFrame)
 {
-	if (objectContainer.getModelCount() == 0)
+	if (models.size() == 0)
 		return;
 	uint32_t dim = static_cast<uint32_t>(pow(2, (1.0f / 3.0f)));
-	for (size_t i = 0; i < objectContainer.get().size(); i++) {
-		glm::mat4* modelMat = (glm::mat4*)(((uint64_t)dynamicUbo.model + (i * dynamicAlignment)));
-		*modelMat = glm::translate(glm::mat4(1.0), objectContainer.get()[i]->position);
-		*modelMat = glm::rotate(*modelMat, glm::radians(objectContainer.get()[i]->rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-		*modelMat = glm::rotate(*modelMat, glm::radians(objectContainer.get()[i]->rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		*modelMat = glm::rotate(*modelMat, glm::radians(objectContainer.get()[i]->rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-		*modelMat = glm::scale(*modelMat, objectContainer.get()[i]->scale);
+	for (size_t i = 0; i < models.size(); i++)
+	{
+		auto modelMat = (glm::mat4*)(((uint64_t)dynamicUbo.model + (i * dynamicAlignment)));
+		*modelMat = translate(glm::mat4(1.0), models[i].position);
+		*modelMat = rotate(*modelMat, glm::radians(models[i].rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		*modelMat = rotate(*modelMat, glm::radians(models[i].rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		*modelMat = rotate(*modelMat, glm::radians(models[i].rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+		*modelMat = scale(*modelMat, models[i].scale);
 	}
 
 
@@ -115,9 +126,11 @@ void UniformBuffer::updateDynamic(uint32_t currentFrame)
 	memoryRange.size = bufferSize;
 	vkFlushMappedMemoryRanges(device, 1, &memoryRange);
 }
+
 void UniformBuffer::cleanup()
 {
-	for (size_t i = 0; i < uniformBuffers.dynamicBuffers.size(); i++) {
+	for (size_t i = 0; i < uniformBuffers.dynamicBuffers.size(); i++)
+	{
 		vkDestroyBuffer(device, uniformBuffers.dynamicBuffers[i], nullptr);
 		vkDestroyBuffer(device, uniformBuffers.staticBuffers[i], nullptr);
 		vkFreeMemory(device, uniformBuffers.dynamicBuffersMemory[i], nullptr);
@@ -128,18 +141,22 @@ void UniformBuffer::cleanup()
 
 	vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
 }
+
 VkDescriptorSetLayout& UniformBuffer::getLayout()
 {
 	return descriptorSetLayout;
 }
+
 uint32_t UniformBuffer::getDynamicAlignment()
 {
 	return dynamicAlignment;
 }
+
 VkDescriptorPool& UniformBuffer::getDescriptorPool()
 {
 	return descriptorPool;
 }
+
 void UniformBuffer::createDescriptorSetLayout()
 {
 	VkDescriptorSetLayoutBinding uboLayoutBinding{};
@@ -163,18 +180,20 @@ void UniformBuffer::createDescriptorSetLayout()
 	samplerLayoutBinding.pImmutableSamplers = nullptr;
 	samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-	std::array<VkDescriptorSetLayoutBinding, 3> bindings = { uboLayoutBinding, dynamicboLayoutBinding, samplerLayoutBinding };
+	std::array<VkDescriptorSetLayoutBinding, 3> bindings = {
+		uboLayoutBinding, dynamicboLayoutBinding, samplerLayoutBinding
+	};
 	VkDescriptorSetLayoutCreateInfo layoutInfo{};
 	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 	layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
 	layoutInfo.pBindings = bindings.data();
 
-	if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS) {
+	if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS)
+	{
 		throw std::runtime_error("failed to create descriptor set layout!");
 	}
-
-
 }
+
 void UniformBuffer::createDescriptorPool(const int MAX_FRAMES_IN_FLIGHT)
 {
 	std::array<VkDescriptorPoolSize, 3> poolSizes{};
@@ -192,10 +211,12 @@ void UniformBuffer::createDescriptorPool(const int MAX_FRAMES_IN_FLIGHT)
 	poolInfo.maxSets = MAX_MODEL_COUNT;
 	poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
 
-	if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
+	if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS)
+	{
 		throw std::runtime_error("failed to create descriptor pool!");
 	}
 }
+
 void UniformBuffer::createDescriptorSets(Object& object, const int MAX_FRAMES_IN_FLIGHT)
 {
 	std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT * 3);
@@ -210,11 +231,13 @@ void UniformBuffer::createDescriptorSets(Object& object, const int MAX_FRAMES_IN
 	allocInfo.pSetLayouts = layouts.data();
 
 	object.descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
-	if (vkAllocateDescriptorSets(device, &allocInfo, object.descriptorSets.data()) != VK_SUCCESS) {
+	if (vkAllocateDescriptorSets(device, &allocInfo, object.descriptorSets.data()) != VK_SUCCESS)
+	{
 		throw std::runtime_error("failed to allocate descriptor sets!");
 	}
 
-	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	{
 		VkDescriptorBufferInfo staticBufferInfo{};
 		staticBufferInfo.buffer = uniformBuffers.staticBuffers[i];
 		staticBufferInfo.offset = 0;
@@ -255,10 +278,11 @@ void UniformBuffer::createDescriptorSets(Object& object, const int MAX_FRAMES_IN
 		vkUpdateDescriptorSets(device, 1, &modelDynamicDescriptorWrite, 0, nullptr);
 
 		std::cout << typeid(object).name() << std::endl;
-		if (typeid(object).name() != typeid(Model).name()) {
+		if (typeid(object).name() != typeid(Model).name())
+		{
 			continue;
 		}
-		Model* model = dynamic_cast<Model*>(&object);
+		auto model = dynamic_cast<Model*>(&object);
 
 		VkDescriptorImageInfo imageInfo{};
 		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -275,8 +299,5 @@ void UniformBuffer::createDescriptorSets(Object& object, const int MAX_FRAMES_IN
 		textureDescriptorWrite.pImageInfo = &imageInfo;
 
 		vkUpdateDescriptorSets(device, 1, &textureDescriptorWrite, 0, nullptr);
-
-
 	}
-
 }

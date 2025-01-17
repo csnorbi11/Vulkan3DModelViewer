@@ -17,18 +17,22 @@ const VkPhysicalDevice& DeviceManager::getPhysicalDevice()
 {
 	return physicalDevice;
 }
+
 const VkPhysicalDeviceProperties& DeviceManager::getPhysicalDeviceProperties()
 {
 	return phyDeviceProps;
 }
+
 const QueueFamilyIndices& DeviceManager::getIndices()
 {
 	return indices;
 }
+
 const VkDevice& DeviceManager::getDevice()
 {
 	return device;
 }
+
 const std::vector<const char*>& DeviceManager::getDeviceExtensions()
 {
 	return deviceExtensions;
@@ -53,16 +57,18 @@ void DeviceManager::pickPhysicalDevice(VkInstance instance, VkSurfaceKHR surface
 {
 	uint32_t devicesCount = 0;
 	vkEnumeratePhysicalDevices(instance, &devicesCount, nullptr);
-	if (devicesCount == 0) {
+	if (devicesCount == 0)
+	{
 		throw std::runtime_error("failed to find GPU");
 	}
-	
+
 	std::vector<VkPhysicalDevice> devices(devicesCount);
 	vkEnumeratePhysicalDevices(instance, &devicesCount, devices.data());
 
-	for (const auto& device : devices) {
-		
-		if (isPhysicalDeviceSuitable(device, surface)) {
+	for (const auto& device : devices)
+	{
+		if (isPhysicalDeviceSuitable(device, surface))
+		{
 			physicalDevice = device;
 			msaaSamples = getMaxUseableSampleCount();
 			break;
@@ -71,19 +77,20 @@ void DeviceManager::pickPhysicalDevice(VkInstance instance, VkSurfaceKHR surface
 
 	vkGetPhysicalDeviceProperties(physicalDevice, &phyDeviceProps);
 
-	if (physicalDevice == VK_NULL_HANDLE) {
+	if (physicalDevice == VK_NULL_HANDLE)
+	{
 		throw std::runtime_error("no suitable GPU");
 	}
 }
 
 bool DeviceManager::isPhysicalDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface)
 {
-	
 	indices = findQueueFamilies(device, surface);
 	bool extensionsSupported = checkPhysicalDeviceExtensionSupport(device);
 
 	bool isSwapChainSuitable = false;
-	if (extensionsSupported) {
+	if (extensionsSupported)
+	{
 		SwapChainSupportDetails swapChainDetails = querySwapChainSupport(device, surface);
 		isSwapChainSuitable = !swapChainDetails.formats.empty() && !swapChainDetails.presents.empty();
 	}
@@ -92,18 +99,21 @@ bool DeviceManager::isPhysicalDeviceSuitable(VkPhysicalDevice device, VkSurfaceK
 	vkGetPhysicalDeviceProperties(device, &deviceProperties);
 	bool isDedicated = deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU;
 
-	return indices.isComplete() && extensionsSupported && isSwapChainSuitable&& isDedicated;
+	return indices.isComplete() && extensionsSupported && isSwapChainSuitable && isDedicated;
 }
 
 void DeviceManager::createLogicalDevice(const std::vector<const char*>& extensions)
 {
 	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-	std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(),
-		indices.presentFamily.value() };
+	std::set<uint32_t> uniqueQueueFamilies = {
+		indices.graphicsFamily.value(),
+		indices.presentFamily.value()
+	};
 
 
 	float queuePriority = 1.0f;
-	for (uint32_t queueFamily : uniqueQueueFamilies) {
+	for (uint32_t queueFamily : uniqueQueueFamilies)
+	{
 		VkDeviceQueueCreateInfo queueCreateInfo{};
 		queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
 		queueCreateInfo.queueFamilyIndex = queueFamily;
@@ -124,21 +134,23 @@ void DeviceManager::createLogicalDevice(const std::vector<const char*>& extensio
 	createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
 	createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
-	if (enableValidationLayers) {
+	if (enableValidationLayers)
+	{
 		createInfo.enabledLayerCount = static_cast<uint32_t>(extensions.size());
 		createInfo.ppEnabledLayerNames = extensions.data();
 	}
-	else {
+	else
+	{
 		createInfo.enabledLayerCount = 0;
 	}
 
-	if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device) != VK_SUCCESS) {
+	if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device) != VK_SUCCESS)
+	{
 		throw std::runtime_error("failed to create logical device!");
 	}
 
 	vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
 	vkGetDeviceQueue(device, indices.presentFamily.value(), 0, &presentQueue);
-
 }
 
 VkSampleCountFlagBits DeviceManager::getMaxUseableSampleCount()
@@ -165,7 +177,8 @@ bool DeviceManager::checkPhysicalDeviceExtensionSupport(VkPhysicalDevice device)
 
 	std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
 
-	for (const auto& extension : availableExtensions) {
+	for (const auto& extension : availableExtensions)
+	{
 		requiredExtensions.erase(extension.extensionName);
 	}
 
