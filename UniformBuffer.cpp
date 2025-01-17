@@ -288,7 +288,6 @@ void UniformBuffer::createDescriptorSets(Object& object, const int MAX_FRAMES_IN
 		vkUpdateDescriptorSets(device, 1, &staticDescriptorWrite, 0, nullptr);
 		vkUpdateDescriptorSets(device, 1, &modelDynamicDescriptorWrite, 0, nullptr);
 
-		std::cout << typeid(object).name() << std::endl;
 		if (typeid(object).name() != typeid(Model).name())
 		{
 			continue;

@@ -27,8 +27,8 @@ public:
 
 	void wait();
 	void recieveModel(const Model& model);
-	template <typename T>
-	void deleteObject(T& object);
+	void deleteLightSource(LightSource& lightSource);
+	void deleteModel(Model& model);
 	void deleteAllModels();
 
 	bool framebufferResized;

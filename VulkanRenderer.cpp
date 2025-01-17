@@ -1,7 +1,7 @@
 #include "VulkanRenderer.hpp"
 
 VulkanRenderer::VulkanRenderer(GLFWwindow* window, int& windowWidth, int& windowHeight,
-                               const Camera& camera, const std::string configPath)
+	const Camera& camera, const std::string configPath)
 	:
 	framebufferResized(false),
 	window(window),
@@ -23,29 +23,29 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window, int& windowWidth, int& window
 	swapchainManager = std::make_unique<SwapchainManager>(*deviceManager, surface, width, height);
 
 	uniformBuffer = std::make_unique<UniformBuffer>(deviceManager->getDevice(),
-	                                                deviceManager->getPhysicalDevice(), MAX_FRAMES_IN_FLIGHT,
-	                                                swapchainManager->getImageExtent(),
-	                                                deviceManager->getPhysicalDeviceProperties(),
-	                                                models, lightSources, camera);
+		deviceManager->getPhysicalDevice(), MAX_FRAMES_IN_FLIGHT,
+		swapchainManager->getImageExtent(),
+		deviceManager->getPhysicalDeviceProperties(),
+		models, lightSources, camera);
 
 	graphicsPipelines.push_back(GraphicsPipeline(*deviceManager, swapchainManager->getImageExtent(),
-	                                             swapchainManager->getImageFormat(),
-	                                             swapchainManager->getRenderPass().getRenderPass(),
-	                                             MAX_FRAMES_IN_FLIGHT, *uniformBuffer, "modelShader", "shadervert.spv",
-	                                             "shader.fragrag.spv"));
+		swapchainManager->getImageFormat(),
+		swapchainManager->getRenderPass().getRenderPass(),
+		MAX_FRAMES_IN_FLIGHT, *uniformBuffer, "modelShader", "shadervert.spv",
+		"shader.fragrag.spv"));
 
 	graphicsPipelines.push_back(GraphicsPipeline(*deviceManager, swapchainManager->getImageExtent(),
-	                                             swapchainManager->getImageFormat(),
-	                                             swapchainManager->getRenderPass().getRenderPass(),
-	                                             MAX_FRAMES_IN_FLIGHT, *uniformBuffer, "lightShader",
-	                                             "lightblubvert.spv", "lightblub.fragrag.spv"));
+		swapchainManager->getImageFormat(),
+		swapchainManager->getRenderPass().getRenderPass(),
+		MAX_FRAMES_IN_FLIGHT, *uniformBuffer, "lightShader",
+		"lightblubvert.spv", "lightblub.fragrag.spv"));
 
 	commandbuffer = std::make_unique<CommandBuffer>(deviceManager->getDevice(), deviceManager->getIndices(),
-	                                                swapchainManager->getRenderPass().getRenderPass(),
-	                                                swapchainManager->getFramebuffer().getSwapchainFramebuffers(),
-	                                                swapchainManager->getImageExtent(), graphicsPipelines,
-	                                                graphicsPipelines[0].getLayout(),
-	                                                MAX_FRAMES_IN_FLIGHT, uniformBuffer->getDynamicAlignment());
+		swapchainManager->getRenderPass().getRenderPass(),
+		swapchainManager->getFramebuffer().getSwapchainFramebuffers(),
+		swapchainManager->getImageExtent(), graphicsPipelines,
+		graphicsPipelines[0].getLayout(),
+		MAX_FRAMES_IN_FLIGHT, uniformBuffer->getDynamicAlignment());
 
 	syncObjects = std::make_unique<SyncObjects>(deviceManager->getDevice(), MAX_FRAMES_IN_FLIGHT);
 
@@ -167,12 +167,12 @@ void VulkanRenderer::readConfig(const std::string configPath)
 void VulkanRenderer::drawFrame()
 {
 	vkWaitForFences(deviceManager->getDevice(), 1, &(syncObjects->inFlightFences[currentFrame]),
-	                VK_TRUE, UINT64_MAX);
+		VK_TRUE, UINT64_MAX);
 
 	uint32_t imageIndex;
 	VkResult result = vkAcquireNextImageKHR(deviceManager->getDevice(), swapchainManager->getSwapchain(), UINT64_MAX,
-	                                        syncObjects->imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE,
-	                                        &imageIndex);
+		syncObjects->imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE,
+		&imageIndex);
 
 	if (result == VK_ERROR_OUT_OF_DATE_KHR)
 	{
@@ -197,15 +197,15 @@ void VulkanRenderer::drawFrame()
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-	VkSemaphore waitSemaphores[] = {syncObjects->imageAvailableSemaphores[currentFrame]};
-	VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+	VkSemaphore waitSemaphores[] = { syncObjects->imageAvailableSemaphores[currentFrame] };
+	VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 	submitInfo.waitSemaphoreCount = 1;
 	submitInfo.pWaitSemaphores = waitSemaphores;
 	submitInfo.pWaitDstStageMask = waitStages;
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &commandbuffer->getCommandbuffers()[currentFrame];
 
-	VkSemaphore signalSemaphores[] = {syncObjects->renderFinishedSemaphores[currentFrame]};
+	VkSemaphore signalSemaphores[] = { syncObjects->renderFinishedSemaphores[currentFrame] };
 	submitInfo.signalSemaphoreCount = 1;
 	submitInfo.pSignalSemaphores = signalSemaphores;
 
@@ -220,7 +220,7 @@ void VulkanRenderer::drawFrame()
 	presentInfo.waitSemaphoreCount = 1;
 	presentInfo.pWaitSemaphores = signalSemaphores;
 
-	VkSwapchainKHR swapChains[] = {swapchainManager->getSwapchain()};
+	VkSwapchainKHR swapChains[] = { swapchainManager->getSwapchain() };
 	presentInfo.swapchainCount = 1;
 	presentInfo.pSwapchains = swapChains;
 	presentInfo.pImageIndices = &imageIndex;
@@ -256,33 +256,33 @@ void VulkanRenderer::recieveModel(const Model& model)
 		uniformBuffer->createDescriptorSets(lightSource, MAX_FRAMES_IN_FLIGHT);
 }
 
-template <typename T>
-void VulkanRenderer::deleteObject(T& object)
+void VulkanRenderer::deleteLightSource(LightSource& lightSource)
 {
-	if (typeid(object) == typeid(Model))
+	lightSource.cleanup(deviceManager->getDevice());
+	for (auto it = lightSources.begin(); it != lightSources.end(); ++it)
 	{
-		object->cleanup(deviceManager->getDevice());
-		for (auto it = models.begin(); it != models.end(); ++it)
+		if (&(*it) == &lightSource)
 		{
-			if (&(*it) == object)
-			{
-				models.erase(it);
-				return;
-			}
+			lightSources.erase(it);
+			return;
 		}
 	}
-	else if (typeid(object) == typeid(LightSource))
+}
+
+void VulkanRenderer::deleteModel(Model& model)
+{
+
+	model.cleanup(deviceManager->getDevice());
+	for (auto it = models.begin(); it != models.end(); ++it)
 	{
-		object->cleanup(deviceManager->getDevice());
-		for (auto it = lightSources.begin(); it != lightSources.end(); ++it)
+		if (&(*it) == &model)
 		{
-			if (&(*it) == object)
-			{
-				lightSources.erase(it);
-				return;
-			}
+			models.erase(it);
+			return;
 		}
 	}
+
+	
 }
 
 void VulkanRenderer::deleteAllModels()
@@ -292,6 +292,12 @@ void VulkanRenderer::deleteAllModels()
 		model.cleanup(deviceManager->getDevice());
 	}
 	models.clear();
+
+	for (auto& lightSource : lightSources)
+	{
+		lightSource.cleanup(deviceManager->getDevice());
+	}
+	lightSources.clear();
 }
 
 DeviceManager& VulkanRenderer::getDeviceManager()

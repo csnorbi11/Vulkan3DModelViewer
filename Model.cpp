@@ -13,11 +13,12 @@ Model::Model(DeviceManager& deviceManager,
 
 void Model::cleanup(VkDevice device)
 {
+
+	Object::cleanup(device);
 	for (auto& texture : textures)
 	{
 		texture.cleanup(device);
 	}
-	Object::cleanup(device);
 }
 
 std::vector<Texture>& Model::getTextures()

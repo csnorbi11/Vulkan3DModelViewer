@@ -33,9 +33,9 @@ App::App()
 	:
 	glfwHandler(),
 	renderer(glfwHandler.window.get(), glfwHandler.WIDTH, glfwHandler.HEIGHT, camera,
-	         "config.txt"),
+		"config.txt"),
 	modelLoader(renderer.getDeviceManager(), renderer.getCommandBuffer().getCommandPool()),
-	camera(glfwHandler.window.get(), {0.0, 0.0, -3.0}, 5.0f)
+	camera(glfwHandler.window.get(), { 0.0, 0.0, -3.0 }, 5.0f)
 {
 	glfwSetWindowUserPointer(glfwHandler.window.get(), this);
 	glfwSetWindowSizeCallback(glfwHandler.window.get(), framebufferResizeCallback);
@@ -47,6 +47,8 @@ App::App()
 
 App::~App()
 {
+	renderer.deleteAllModels();
+
 	ImGui_ImplVulkan_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
@@ -115,8 +117,6 @@ void App::ModelHandlerWIndow(bool& flipY)
 	ModelLoaderDialog(flipY);
 	ImGui::Text("Number of models: %d", renderer.models.size());
 	ObjectPropertiesGUI(renderer.models);
-	ImGui::Text("Number of light sources: %d", renderer.lightSources.size());
-	ObjectPropertiesGUI(renderer.lightSources);
 	ImGui::End();
 	ImGui::Begin("Light Transformer");
 	modelWindowSize = ImVec2(glfwHandler.WIDTH / 4, glfwHandler.HEIGHT / 2);
@@ -164,10 +164,10 @@ void App::ObjectPropertiesGUI(std::vector<T>& vector)
 		ImGui::LabelText("Name", object.name.c_str());
 		if (ImGui::Button("Delete"))
 		{
-			if (typeid(T) == typeid(Model))
-			{
-				//renderer.deleteObject(object);
-			}
+			if (typeid(object) == typeid(Model))
+				renderer.deleteModel(dynamic_cast<Model&>(object));
+			else if (typeid(object) == typeid(LightSource))
+				renderer.deleteLightSource(dynamic_cast<LightSource&>(object));
 			ImGui::EndChild();
 			break;
 		}

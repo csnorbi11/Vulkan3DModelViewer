@@ -14,6 +14,7 @@ Object::Object(DeviceManager& deviceManager, VkCommandPool commandPool, std::vec
 
 void Object::cleanup(VkDevice device)
 {
+	vkDeviceWaitIdle(device);
 	vertexBuffer.cleanup(device);
 	indexBuffer.cleanup(device);
 }
