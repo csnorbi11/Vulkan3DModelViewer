@@ -85,7 +85,7 @@ void UniformBuffer::recreateDynamicBuffer()
 
 void UniformBuffer::calculateDynamicBuffer()
 {
-	bufferSize = dynamicAlignment * MAX_FRAMES_IN_FLIGHT * (models.size() + lightSources.size());
+	bufferSize = dynamicAlignment * MAX_FRAMES_IN_FLIGHT * models.size();
 
 	dynamicUbo.model = static_cast<glm::mat4*>(_aligned_realloc(dynamicUbo.model, bufferSize, dynamicAlignment));
 	assert(dynamicUbo.model);
@@ -99,12 +99,17 @@ void UniformBuffer::updateStatic(uint32_t currentFrame)
 		swapchainExtent.width / static_cast<float>(swapchainExtent.height), 0.1f, 100.0f);
 	staticUbo.proj[1][1] *= -1;
 
+	for (size_t i=0;i<MAX_LIGHT_SOURCE;i++)
+	{
+		staticUbo.lightSources[i] = lightSources[i];
+	}
+
 	memcpy(uniformBuffers.staticBuffersMapped[currentFrame], &staticUbo, sizeof(staticUbo));
 }
 
 void UniformBuffer::updateDynamic(uint32_t currentFrame)
 {
-	if (models.empty() && lightSources.empty())
+	if (models.empty())
 		return;
 	uint32_t dim = static_cast<uint32_t>(pow(2, (1.0f / 3.0f)));
 	size_t offset = 0;
@@ -118,16 +123,7 @@ void UniformBuffer::updateDynamic(uint32_t currentFrame)
 		*modelMat = rotate(*modelMat, glm::radians(models[i].rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 		*modelMat = scale(*modelMat, models[i].scale);
 	}
-	for (size_t i=0;i<lightSources.size();i++)
-	{
-		auto modelMat = (glm::mat4*)(((uint64_t)dynamicUbo.model + (offset * dynamicAlignment)));
-		offset++;
-		*modelMat = translate(glm::mat4(1.0), lightSources[i].position);
-		*modelMat = rotate(*modelMat, glm::radians(lightSources[i].rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-		*modelMat = rotate(*modelMat, glm::radians(lightSources[i].rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		*modelMat = rotate(*modelMat, glm::radians(lightSources[i].rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-		*modelMat = scale(*modelMat, lightSources[i].scale);
-	}
+
 
 	memcpy(uniformBuffers.dynamicBuffersMapped[currentFrame], dynamicUbo.model, bufferSize);
 	VkMappedMemoryRange memoryRange{};
@@ -230,10 +226,10 @@ void UniformBuffer::createDescriptorPool(const int MAX_FRAMES_IN_FLIGHT)
 
 void UniformBuffer::createDescriptorSets(Object& object, const int MAX_FRAMES_IN_FLIGHT)
 {
-	std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT * 3);
+	std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT * 2);
 	layouts[0] = descriptorSetLayout;
 	layouts[1] = descriptorSetLayout;
-	layouts[2] = descriptorSetLayout;
+
 
 	VkDescriptorSetAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -259,11 +255,9 @@ void UniformBuffer::createDescriptorSets(Object& object, const int MAX_FRAMES_IN
 		modelDynamicBufferInfo.offset = 0;
 		modelDynamicBufferInfo.range = dynamicAlignment;
 
-		VkDescriptorBufferInfo lightSourcesDynamicBufferInfo{};
 
 		VkWriteDescriptorSet staticDescriptorWrite{};
 		VkWriteDescriptorSet modelDynamicDescriptorWrite{};
-		VkWriteDescriptorSet lightSourcesDynamicDescriptorWrite{};
 
 		staticDescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		staticDescriptorWrite.dstSet = object.descriptorSets[i];
