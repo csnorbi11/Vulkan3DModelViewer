@@ -6,21 +6,25 @@
 
 #include <chrono>
 
+const size_t MAX_LIGHTS=32;
+
+struct LightStruct
+{
+	glm::vec3 position;
+	glm::vec3 color;
+};
+
 struct StaticUbo
 {
 	glm::mat4 view;
 	glm::mat4 proj;
 	glm::vec3 camPos;
+	LightStruct lightSources[MAX_LIGHTS];
 };
 
 struct ModelDynamicUbo
 {
 	glm::mat4* model{nullptr};
-};
-
-struct LightSourceDynamicUbo
-{
-	std::vector<glm::vec3>* lightSourcePositions;
 };
 
 struct UniformBuffers
