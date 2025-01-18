@@ -6,12 +6,12 @@
 
 #include <chrono>
 
-const size_t MAX_LIGHTS=32;
+const size_t MAX_LIGHTS=10;
 
-struct LightStruct
+struct alignas(16) LightStruct
 {
 	glm::vec3 position;
-	glm::vec3 color;
+	alignas(16)glm::vec3 color;
 };
 
 struct StaticUbo
@@ -19,7 +19,7 @@ struct StaticUbo
 	glm::mat4 view;
 	glm::mat4 proj;
 	glm::vec3 camPos;
-	LightStruct lightSources[MAX_LIGHTS];
+	alignas(16)LightStruct lightSources[MAX_LIGHTS];
 };
 
 struct ModelDynamicUbo

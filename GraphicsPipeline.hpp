@@ -1,8 +1,8 @@
 #pragma once
 #include "RendererCommon.h"
-#include "RenderPass.hpp"
-#include "UniformBuffer.hpp"
 #include "DeviceManager.hpp"
+#include "UniformBuffer.hpp"
+
 
 class GraphicsPipeline
 {

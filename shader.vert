@@ -15,7 +15,6 @@ layout(location = 0) out vec2 fragTexCoord;
 layout(location=1) out vec3 outNormal;
 layout(location=2) out vec4 fragPos;
 layout(location=3) out vec3 camPos;
-layout(location=4) out LightSource outLightSources[MAX_LIGHTS];
 
 layout(binding = 0) uniform UniformBufferObject {
     mat4 view;
@@ -34,7 +33,6 @@ void main(){
 	outNormal=mat3(transpose(inverse(mubo.model))) * inNormal;
 	fragPos= vec4(mubo.model * vec4(inPosition, 1.0));
 	camPos=ubo.camPos;
-	outLightSources=ubo.lightSources;
 
 	gl_Position = ubo.proj * ubo.view * fragPos;
 }

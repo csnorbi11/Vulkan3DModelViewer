@@ -1,5 +1,7 @@
 #include "VulkanRenderer.hpp"
 
+
+
 VulkanRenderer::VulkanRenderer(GLFWwindow* window, int& windowWidth, int& windowHeight,
 	const Camera& camera, const std::string configPath)
 	:
@@ -49,13 +51,16 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window, int& windowWidth, int& window
 
 	syncObjects = std::make_unique<SyncObjects>(deviceManager->getDevice(), MAX_FRAMES_IN_FLIGHT);
 
-	lightSources.push_back(LightSource(*deviceManager, commandbuffer->getCommandPool(), "light"));
+	lightSources.push_back(LightSource(*deviceManager, commandbuffer->getCommandPool(), "light", glm::vec3(10,10,10)));
 	uniformBuffer->calculateDynamicBuffer();
 	uniformBuffer->recreateDynamicBuffer();
 	for (auto& lightSource : lightSources)
 	{
 		uniformBuffer->createDescriptorSets(lightSource, MAX_FRAMES_IN_FLIGHT);
 	}
+	lightSources[0].position.x = 7;
+	lightSources[0].position.y = 3;
+	lightSources[0].position.z = -2;
 }
 
 VulkanRenderer::~VulkanRenderer()

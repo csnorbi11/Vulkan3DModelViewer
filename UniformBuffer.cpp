@@ -43,6 +43,7 @@ UniformBuffer::UniformBuffer(const VkDevice& device, const VkPhysicalDevice& phy
 	create(MAX_FRAMES_IN_FLIGHT, physicalDevice);
 	createDescriptorSetLayout();
 	createDescriptorPool(MAX_FRAMES_IN_FLIGHT);
+
 }
 
 void UniformBuffer::create(const int MAX_FRAMES_IN_FLIGHT, const VkPhysicalDevice& physicalDevice)
@@ -85,7 +86,7 @@ void UniformBuffer::recreateDynamicBuffer()
 
 void UniformBuffer::calculateDynamicBuffer()
 {
-	bufferSize = dynamicAlignment * MAX_FRAMES_IN_FLIGHT * models.size();
+	bufferSize = dynamicAlignment * MAX_FRAMES_IN_FLIGHT * (models.size()+lightSources.size());
 
 	dynamicUbo.model = static_cast<glm::mat4*>(_aligned_realloc(dynamicUbo.model, bufferSize, dynamicAlignment));
 	assert(dynamicUbo.model);
@@ -93,7 +94,9 @@ void UniformBuffer::calculateDynamicBuffer()
 
 void UniformBuffer::updateStatic(uint32_t currentFrame)
 {
-	staticUbo.camPos = camera.getPosition();
+	staticUbo.camPos.x = camera.getPosition().x;
+	staticUbo.camPos.y = camera.getPosition().y;
+	staticUbo.camPos.z = camera.getPosition().z;
 	staticUbo.view = camera.getViewMatrix();
 	staticUbo.proj = glm::perspective(glm::radians(80.0f),
 		swapchainExtent.width / static_cast<float>(swapchainExtent.height), 0.1f, 100.0f);
@@ -101,12 +104,7 @@ void UniformBuffer::updateStatic(uint32_t currentFrame)
 	for (size_t i=0;i<std::min(MAX_LIGHTS,lightSources.size());i++)
 	{
 		staticUbo.lightSources[i].position = lightSources[i].position;
-		staticUbo.lightSources[i].position = lightSources[i].color;
-	}
-
-	for (size_t i=0;i<MAX_LIGHT_SOURCE;i++)
-	{
-		staticUbo.lightSources[i] = lightSources[i];
+		staticUbo.lightSources[i].color = lightSources[i].color;
 	}
 
 	memcpy(uniformBuffers.staticBuffersMapped[currentFrame], &staticUbo, sizeof(staticUbo));
@@ -114,7 +112,7 @@ void UniformBuffer::updateStatic(uint32_t currentFrame)
 
 void UniformBuffer::updateDynamic(uint32_t currentFrame)
 {
-	if (models.empty())
+	if (models.empty()&&lightSources.empty())
 		return;
 	uint32_t dim = static_cast<uint32_t>(pow(2, (1.0f / 3.0f)));
 	size_t offset = 0;
@@ -127,6 +125,16 @@ void UniformBuffer::updateDynamic(uint32_t currentFrame)
 		*modelMat = rotate(*modelMat, glm::radians(models[i].rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 		*modelMat = rotate(*modelMat, glm::radians(models[i].rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 		*modelMat = scale(*modelMat, models[i].scale);
+	}
+	for (size_t i = 0; i < lightSources.size(); i++)
+	{
+		auto modelMat = (glm::mat4*)(((uint64_t)dynamicUbo.model + (offset * dynamicAlignment)));
+		offset++;
+		*modelMat = translate(glm::mat4(1.0), lightSources[i].position);
+		*modelMat = rotate(*modelMat, glm::radians(lightSources[i].rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		*modelMat = rotate(*modelMat, glm::radians(lightSources[i].rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		*modelMat = rotate(*modelMat, glm::radians(lightSources[i].rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+		*modelMat = scale(*modelMat, lightSources[i].scale);
 	}
 
 
@@ -176,7 +184,7 @@ void UniformBuffer::createDescriptorSetLayout()
 	uboLayoutBinding.descriptorCount = 1;
 	uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	uboLayoutBinding.pImmutableSamplers = nullptr;
-	uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+	uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
 
 	VkDescriptorSetLayoutBinding dynamicboLayoutBinding{};
 	dynamicboLayoutBinding.binding = 1;
