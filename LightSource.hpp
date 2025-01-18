@@ -9,7 +9,8 @@ public:
 	~LightSource() override = default;
 
 	LightSource(DeviceManager& deviceManager,
-	            VkCommandPool commandPool, std::string name,
-	            glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f));
+		VkCommandPool commandPool, std::string name,
+		glm::vec3 color = glm::vec3(1.0f), float intensity = 1.0f);
 	glm::vec3 color;
+	float intensity;
 };

@@ -105,6 +105,7 @@ void UniformBuffer::updateStatic(uint32_t currentFrame)
 	{
 		staticUbo.lightSources[i].position = lightSources[i].position;
 		staticUbo.lightSources[i].color = lightSources[i].color;
+		staticUbo.lightSources[i].intensity = lightSources[i].intensity;
 	}
 
 	memcpy(uniformBuffers.staticBuffersMapped[currentFrame], &staticUbo, sizeof(staticUbo));

@@ -27,6 +27,7 @@ public:
 
 	void wait();
 	void recieveModel(const Model& model);
+	void addLightSource();
 	void deleteLightSource(LightSource& lightSource);
 	void deleteModel(Model& model);
 	void deleteAllModels();

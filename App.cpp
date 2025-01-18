@@ -68,6 +68,7 @@ void App::loop()
 
 
 	renderer.recieveModel(modelLoader.loadModel("backpack.obj"));
+	renderer.addLightSource();
 
 	while (!glfwWindowShouldClose(glfwHandler.window.get()))
 	{
@@ -116,7 +117,7 @@ void App::ModelHandlerWIndow(bool& flipY)
 	ImGui::SetWindowPos(ImVec2(posOffsetX, 0));
 	ModelLoaderDialog(flipY);
 	ImGui::Text("Number of models: %d", renderer.models.size());
-	ObjectPropertiesGUI(renderer.models);
+	ModelPropertiesGUI(renderer.models);
 	ImGui::End();
 	ImGui::Begin("Light Transformer");
 	modelWindowSize = ImVec2(glfwHandler.WIDTH / 4, glfwHandler.HEIGHT / 2);
@@ -124,7 +125,11 @@ void App::ModelHandlerWIndow(bool& flipY)
 	posOffsetX = glfwHandler.WIDTH - modelWindowSize.x;
 	ImGui::SetWindowPos(ImVec2(posOffsetX, glfwHandler.HEIGHT / 2));
 	ImGui::Text("Number of light sources: %d", renderer.lightSources.size());
-	ObjectPropertiesGUI(renderer.lightSources);
+	if (ImGui::Button("Add light"))
+	{
+		renderer.addLightSource();
+	}
+	LightPropertiesGUI(renderer.lightSources);
 	ImGui::End();
 }
 
@@ -154,44 +159,79 @@ void App::initImGui()
 	ImGui_ImplVulkan_CreateFontsTexture();
 }
 
-template <class T>
-void App::ObjectPropertiesGUI(std::vector<T>& vector)
+void App::ModelPropertiesGUI(std::vector<Model>& models)
 {
 	int i = 1;
-	for (auto& object : vector)
+	for (auto& model : models)
 	{
 		ImGui::BeginChild(i, modelWindowSize, true);
-		ImGui::LabelText("Name", object.name.c_str());
+		ImGui::LabelText("Name", model.name.c_str());
 		if (ImGui::Button("Delete"))
 		{
-			if (typeid(object) == typeid(Model))
-				renderer.deleteModel(dynamic_cast<Model&>(object));
-			else if (typeid(object) == typeid(LightSource))
-				renderer.deleteLightSource(dynamic_cast<LightSource&>(object));
+			renderer.deleteModel(model);
 			ImGui::EndChild();
 			break;
 		}
 		if (ImGui::Button("Reset Position"))
 		{
-			object.position = glm::vec3(0.0f);
+			model.position = glm::vec3(0.0f);
 		}
 		if (ImGui::Button("Reset Rotation"))
 		{
-			object.rotation = glm::vec3(0.0f);
+			model.rotation = glm::vec3(0.0f);
 		}
 		if (ImGui::Button("Reset Scale"))
 		{
-			object.scale = glm::vec3(1.0f);
+			model.scale = glm::vec3(1.0f);
 		}
-		ImGui::DragFloat("x", &object.position.x, 0.1f);
-		ImGui::DragFloat("y", &object.position.y, 0.1f);
-		ImGui::DragFloat("z", &object.position.z, 0.1f);
-		ImGui::DragFloat("pitch", &object.rotation.x, 0.1f);
-		ImGui::DragFloat("yaw", &object.rotation.y, 0.1f);
-		ImGui::DragFloat("roll", &object.rotation.z, 0.1f);
-		ImGui::DragFloat("ScaleX: ", &object.scale.x, 0.1f, 0.0f);
-		ImGui::DragFloat("ScaleY", &object.scale.y, 0.1f, 0.0f);
-		ImGui::DragFloat("ScaleZ", &object.scale.z, 0.1f, 0.0f);
+		ImGui::DragFloat("x", &model.position.x, 0.1f);
+		ImGui::DragFloat("y", &model.position.y, 0.1f);
+		ImGui::DragFloat("z", &model.position.z, 0.1f);
+		ImGui::DragFloat("pitch", &model.rotation.x, 0.1f);
+		ImGui::DragFloat("yaw", &model.rotation.y, 0.1f);
+		ImGui::DragFloat("roll", &model.rotation.z, 0.1f);
+		ImGui::DragFloat("ScaleX: ", &model.scale.x, 0.1f, 0.0f);
+		ImGui::DragFloat("ScaleY", &model.scale.y, 0.1f, 0.0f);
+		ImGui::DragFloat("ScaleZ", &model.scale.z, 0.1f, 0.0f);
+		ImGui::EndChild();
+		i++;
+	}
+}
+
+void App::LightPropertiesGUI(std::vector<LightSource>& lightSources)
+{
+	int i = 1;
+	for (auto& light_source : lightSources)
+	{
+		ImGui::BeginChild(i, modelWindowSize, true);
+		ImGui::LabelText("Name", light_source.name.c_str());
+		if (ImGui::Button("Delete"))
+		{
+			renderer.deleteLightSource(light_source);
+			ImGui::EndChild();
+			break;
+		}
+		if (ImGui::Button("Reset Position"))
+		{
+			light_source.position = glm::vec3(0.0f);
+		}
+		if (ImGui::Button("Reset Color"))
+		{
+			light_source.color = glm::vec3(1.0f);
+		}
+		if (ImGui::Button("Reset Intensity"))
+		{
+			light_source.intensity = 10.0f;
+		}
+		ImGui::DragFloat("x", &light_source.position.x, 0.1f);
+		ImGui::DragFloat("y", &light_source.position.y, 0.1f);
+		ImGui::DragFloat("z", &light_source.position.z, 0.1f);
+		ImGui::DragFloat("red", &light_source.color.x, 0.01f);
+		ImGui::DragFloat("green", &light_source.color.y, 0.01f);
+		ImGui::DragFloat("blue", &light_source.color.z, 0.01f);
+		light_source.color = glm::clamp(light_source.color, 0.0f, 1.0f);
+		ImGui::DragFloat("Intensity: ", &light_source.intensity, 0.1f, 0.0f);
+		light_source.intensity = std::clamp(light_source.intensity, 0.0f, (float)UINT32_MAX);
 		ImGui::EndChild();
 		i++;
 	}

@@ -24,8 +24,8 @@ private:
 
 	void initImGui();
 	void ModelLoaderDialog(bool& flipY);
-	template <class T>
-	void ObjectPropertiesGUI(std::vector<T>& vector);
+	void ModelPropertiesGUI(std::vector<Model>& models);
+	void LightPropertiesGUI(std::vector<LightSource>& lightSources);
 
 	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 

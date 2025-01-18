@@ -5,6 +5,7 @@
 struct LightSource{
 	vec3 position;
 	vec3 color;
+	float intensity;
 };
 
 layout(location=0) in vec3 inPosition;

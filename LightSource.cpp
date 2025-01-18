@@ -2,7 +2,7 @@
 
 LightSource::LightSource(DeviceManager& deviceManager,
 	VkCommandPool commandPool, std::string name,
-	glm::vec3 color)
+	glm::vec3 color, float intensity)
 	:
 	Object(deviceManager, commandPool,
 		{
@@ -24,6 +24,7 @@ LightSource::LightSource(DeviceManager& deviceManager,
 			   3, 2, 0, 1, 3, 0
 		   },
 		name),
-	color(color)
+	color(color),
+	intensity(intensity)
 {
 }

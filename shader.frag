@@ -1,12 +1,11 @@
 #version 450
 
-#define MAX_LIGHTS 32
+#define MAX_LIGHTS 10
 
 struct LightSource{
 	vec3 position;
-    float pad1;
 	vec3 color;
-    float pad2;
+    float intensity;
 };
 
 layout(binding=2) uniform sampler2D texSampler;
@@ -25,32 +24,39 @@ layout(binding = 0) uniform UniformBufferObject {
 	LightSource lightSources[MAX_LIGHTS];
 } ubo;
 
+bool valueOutOfRangeOpen(float value, float min, float max);
+
 void main(){
 	
 
-    vec3 result;
+    vec3 result=vec3(0.0);
     for(int i=0;i<ubo.lightSources.length();i++){
          // ambient
-        float ambientStrength = 0.01;
-        vec3 ambient = ambientStrength * ubo.lightSources[0].color;
+        float ambientStrength = 0.1;
+        vec3 ambient = ambientStrength * ubo.lightSources[i].color;
   	
         // diffuse 
         vec3 norm = normalize(inNormal);
         vec3 lightDir = normalize(ubo.lightSources[0].position - inPos.xyz);
         float diff = max(dot(norm, lightDir), 0.0);
-        vec3 diffuse = diff * ubo.lightSources[i].color;
+        vec3 diffuse = diff* ubo.lightSources[i].intensity * ubo.lightSources[i].color;
     
         // specular
         float specularStrength = 0.5;
         vec3 viewDir = normalize(camPos - inPos.xyz);
         vec3 reflectDir = reflect(-lightDir, norm);  
         float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
-        vec3 specular = specularStrength * spec * ubo.lightSources[0].color;  
+        vec3 specular = specularStrength* ubo.lightSources[i].intensity * spec * ubo.lightSources[0].color;  
         
-        result = (ambient + diffuse + specular) * texture(texSampler, fragTexCoord).rgb;
+        result += (ambient + diffuse + specular) * texture(texSampler, fragTexCoord).rgb;
     }
 
 
    
 	outColor=vec4(result,1.0f);
+}
+
+bool valueOutOfRangeOpen(float value, float min, float max)
+{
+    return value<min||value>max;
 }
