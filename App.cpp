@@ -221,7 +221,7 @@ void App::LightPropertiesGUI(std::vector<LightSource>& lightSources)
 		}
 		if (ImGui::Button("Reset Intensity"))
 		{
-			light_source.intensity = 10.0f;
+			light_source.intensity = 1.0f;
 		}
 		ImGui::DragFloat("x", &light_source.position.x, 0.1f);
 		ImGui::DragFloat("y", &light_source.position.y, 0.1f);
@@ -232,7 +232,7 @@ void App::LightPropertiesGUI(std::vector<LightSource>& lightSources)
 		lightColor[0] = &light_source.color.x;
 		lightColor[1] = &light_source.color.y;
 		lightColor[2] = &light_source.color.z;
-		ImGui::ColorPicker3("Light Color/Intensity", *lightColor);
+		ImGui::ColorPicker3("Light Color", *lightColor);
 		ImGui::EndChild();
 		i++;
 	}

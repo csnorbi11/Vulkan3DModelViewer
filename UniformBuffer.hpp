@@ -6,7 +6,7 @@
 
 #include <chrono>
 
-const size_t MAX_LIGHTS=10;
+constexpr size_t MAX_LIGHTS=10;
 
 struct alignas(16) LightStruct
 {

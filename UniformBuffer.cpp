@@ -132,10 +132,6 @@ void UniformBuffer::updateDynamic(uint32_t currentFrame)
 		auto modelMat = (glm::mat4*)(((uint64_t)dynamicUbo.model + (offset * dynamicAlignment)));
 		offset++;
 		*modelMat = translate(glm::mat4(1.0), lightSources[i].position);
-		*modelMat = rotate(*modelMat, glm::radians(lightSources[i].rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-		*modelMat = rotate(*modelMat, glm::radians(lightSources[i].rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		*modelMat = rotate(*modelMat, glm::radians(lightSources[i].rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-		*modelMat = scale(*modelMat, lightSources[i].scale);
 	}
 
 

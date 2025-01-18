@@ -1,6 +1,6 @@
 #version 450
 
-#define MAX_LIGHTS 32
+#define MAX_LIGHTS 10
 
 struct LightSource{
 	vec3 position;
