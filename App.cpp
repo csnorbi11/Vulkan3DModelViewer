@@ -226,12 +226,13 @@ void App::LightPropertiesGUI(std::vector<LightSource>& lightSources)
 		ImGui::DragFloat("x", &light_source.position.x, 0.1f);
 		ImGui::DragFloat("y", &light_source.position.y, 0.1f);
 		ImGui::DragFloat("z", &light_source.position.z, 0.1f);
-		ImGui::DragFloat("red", &light_source.color.x, 0.01f);
-		ImGui::DragFloat("green", &light_source.color.y, 0.01f);
-		ImGui::DragFloat("blue", &light_source.color.z, 0.01f);
-		light_source.color = glm::clamp(light_source.color, 0.0f, 1.0f);
 		ImGui::DragFloat("Intensity: ", &light_source.intensity, 0.1f, 0.0f);
 		light_source.intensity = std::clamp(light_source.intensity, 0.0f, (float)UINT32_MAX);
+		float* lightColor[3];
+		lightColor[0] = &light_source.color.x;
+		lightColor[1] = &light_source.color.y;
+		lightColor[2] = &light_source.color.z;
+		ImGui::ColorPicker3("Light Color/Intensity", *lightColor);
 		ImGui::EndChild();
 		i++;
 	}
