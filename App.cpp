@@ -31,7 +31,6 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 
 App::App()
 	:
-	glfwHandler(),
 	renderer(glfwHandler.window.get(), glfwHandler.WIDTH, glfwHandler.HEIGHT, camera,
 		"config.txt"),
 	modelLoader(renderer.getDeviceManager(), renderer.getCommandBuffer().getCommandPool()),

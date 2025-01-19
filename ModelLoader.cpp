@@ -2,7 +2,7 @@
 
 
 ModelLoader::ModelLoader(DeviceManager& deviceManager,
-                         VkCommandPool commandPool)
+	VkCommandPool commandPool)
 	:
 	deviceManager(deviceManager),
 	commandPool(commandPool)
@@ -21,8 +21,8 @@ Model ModelLoader::loadModel(const std::string PATH, bool verticalFlipTexture)
 	std::vector<Texture> textures;
 
 	size_t index = PATH.find_last_of("\\");
-	std::string fileName = PATH.substr(index + 1).c_str();
-	std::string path = PATH.substr(0, index + 1).c_str();
+	std::string fileName = PATH.substr(index + 1);
+	std::string path = PATH.substr(0, index + 1);
 
 
 	if (!LoadObj(&attrib, &shapes, &materials, &warn, PATH.c_str(), path.c_str()))
@@ -41,21 +41,21 @@ Model ModelLoader::loadModel(const std::string PATH, bool verticalFlipTexture)
 				attrib.vertices[3 * index.vertex_index + 1],
 				attrib.vertices[3 * index.vertex_index + 2]
 			};
-			if (attrib.texcoords.size() != 0)
+			if (!attrib.texcoords.empty())
 			{
 				if (verticalFlipTexture)
 					vertex.texCoord = {
 						attrib.texcoords[2 * index.texcoord_index + 0],
 						1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
-					};
+				};
 				else
 					vertex.texCoord = {
 						attrib.texcoords[2 * index.texcoord_index + 0],
 						attrib.texcoords[2 * index.texcoord_index + 1]
-					};
+				};
 			}
 
-			if (attrib.normals.size() != 0)
+			if (!attrib.normals.empty())
 			{
 				vertex.normal = {
 					attrib.normals[3 * index.normal_index + 0],
@@ -72,6 +72,11 @@ Model ModelLoader::loadModel(const std::string PATH, bool verticalFlipTexture)
 	bool hasTexture = false;
 	for (size_t i = 0; i < materials.size(); i++)
 	{
+		std::cout << path << " " << i << ". diffuse:\t" << materials[i].diffuse_texname << std::endl;
+		std::cout << path << "\t" << i << ". bump:\t" << materials[i].bump_texname << std::endl;
+		std::cout << "\t" << i << "specular:\t" << materials[i].specular_texname << std::endl;
+		std::cout << "\t" << i << ". normal:\t" << materials[i].normal_texname << std::endl;
+		std::cout << "\t" << i << ". normal:\t" << materials[i].roughness_texname << std::endl;
 		if (materials[i].diffuse_texname != "")
 		{
 			textures.emplace_back(deviceManager, commandPool, path + materials[i].diffuse_texname);

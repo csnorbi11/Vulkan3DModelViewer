@@ -3,12 +3,9 @@
 #include "ValidationLayers.hpp"
 #include "SwapchainManager.hpp"
 #include "DeviceManager.hpp"
-#include "Framebuffer.hpp"
 #include "GraphicsPipeline.hpp"
 #include "CommandBuffer.hpp"
 #include "SyncObjects.hpp"
-#include "VertexBuffer.hpp"
-#include "IndexBuffer.hpp"
 #include "UniformBuffer.hpp"
 #include "Model.hpp"
 #include "Camera.hpp"
@@ -25,7 +22,7 @@ public:
 
 	void drawFrame();
 
-	void wait();
+	void wait() const;
 	void recieveModel(const Model& model);
 	void addLightSource();
 	void deleteLightSource(LightSource& lightSource);

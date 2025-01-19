@@ -12,7 +12,6 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window, int& windowWidth, int& window
 	currentFrame(0),
 	MAX_FRAMES_IN_FLIGHT(2)
 {
-	readConfig(configPath);
 
 	validationLayers = std::make_unique<ValidationLayers>();
 	createInstance();
@@ -236,7 +235,7 @@ void VulkanRenderer::drawFrame()
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
-void VulkanRenderer::wait()
+void VulkanRenderer::wait() const
 {
 	vkDeviceWaitIdle(deviceManager->getDevice());
 }
@@ -254,7 +253,7 @@ void VulkanRenderer::recieveModel(const Model& model)
 
 void VulkanRenderer::addLightSource()
 {
-	lightSources.push_back(LightSource(*deviceManager, commandbuffer->getCommandPool(), "light", glm::vec3(10, 10, 10)));
+	lightSources.emplace_back(LightSource(*deviceManager, commandbuffer->getCommandPool(), "light", glm::vec3(1.f)));
 	uniformBuffer->calculateDynamicBuffer();
 	uniformBuffer->recreateDynamicBuffer();
 	for (auto& model : models)
