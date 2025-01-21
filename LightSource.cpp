@@ -4,16 +4,16 @@ LightSource::LightSource(DeviceManager& deviceManager,
 	VkCommandPool commandPool, std::string name,
 	glm::vec3 color, float intensity)
 	:
-	Object(deviceManager, commandPool,
+	Object<VertexColor>(deviceManager, commandPool,
 		{
-			Vertex{{-0.1f, -0.1f, 0.1f}, {}, {}, {color}},
-			Vertex{{-0.1f, -0.1f, -0.1f}, {}, {}, {color}},
-			Vertex{{0.1f, -0.1f, 0.1f}, {}, {}, {color}},
-			Vertex{{0.1f, -0.1f, -0.1f}, {}, {}, {color}},
-			Vertex{{-0.1f, 0.1f, 0.1f}, {}, {}, {color}},
-			Vertex{{-0.1f, 0.1f, -0.1f}, {}, {}, {color}},
-			Vertex{{0.1f, 0.1f, 0.1f}, {}, {}, {color}},
-			Vertex{{0.1f, 0.1f, -0.1f}, {}, {}, {color}}
+			VertexColor{{-0.1f, -0.1f, 0.1f},  {color}},
+			VertexColor{{-0.1f, -0.1f, -0.1f},  {color}},
+			VertexColor{{0.1f, -0.1f, 0.1f},  {color}},
+			VertexColor{{0.1f, -0.1f, -0.1f}, {color}},
+			VertexColor{{-0.1f, 0.1f, 0.1f}, {color}},
+			VertexColor{{-0.1f, 0.1f, -0.1f},  {color}},
+			VertexColor{{0.1f, 0.1f, 0.1f},  {color}},
+			VertexColor{{0.1f, 0.1f, -0.1f},  {color}}
 		},
 		   {
 			   6, 4, 0, 2, 6, 0,
@@ -27,4 +27,9 @@ LightSource::LightSource(DeviceManager& deviceManager,
 	color(color),
 	intensity(intensity)
 {
+}
+
+void LightSource::cleanup(VkDevice device)
+{
+	Object<VertexColor>::cleanup(device);
 }

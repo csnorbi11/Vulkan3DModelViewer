@@ -8,7 +8,10 @@ struct LightSource{
     float intensity;
 };
 
+
+
 layout(binding=2) uniform sampler2D texSampler;
+layout(binding=3) uniform sampler2D specTexSampler;
  
 layout(location=0) in vec2 fragTexCoord;
 layout(location=1) in vec3 inNormal;
@@ -33,22 +36,25 @@ void main(){
     for(int i=0;i<ubo.lightSources.length();i++){
          // ambient
         float ambientStrength = 0.01;
-        vec3 ambient = ambientStrength * ubo.lightSources[i].color;
+        vec3 ambient = ambientStrength * ubo.lightSources[i].color*
+        texture(texSampler, fragTexCoord).rgb;
   	
         // diffuse 
         vec3 norm = normalize(inNormal);
         vec3 lightDir = normalize(ubo.lightSources[i].position - inPos.xyz);
         float diff = max(dot(norm, lightDir), 0.0);
-        vec3 diffuse = diff* ubo.lightSources[i].intensity * ubo.lightSources[i].color;
+        vec3 diffuse = diff* vec3(0.5f, 0.5f, 0.5f)
+        * ubo.lightSources[i].color* texture(texSampler, fragTexCoord).rgb;
     
         // specular
         float specularStrength = 0.5;
         vec3 viewDir = normalize(camPos - inPos.xyz);
         vec3 reflectDir = reflect(-lightDir, norm);  
         float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
-        vec3 specular = specularStrength* ubo.lightSources[i].intensity * spec * ubo.lightSources[i].color;  
+        vec3 specular = specularStrength* vec3(1.0f, 1.0f, 1.0f) * spec
+        * ubo.lightSources[i].color*texture(specTexSampler,fragTexCoord).rgb;  
         
-        result += (ambient + diffuse + specular) * texture(texSampler, fragTexCoord).rgb;
+        result += ambient + diffuse + specular;
     }
 
 

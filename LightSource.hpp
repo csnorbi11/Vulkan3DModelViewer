@@ -2,7 +2,7 @@
 #include "RendererCommon.h"
 #include "Object.hpp"
 
-class LightSource : public Object
+class LightSource : public Object<VertexColor>
 {
 public:
 	LightSource() = default;
@@ -13,4 +13,8 @@ public:
 		glm::vec3 color = glm::vec3(1.0f), float intensity = 1.0f);
 	glm::vec3 color;
 	float intensity;
+
+	void cleanup(VkDevice device) override;
+
+
 };

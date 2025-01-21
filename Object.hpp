@@ -3,7 +3,7 @@
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
 
-
+template <typename T>
 class Object
 {
 public:
@@ -12,13 +12,33 @@ public:
 
 	Object(DeviceManager& deviceManager,
 	       VkCommandPool commandPool,
-	       std::vector<Vertex> vertices, std::vector<uint32_t> indices,
-	       std::string name);
+	       std::vector<T> vertices, std::vector<uint32_t> indices,
+	       std::string name)
+		:
+		position(glm::vec3(0.0f)),
+		rotation(glm::vec3(0.0f)),
+		scale(glm::vec3(1.0f)),
+		name(name),
+		vertexBuffer(deviceManager, commandPool, vertices),
+		indexBuffer(deviceManager, commandPool, indices)
+	{
+	}
 
-	virtual void cleanup(VkDevice device);
+	virtual void cleanup(VkDevice device)
+	{
+		vkDeviceWaitIdle(device);
+		vertexBuffer.cleanup(device);
+		indexBuffer.cleanup(device);
+	}
 
-	VertexBuffer& getVertexBuffer();
-	IndexBuffer& getIndexBuffer();
+	VertexBuffer<T>& getVertexBuffer()
+	{
+		return vertexBuffer;
+	}
+	IndexBuffer& getIndexBuffer()
+	{
+		return indexBuffer;
+	}
 
 	std::vector<VkDescriptorSet> descriptorSets;
 
@@ -27,7 +47,7 @@ public:
 	glm::vec3 scale;
 	std::string name;
 
-protected:
-	VertexBuffer vertexBuffer;
+private:
+	VertexBuffer<T> vertexBuffer;
 	IndexBuffer indexBuffer;
 };

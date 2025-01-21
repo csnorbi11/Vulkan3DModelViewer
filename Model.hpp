@@ -5,7 +5,7 @@
 
 
 
-class Model : public Object
+class Model : public Object<VertexNormalTexture>
 {
 public:
 	Model() = default;
@@ -13,7 +13,7 @@ public:
 
 	Model(DeviceManager& deviceManager,
 	      VkCommandPool commandPool,
-	      std::vector<Vertex> vertices, std::vector<uint32_t> indices,
+	      std::vector<VertexNormalTexture> vertices, std::vector<uint32_t> indices,
 	      std::vector<Texture> textures, std::string name);
 
 

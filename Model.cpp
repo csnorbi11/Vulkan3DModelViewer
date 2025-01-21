@@ -2,10 +2,10 @@
 
 Model::Model(DeviceManager& deviceManager,
              VkCommandPool commandPool,
-             std::vector<Vertex> vertices, std::vector<uint32_t> indices,
+             std::vector<VertexNormalTexture> vertices, std::vector<uint32_t> indices,
              std::vector<Texture> textures, std::string name)
 	:
-	Object(deviceManager, commandPool, vertices, indices, name),
+	Object<VertexNormalTexture>(deviceManager, commandPool, vertices, indices, name),
 	textures(textures)
 {
 }
@@ -14,7 +14,7 @@ Model::Model(DeviceManager& deviceManager,
 void Model::cleanup(VkDevice device)
 {
 
-	Object::cleanup(device);
+	Object<VertexNormalTexture>::cleanup(device);
 	for (auto& texture : textures)
 	{
 		texture.cleanup(device);

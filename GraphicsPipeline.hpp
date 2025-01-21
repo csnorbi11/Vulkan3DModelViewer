@@ -2,6 +2,7 @@
 #include "RendererCommon.h"
 #include "DeviceManager.hpp"
 #include "UniformBuffer.hpp"
+#include "Shader.hpp"
 
 
 class GraphicsPipeline
@@ -13,7 +14,7 @@ public:
 	GraphicsPipeline(DeviceManager& deviceManager, VkExtent2D swapchainExtent,
 	                 VkFormat swapchainImageFormat, VkRenderPass renderpass,
 	                 int MAX_FRAMES_IN_FLIGHT, UniformBuffer uniformBuffer,
-	                 std::string name, const std::string& vertShader, const std::string& fragShader);
+	                 std::string name, const Shader& vertexShader, const Shader& fragmentShader);
 
 	void cleanup(VkDevice device);
 
@@ -22,7 +23,6 @@ public:
 	const std::string& getName();
 
 private:
-	VkShaderModule createShaderModule(VkDevice device, const std::vector<char>& code);
 
 	const std::string name;
 

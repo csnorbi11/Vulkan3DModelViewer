@@ -16,7 +16,7 @@ Model ModelLoader::loadModel(const std::string PATH, bool verticalFlipTexture)
 	std::vector<tinyobj::material_t> materials;
 	std::string warn;
 
-	std::vector<Vertex> vertices;
+	std::vector<VertexNormalTexture> vertices;
 	std::vector<uint32_t> indices;
 	std::vector<Texture> textures;
 
@@ -35,8 +35,8 @@ Model ModelLoader::loadModel(const std::string PATH, bool verticalFlipTexture)
 	{
 		for (const auto& index : shape.mesh.indices)
 		{
-			Vertex vertex{};
-			vertex.position = {
+			VertexNormalTexture vertex{};
+			vertex.pos = {
 				attrib.vertices[3 * index.vertex_index + 0],
 				attrib.vertices[3 * index.vertex_index + 1],
 				attrib.vertices[3 * index.vertex_index + 2]
@@ -77,9 +77,13 @@ Model ModelLoader::loadModel(const std::string PATH, bool verticalFlipTexture)
 		std::cout << "\t" << i << "specular:\t" << materials[i].specular_texname << std::endl;
 		std::cout << "\t" << i << ". normal:\t" << materials[i].normal_texname << std::endl;
 		std::cout << "\t" << i << ". normal:\t" << materials[i].roughness_texname << std::endl;
-		if (materials[i].diffuse_texname != "")
+		if (!materials[i].diffuse_texname.empty())
 		{
 			textures.emplace_back(deviceManager, commandPool, path + materials[i].diffuse_texname);
+		}
+		if (!materials[i].specular_texname.empty())
+		{
+			textures.emplace_back(deviceManager, commandPool, path + materials[i].specular_texname);
 		}
 	}
 

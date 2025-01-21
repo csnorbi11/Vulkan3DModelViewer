@@ -86,7 +86,7 @@ void UniformBuffer::recreateDynamicBuffer()
 
 void UniformBuffer::calculateDynamicBuffer()
 {
-	bufferSize = dynamicAlignment * MAX_FRAMES_IN_FLIGHT * (models.size()+lightSources.size());
+	bufferSize = dynamicAlignment * MAX_FRAMES_IN_FLIGHT * (models.size() + lightSources.size());
 
 	dynamicUbo.model = static_cast<glm::mat4*>(_aligned_realloc(dynamicUbo.model, bufferSize, dynamicAlignment));
 	assert(dynamicUbo.model);
@@ -101,7 +101,7 @@ void UniformBuffer::updateStatic(uint32_t currentFrame)
 	staticUbo.proj = glm::perspective(glm::radians(80.0f),
 		swapchainExtent.width / static_cast<float>(swapchainExtent.height), 0.1f, 100.0f);
 	staticUbo.proj[1][1] *= -1;
-	for (size_t i=0;i<std::min(MAX_LIGHTS,lightSources.size());i++)
+	for (size_t i = 0; i < std::min(MAX_LIGHTS, lightSources.size()); i++)
 	{
 		staticUbo.lightSources[i].position = lightSources[i].position;
 		staticUbo.lightSources[i].color = lightSources[i].color;
@@ -113,7 +113,7 @@ void UniformBuffer::updateStatic(uint32_t currentFrame)
 
 void UniformBuffer::updateDynamic(uint32_t currentFrame)
 {
-	if (models.empty()&&lightSources.empty())
+	if (models.empty() && lightSources.empty())
 		return;
 	uint32_t dim = static_cast<uint32_t>(pow(2, (1.0f / 3.0f)));
 	size_t offset = 0;
@@ -190,15 +190,22 @@ void UniformBuffer::createDescriptorSetLayout()
 	dynamicboLayoutBinding.pImmutableSamplers = nullptr;
 	dynamicboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
-	VkDescriptorSetLayoutBinding samplerLayoutBinding{};
-	samplerLayoutBinding.binding = 2;
-	samplerLayoutBinding.descriptorCount = 1;
-	samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	samplerLayoutBinding.pImmutableSamplers = nullptr;
-	samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+	VkDescriptorSetLayoutBinding samplerLayoutBinding1{};
+	samplerLayoutBinding1.binding = 2;
+	samplerLayoutBinding1.descriptorCount = 1;
+	samplerLayoutBinding1.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	samplerLayoutBinding1.pImmutableSamplers = nullptr;
+	samplerLayoutBinding1.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-	std::array<VkDescriptorSetLayoutBinding, 3> bindings = {
-		uboLayoutBinding, dynamicboLayoutBinding, samplerLayoutBinding
+	VkDescriptorSetLayoutBinding samplerLayoutBinding2{};
+	samplerLayoutBinding2.binding = 3;
+	samplerLayoutBinding2.descriptorCount = 1;
+	samplerLayoutBinding2.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	samplerLayoutBinding2.pImmutableSamplers = nullptr;
+	samplerLayoutBinding2.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+	std::array<VkDescriptorSetLayoutBinding, 4> bindings = {
+		uboLayoutBinding, dynamicboLayoutBinding, samplerLayoutBinding1, samplerLayoutBinding2
 	};
 	VkDescriptorSetLayoutCreateInfo layoutInfo{};
 	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
@@ -231,87 +238,5 @@ void UniformBuffer::createDescriptorPool(const int MAX_FRAMES_IN_FLIGHT)
 	if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS)
 	{
 		throw std::runtime_error("failed to create descriptor pool!");
-	}
-}
-
-void UniformBuffer::createDescriptorSets(Object& object, const int MAX_FRAMES_IN_FLIGHT)
-{
-	std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT * 2);
-	layouts[0] = descriptorSetLayout;
-	layouts[1] = descriptorSetLayout;
-
-
-	VkDescriptorSetAllocateInfo allocInfo{};
-	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	allocInfo.descriptorPool = descriptorPool;
-	allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-	allocInfo.pSetLayouts = layouts.data();
-
-	object.descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
-	if (vkAllocateDescriptorSets(device, &allocInfo, object.descriptorSets.data()) != VK_SUCCESS)
-	{
-		throw std::runtime_error("failed to allocate descriptor sets!");
-	}
-
-	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-	{
-		VkDescriptorBufferInfo staticBufferInfo{};
-		staticBufferInfo.buffer = uniformBuffers.staticBuffers[i];
-		staticBufferInfo.offset = 0;
-		staticBufferInfo.range = sizeof(staticUbo);
-
-		VkDescriptorBufferInfo modelDynamicBufferInfo{};
-		modelDynamicBufferInfo.buffer = uniformBuffers.dynamicBuffers[i];
-		modelDynamicBufferInfo.offset = 0;
-		modelDynamicBufferInfo.range = dynamicAlignment;
-
-
-		VkWriteDescriptorSet staticDescriptorWrite{};
-		VkWriteDescriptorSet modelDynamicDescriptorWrite{};
-
-		staticDescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		staticDescriptorWrite.dstSet = object.descriptorSets[i];
-		staticDescriptorWrite.dstBinding = 0;
-		staticDescriptorWrite.dstArrayElement = 0;
-		staticDescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		staticDescriptorWrite.descriptorCount = 1;
-		staticDescriptorWrite.pBufferInfo = &staticBufferInfo;
-		staticDescriptorWrite.pImageInfo = nullptr;
-		staticDescriptorWrite.pTexelBufferView = nullptr;
-
-		modelDynamicDescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		modelDynamicDescriptorWrite.dstSet = object.descriptorSets[i];
-		modelDynamicDescriptorWrite.dstBinding = 1;
-		modelDynamicDescriptorWrite.dstArrayElement = 0;
-		modelDynamicDescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
-		modelDynamicDescriptorWrite.descriptorCount = 1;
-		modelDynamicDescriptorWrite.pBufferInfo = &modelDynamicBufferInfo;
-		modelDynamicDescriptorWrite.pImageInfo = nullptr;
-		modelDynamicDescriptorWrite.pTexelBufferView = nullptr;
-
-		vkUpdateDescriptorSets(device, 1, &staticDescriptorWrite, 0, nullptr);
-		vkUpdateDescriptorSets(device, 1, &modelDynamicDescriptorWrite, 0, nullptr);
-
-		if (typeid(object).name() != typeid(Model).name())
-		{
-			continue;
-		}
-		auto model = dynamic_cast<Model*>(&object);
-
-		VkDescriptorImageInfo imageInfo{};
-		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		imageInfo.imageView = model->getTextures()[0].getImageView();
-		imageInfo.sampler = model->getTextures()[0].getSampler();
-
-		VkWriteDescriptorSet textureDescriptorWrite{};
-		textureDescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		textureDescriptorWrite.dstSet = model->descriptorSets[i];
-		textureDescriptorWrite.dstBinding = 2;
-		textureDescriptorWrite.dstArrayElement = 0;
-		textureDescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		textureDescriptorWrite.descriptorCount = 1;
-		textureDescriptorWrite.pImageInfo = &imageInfo;
-
-		vkUpdateDescriptorSets(device, 1, &textureDescriptorWrite, 0, nullptr);
 	}
 }
