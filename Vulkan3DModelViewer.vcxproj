@@ -171,7 +171,6 @@
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="Msaa.cpp" />
-    <ClCompile Include="Object.cpp" />
     <ClCompile Include="RendererCommon.cpp" />
     <ClCompile Include="RendererCommon.h" />
     <ClCompile Include="RenderPass.cpp" />
@@ -182,7 +181,6 @@
     <ClCompile Include="UniformBuffer.cpp" />
     <ClCompile Include="ValidationLayers.cpp" />
     <ClCompile Include="Vertex.cpp" />
-    <ClCompile Include="VertexBuffer.cpp" />
     <ClCompile Include="VulkanRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
