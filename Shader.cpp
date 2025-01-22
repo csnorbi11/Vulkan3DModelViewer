@@ -18,12 +18,19 @@ void Shader::createModule(VkDevice device, const std::string& filename)
 	}
 }
 
+Shader::~Shader()
+{
+	vkDestroyShaderModule(device, shaderModule, nullptr);
+}
+
 Shader::Shader(VkDevice device, const std::string& filename,
 	VertexAttribute vertexAttributes)
+	:
+	device(device)
 {
 	createModule(device, filename);
 
-	if (vertexAttributes == (VertexAttribute::POSITION & VertexAttribute::COLOR))
+	if (vertexAttributes == (VertexAttribute::POSITION | VertexAttribute::COLOR))
 	{
 		bindingDescription.stride = sizeof(VertexColor);
 
@@ -39,7 +46,7 @@ Shader::Shader(VkDevice device, const std::string& filename,
 		attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
 		attributeDescriptions[1].offset = offsetof(VertexColor, color);
 	}
-	else if (vertexAttributes == (VertexAttribute::POSITION & VertexAttribute::NORMAL &
+	else if (vertexAttributes == (VertexAttribute::POSITION | VertexAttribute::NORMAL |
 		VertexAttribute::TEXCOORD))
 	{
 		bindingDescription.stride = sizeof(VertexNormalTexture);

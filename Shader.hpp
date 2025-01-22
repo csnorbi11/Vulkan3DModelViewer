@@ -1,12 +1,11 @@
 #pragma once
 #include "RendererCommon.h"
 
-
 class Shader
 {
 public:
 	Shader() = default;
-	~Shader() = default;
+	~Shader();
 
 	Shader(VkDevice device, const std::string& filename,
 		VertexAttribute vertexAttributes);
@@ -23,6 +22,8 @@ private:
 	VkShaderModule shaderModule;
 	VkVertexInputBindingDescription bindingDescription;
 	std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
+
+	VkDevice device;
 };
 
 

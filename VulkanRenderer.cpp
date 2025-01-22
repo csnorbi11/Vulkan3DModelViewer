@@ -29,25 +29,25 @@ VulkanRenderer::VulkanRenderer(GLFWwindow* window, int& windowWidth, int& window
 		deviceManager->getPhysicalDeviceProperties(),
 		models, lightSources, camera);
 
-	Shader modelVertShader(deviceManager->getDevice(), "shadervert.spv",
-		VertexAttribute::POSITION & VertexAttribute::NORMAL & VertexAttribute::TEXCOORD);
-	Shader modelFragShader(deviceManager->getDevice(), "shader.fragrag.spv",
-		VertexAttribute::POSITION & VertexAttribute::COLOR);
-	Shader lightVertShader(deviceManager->getDevice(), "lightblubvert.spv",
-		VertexAttribute::POSITION & VertexAttribute::COLOR);
-	Shader lightFragShader(deviceManager->getDevice(), "lightblub.fragrag.spv",
-		VertexAttribute::POSITION & VertexAttribute::COLOR);
+	std::unique_ptr<Shader> modelVertShader=std::make_unique<Shader>(deviceManager->getDevice(), "shadervert.spv",
+		VertexAttribute::POSITION | VertexAttribute::NORMAL | VertexAttribute::TEXCOORD);
+	std::unique_ptr<Shader> modelFragShader = std::make_unique<Shader>(deviceManager->getDevice(), "shader.fragrag.spv",
+		VertexAttribute::POSITION | VertexAttribute::COLOR);
+	std::unique_ptr<Shader> lightVertShader = std::make_unique<Shader>(deviceManager->getDevice(), "lightblubvert.spv",
+		VertexAttribute::POSITION | VertexAttribute::COLOR);
+	std::unique_ptr<Shader> lightFragShader = std::make_unique<Shader>(deviceManager->getDevice(), "lightblub.fragrag.spv",
+		VertexAttribute::POSITION | VertexAttribute::COLOR);
 	graphicsPipelines.emplace_back(GraphicsPipeline(*deviceManager, swapchainManager->getImageExtent(),
 		swapchainManager->getImageFormat(),
 		swapchainManager->getRenderPass().getRenderPass(),
-		MAX_FRAMES_IN_FLIGHT, *uniformBuffer, "modelShader", modelVertShader,
-		modelFragShader));
+		MAX_FRAMES_IN_FLIGHT, *uniformBuffer, "modelShader", *modelVertShader,
+		*modelFragShader));
 
 	graphicsPipelines.emplace_back(GraphicsPipeline(*deviceManager, swapchainManager->getImageExtent(),
 		swapchainManager->getImageFormat(),
 		swapchainManager->getRenderPass().getRenderPass(),
 		MAX_FRAMES_IN_FLIGHT, *uniformBuffer, "lightShader",
-		lightVertShader, lightFragShader));
+		*lightVertShader, *lightFragShader));
 
 	commandbuffer = std::make_unique<CommandBuffer>(deviceManager->getDevice(), deviceManager->getIndices(),
 		swapchainManager->getRenderPass().getRenderPass(),
