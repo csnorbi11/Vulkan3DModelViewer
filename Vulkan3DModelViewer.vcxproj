@@ -181,6 +181,7 @@
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="UniformBuffer.cpp" />
     <ClCompile Include="ValidationLayers.cpp" />
+    <ClCompile Include="Vertex.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
     <ClCompile Include="VulkanRenderer.cpp" />
   </ItemGroup>
@@ -209,6 +210,7 @@
     <ClInclude Include="Texture.hpp" />
     <ClInclude Include="UniformBuffer.hpp" />
     <ClInclude Include="ValidationLayers.hpp" />
+    <ClInclude Include="Vertex.hpp" />
     <ClInclude Include="VertexBuffer.hpp" />
     <ClInclude Include="VulkanRenderer.hpp" />
   </ItemGroup>

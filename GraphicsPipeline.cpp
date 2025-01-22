@@ -3,12 +3,14 @@
 
 
 GraphicsPipeline::GraphicsPipeline(DeviceManager& deviceManager, VkExtent2D swapchainExtent,
-                                   VkFormat swapchainImageFormat, VkRenderPass renderpass,
-                                   const int MAX_FRAMES_IN_FLIGHT, UniformBuffer uniformBuffer,
-                                   const std::string name, const Shader& vertexShader, const Shader& fragmentShader)
+	VkFormat swapchainImageFormat, VkRenderPass renderpass,
+	const int MAX_FRAMES_IN_FLIGHT, UniformBuffer uniformBuffer,
+	const std::string name, const Shader& vertexShader, const Shader& fragmentShader)
 	:
 	name(name)
 {
+	assert(vertexShader.getType() == ShaderType::VERTEX);
+	assert(fragmentShader.getType() == ShaderType::FRAGMENT);
 
 	VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
 	vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -23,16 +25,30 @@ GraphicsPipeline::GraphicsPipeline(DeviceManager& deviceManager, VkExtent2D swap
 	fragShaderStageInfo.pName = "main";
 
 
-	VkPipelineShaderStageCreateInfo shaderStages[] = {vertShaderStageInfo, fragShaderStageInfo};
+	VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
 
-
+	VkVertexInputBindingDescription bindingDescription;
+	std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
+	switch (vertexShader.getVertexAttributes())
+	{
+	case VertexAttribute::POSITION | VertexAttribute::COLOR:
+		bindingDescription = VertexColor::getBindingDescription();
+		attributeDescriptions = VertexColor::getAttributeDescriptions();
+		break;
+	case VertexAttribute::POSITION | VertexAttribute::NORMAL | VertexAttribute::TEXCOORD:
+		bindingDescription = VertexNormalTexture::getBindingDescription();
+		attributeDescriptions = VertexNormalTexture::getAttributeDescriptions();
+		break;
+	default:
+		break;
+	}
 
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 	vertexInputInfo.vertexBindingDescriptionCount = 1;
-	vertexInputInfo.pVertexBindingDescriptions = &vertexShader.getBindingDescription();
-	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(vertexShader.getAttributeDescriptions().size());
-	vertexInputInfo.pVertexAttributeDescriptions = vertexShader.getAttributeDescriptions().data();
+	vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+	vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
 	VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
 	inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -48,7 +64,7 @@ GraphicsPipeline::GraphicsPipeline(DeviceManager& deviceManager, VkExtent2D swap
 	viewport.maxDepth = 1.0f;
 
 	VkRect2D scissor{};
-	scissor.offset = {0, 0};
+	scissor.offset = { 0, 0 };
 	scissor.extent = swapchainExtent;
 
 	VkPipelineViewportStateCreateInfo viewportState{};

@@ -27,34 +27,7 @@ const bool enableValidationLayers = false;
 constexpr bool enableValidationLayers = true;
 #endif
 
-enum class VertexAttribute : unsigned int
-{
-	POSITION = 0x01,
-	NORMAL = 0x02,
-	TEXCOORD = 0x04,
-	COLOR = 0x08,
-};
 
-struct VertexColor
-{
-	glm::vec3 pos;
-	glm::vec3 color;
-	bool operator==(const VertexColor& other) const
-	{
-		return pos == other.pos && color == other.color;
-	}
-};
-struct VertexNormalTexture
-{
-	glm::vec3 pos;
-	glm::vec3 normal;
-	glm::vec2 texCoord;
-
-	bool operator==(const VertexNormalTexture& other) const
-	{
-		return pos == other.pos && normal == other.normal && texCoord == other.texCoord;
-	}
-};
 
 struct QueueFamilyIndices
 {

@@ -2,7 +2,7 @@
 #include "RendererCommon.h"
 #include "Object.hpp"
 #include "Texture.hpp"
-
+#include "Vertex.hpp"
 
 
 class Model : public Object<VertexNormalTexture>

@@ -1,6 +1,7 @@
 #pragma once
 #include "RendererCommon.h"
 #include "Object.hpp"
+#include "Vertex.hpp"
 
 class LightSource : public Object<VertexColor>
 {

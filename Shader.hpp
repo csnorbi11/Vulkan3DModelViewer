@@ -1,5 +1,12 @@
 #pragma once
 #include "RendererCommon.h"
+#include "Vertex.hpp"
+
+enum class ShaderType
+{
+	VERTEX,
+	FRAGMENT
+};
 
 class Shader
 {
@@ -7,21 +14,20 @@ public:
 	Shader() = default;
 	~Shader();
 
-	Shader(VkDevice device, const std::string& filename,
-		VertexAttribute vertexAttributes);
+	Shader(VkDevice device, const std::string& filename, ShaderType type,
+		VertexAttribute vertexAttributes = VertexAttribute::NONE);
 
 	VkShaderModule getModule() const;
-	const VkVertexInputBindingDescription& getBindingDescription() const;
-	const std::vector<VkVertexInputAttributeDescription>& getAttributeDescriptions() const;
+	VertexAttribute getVertexAttributes() const;
+	ShaderType getType() const;
 
-	void cleanup(VkDevice device);
 
 private:
 	void createModule(VkDevice device, const std::string& filename);
 
 	VkShaderModule shaderModule;
-	VkVertexInputBindingDescription bindingDescription;
-	std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
+	VertexAttribute vertexAttributes;
+	ShaderType type;
 
 	VkDevice device;
 };
