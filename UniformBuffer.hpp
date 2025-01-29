@@ -154,7 +154,8 @@ public:
 private:
 	void create(int MAX_FRAMES_IN_FLIGHT, const VkPhysicalDevice& physicalDevice);
 	void createDescriptorSetLayout();
-	void createDescriptorPool(int MAX_FRAMES_IN_FLIGHT);
+	void createDescriptorPool(int MAX_FRAMES_IN_FLIGHT, 
+		std::vector<VkDescriptorType> descriptorTypes);
 
 	const std::vector<Model>& models;
 	const std::vector<LightSource>& lightSources;

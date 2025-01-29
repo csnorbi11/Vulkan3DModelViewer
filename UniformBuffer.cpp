@@ -42,7 +42,9 @@ UniformBuffer::UniformBuffer(const VkDevice& device, const VkPhysicalDevice& phy
 
 	create(MAX_FRAMES_IN_FLIGHT, physicalDevice);
 	createDescriptorSetLayout();
-	createDescriptorPool(MAX_FRAMES_IN_FLIGHT);
+	createDescriptorPool(MAX_FRAMES_IN_FLIGHT,{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+	VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
+		VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER});
 
 }
 
@@ -98,8 +100,8 @@ void UniformBuffer::updateStatic(uint32_t currentFrame)
 	staticUbo.camPos.y = camera.getPosition().y;
 	staticUbo.camPos.z = camera.getPosition().z;
 	staticUbo.view = camera.getViewMatrix();
-	staticUbo.proj = glm::perspective(glm::radians(80.0f),
-		swapchainExtent.width / static_cast<float>(swapchainExtent.height), 0.1f, 100.0f);
+	staticUbo.proj = glm::perspective(glm::radians(65.0f),
+		static_cast<float>(swapchainExtent.width) / static_cast<float>(swapchainExtent.height), 0.1f, 100.0f);
 	staticUbo.proj[1][1] *= -1;
 	for (size_t i = 0; i < std::min(MAX_LIGHTS, lightSources.size()); i++)
 	{
@@ -218,15 +220,16 @@ void UniformBuffer::createDescriptorSetLayout()
 	}
 }
 
-void UniformBuffer::createDescriptorPool(const int MAX_FRAMES_IN_FLIGHT)
+void UniformBuffer::createDescriptorPool(int MAX_FRAMES_IN_FLIGHT,
+	std::vector<VkDescriptorType> descriptorTypes)
 {
-	std::array<VkDescriptorPoolSize, 3> poolSizes{};
-	poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	poolSizes[0].descriptorCount = UINT32_MAX;
-	poolSizes[1].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
-	poolSizes[1].descriptorCount = UINT32_MAX;
-	poolSizes[2].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	poolSizes[2].descriptorCount = UINT32_MAX;
+	std::vector<VkDescriptorPoolSize> poolSizes{};
+	poolSizes.resize(descriptorTypes.size());
+	for (size_t i = 0; i < descriptorTypes.size(); i++)
+	{
+		poolSizes[i].type = descriptorTypes[i];
+		poolSizes[i].descriptorCount = UINT32_MAX;
+	}
 
 	VkDescriptorPoolCreateInfo poolInfo{};
 	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
