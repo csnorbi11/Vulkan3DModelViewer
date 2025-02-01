@@ -1,4 +1,4 @@
-<img src="https://github.com/csnorbi11/Vulkan3DModelViewer/blob/master/screenshot_1.png?raw=true">
+<img src="https://github.com/csnorbi11/Vulkan3DModelViewer/blob/master/screenshot_2.png?raw=true">
 
 <p align="center">
   <img align="center" src="https://img.shields.io/badge/Platform-Windows-brightgreen">
@@ -13,9 +13,10 @@ This project is a 3D model viewer and it's purpose to get started with Vulkan an
   <li>Multiple object loading/unloading, </li>  
   <ul>
     <li>flip texture coordinates</li>
-    <li>Wavefront Object (only loads if the material if in the program root dir)</li>
-    <li>More formats coming</li>
+    <li>Wavefront Object (only attached models are guaranteed to load correctly)</li>
+    <li>Specular texture supported</li>
   </ul>
+  <li>Basic Phong lighting</li>
   <li>Camera movement, rotation</li>
   <li>Able to set position and rotation of the models</li>
   <li>Reset position and rotation</li>
