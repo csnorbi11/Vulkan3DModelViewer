@@ -27,6 +27,7 @@ UniformBuffer::UniformBuffer(const VkDevice& device, const VkPhysicalDevice& phy
 	lightSources(lightSources),
 	camera(camera),
 	MAX_MODEL_COUNT(1000),
+	lightCount(0),
 	staticUbo{},
 	device(device),
 	physicalDevice(physicalDevice),
@@ -42,9 +43,9 @@ UniformBuffer::UniformBuffer(const VkDevice& device, const VkPhysicalDevice& phy
 
 	create(MAX_FRAMES_IN_FLIGHT, physicalDevice);
 	createDescriptorSetLayout();
-	createDescriptorPool(MAX_FRAMES_IN_FLIGHT,{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+	createDescriptorPool(MAX_FRAMES_IN_FLIGHT, { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 	VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
-		VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER});
+		VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER });
 
 }
 
@@ -96,6 +97,16 @@ void UniformBuffer::calculateDynamicBuffer()
 
 void UniformBuffer::updateStatic(uint32_t currentFrame)
 {
+	if (lightCount != lightSources.size())
+	{
+		for (size_t i = 0; i < lightCount; i++)
+		{
+			staticUbo.lightSources[i].color = glm::vec3(0.0f);
+		}
+		lightCount = lightSources.size();
+	}
+
+
 	staticUbo.camPos.x = camera.getPosition().x;
 	staticUbo.camPos.y = camera.getPosition().y;
 	staticUbo.camPos.z = camera.getPosition().z;

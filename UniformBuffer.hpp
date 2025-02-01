@@ -162,6 +162,7 @@ private:
 	size_t bufferSize;
 
 	const uint32_t MAX_MODEL_COUNT;
+	size_t lightCount;
 
 	StaticUbo staticUbo;
 	ModelDynamicUbo dynamicUbo;

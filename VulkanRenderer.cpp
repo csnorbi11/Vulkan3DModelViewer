@@ -278,9 +278,15 @@ void VulkanRenderer::deleteLightSource(LightSource& lightSource)
 		if (&(*it) == &lightSource)
 		{
 			lightSources.erase(it);
-			return;
+			break;
 		}
 	}
+	uniformBuffer->calculateDynamicBuffer();
+	uniformBuffer->recreateDynamicBuffer();
+	for (auto& model : models)
+		uniformBuffer->createDescriptorSets(model, MAX_FRAMES_IN_FLIGHT);
+	for (auto& lightSource : lightSources)
+		uniformBuffer->createDescriptorSets(lightSource, MAX_FRAMES_IN_FLIGHT);
 }
 
 void VulkanRenderer::deleteModel(Model& model)
