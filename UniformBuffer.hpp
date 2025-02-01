@@ -28,10 +28,6 @@ struct ModelDynamicUbo
 	glm::mat4* model{nullptr};
 };
 
-struct LightsDynamicUbo
-{
-	LightStruct* lightSource{nullptr};
-};
 
 struct UniformBuffers
 {

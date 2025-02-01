@@ -72,11 +72,6 @@ Model ModelLoader::loadModel(const std::string PATH, bool verticalFlipTexture)
 	bool hasTexture = false;
 	for (size_t i = 0; i < materials.size(); i++)
 	{
-		std::cout << path << " " << i << ". diffuse:\t" << materials[i].diffuse_texname << std::endl;
-		std::cout << path << "\t" << i << ". bump:\t" << materials[i].bump_texname << std::endl;
-		std::cout << "\t" << i << "specular:\t" << materials[i].specular_texname << std::endl;
-		std::cout << "\t" << i << ". normal:\t" << materials[i].normal_texname << std::endl;
-		std::cout << "\t" << i << ". normal:\t" << materials[i].roughness_texname << std::endl;
 		if (!materials[i].diffuse_texname.empty())
 		{
 			textures.emplace_back(deviceManager, commandPool, path + materials[i].diffuse_texname);

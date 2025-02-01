@@ -44,7 +44,8 @@ void main(){
         vec3 lightDir = normalize(ubo.lightSources[i].position - inPos.xyz);
         float diff = max(dot(norm, lightDir), 0.0);
         vec3 diffuse = diff* vec3(0.5f, 0.5f, 0.5f)
-        * ubo.lightSources[i].color* texture(texSampler, fragTexCoord).rgb;
+        * ubo.lightSources[i].color* texture(texSampler, fragTexCoord).rgb
+        * ubo.lightSources[i].intensity;
     
         // specular
         float specularStrength = 0.5;
@@ -52,7 +53,8 @@ void main(){
         vec3 reflectDir = reflect(-lightDir, norm);  
         float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
         vec3 specular = specularStrength* vec3(1.0f, 1.0f, 1.0f) * spec
-        * ubo.lightSources[i].color*texture(specTexSampler,fragTexCoord).rgb;  
+        * ubo.lightSources[i].color*texture(specTexSampler,fragTexCoord).rgb
+        * ubo.lightSources[i].intensity;  
         
         result += ambient + diffuse + specular;
     }
